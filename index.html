@@ -59,6 +59,9 @@
                 <a href="#" class="desktop-nav-item" data-screen="notifications">
                     <i class="fas fa-bell"></i> <span>Notificações</span>
                 </a>
+                <a href="#" class="desktop-nav-item" data-screen="symptoms">
+                    <i class="fas fa-notes-medical"></i> <span>Triagem</span>
+                </a>
                 <a href="#" class="desktop-nav-item" data-screen="chat">
                     <i class="fas fa-comments"></i> <span>Chat Profissional</span>
                 </a>
@@ -102,359 +105,351 @@
 
                     <section class="quick-actions">
                         <div class="action-card" id="notifications-card">
-                            <div class="icon-container">
-                                <i class="fas fa-bell"></i>
-                            </div>
-                            <h3>Notificações</h3>
-                            <p>Alertas e boletins</p>
+                            <i class="fas fa-bell"></i>
+                            <span>Notificações</span>
                         </div>
                         <div class="action-card" id="chat-card">
-                            <div class="icon-container">
-                                <i class="fas fa-comments"></i>
-                            </div>
-                            <h3>Chat Profissional</h3>
-                            <p>Converse com a equipe</p>
+                            <i class="fas fa-comments"></i>
+                            <span>Chat</span>
                         </div>
                         <div class="action-card" id="library-card">
-                            <div class="icon-container">
-                                <i class="fas fa-book"></i>
-                            </div>
-                            <h3>Biblioteca</h3>
-                            <p>Materiais de referência</p>
                         </div>
-                    </section>
+                        <h3>Biblioteca</h3>
+                        <p>Materiais de referência</p>
+        </div>
+        </section>
 
-                    <section class="alerts-section">
-                        <div class="section-header">
-                            <h2>Alertas Recentes</h2>
-                            <a href="#" class="see-all" id="view-all-alerts">Ver todos</a>
-                        </div>
-                        <div id="recent-alerts">
-                            <!-- Alertas serão carregados dinamicamente -->
-                        </div>
-                    </section>
-                </section>
+        <section class="alerts-section">
+            <div class="section-header">
+                <h2>Alertas Recentes</h2>
+                <a href="#" class="see-all" id="view-all-alerts">Ver todos</a>
+            </div>
+            <div id="recent-alerts">
+                <!-- Alertas serão carregados dinamicamente -->
+            </div>
+        </section>
+        </section>
 
-                <!-- Tela de Notificações -->
-                <section class="screen" id="notifications-screen" style="display: none;">
-                    <div class="screen-header">
-                        <button class="back-button">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <h2>Notificações</h2>
-                        <div class="header-actions">
-                            <button class="icon-button" id="filter-notifications">
-                                <i class="fas fa-filter"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="content-container">
-                        <div class="filter-options" id="notification-filters" style="display: none;">
-                            <h3>Filtrar por:</h3>
-                            <div class="filter-tags">
-                                <button class="filter-tag active" data-filter="all">Todas</button>
-                                <button class="filter-tag" data-filter="alert">Alertas</button>
-                                <button class="filter-tag" data-filter="news">Notícias</button>
-                                <button class="filter-tag" data-filter="update">Atualizações</button>
-                            </div>
-                        </div>
-                        <div class="notifications-list" id="notifications-list">
-                            <!-- Notificações serão carregadas dinamicamente -->
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Tela de Chat -->
-                <section class="screen" id="chat-screen" style="display: none;">
-                    <div class="screen-header">
-                        <button class="back-button">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <h2>Chat Profissional</h2>
-                        <div class="header-actions">
-                            <button class="icon-button" id="new-chat">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="chat-container">
-                        <div class="chat-rooms" id="chat-rooms">
-                            <!-- Salas de chat serão carregadas dinamicamente -->
-                        </div>
-                        <div class="chat-messages" id="chat-messages" style="display: none;">
-                            <div class="chat-header">
-                                <button class="back-to-rooms">
-                                    <i class="fas fa-arrow-left"></i>
-                                </button>
-                                <h3 id="current-chat-name">Sala de Chat</h3>
-                                <div class="chat-actions">
-                                    <button class="icon-button" id="chat-info">
-                                        <i class="fas fa-info-circle"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="messages-container" id="messages-container">
-                                <!-- Mensagens serão carregadas dinamicamente -->
-                            </div>
-                            <div class="message-input-container">
-                                <button class="attachment-button">
-                                    <i class="fas fa-paperclip"></i>
-                                </button>
-                                <input type="text" id="message-input" placeholder="Digite sua mensagem...">
-                                <button class="send-button" id="send-message">
-                                    <i class="fas fa-paper-plane"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Tela de Biblioteca -->
-                <section class="screen" id="library-screen" style="display: none;">
-                    <div class="screen-header">
-                        <button class="back-button">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <h2>Biblioteca Digital</h2>
-                        <div class="header-actions">
-                            <button class="icon-button" id="search-library">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="content-container">
-                        <div class="search-container" id="library-search-container" style="display: none;">
-                            <div class="search-box">
-                                <i class="fas fa-search"></i>
-                                <input type="text" id="library-search" placeholder="Buscar na biblioteca...">
-                                <button class="clear-search" id="clear-search">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            <div class="filter-options">
-                                <select id="document-type-filter">
-                                    <option value="all">Todos os tipos</option>
-                                    <option value="protocol">Protocolos</option>
-                                    <option value="manual">Manuais</option>
-                                    <option value="technical-note">Notas Técnicas</option>
-                                    <option value="report">Relatórios</option>
-                                </select>
-                                <select id="disease-filter">
-                                    <option value="all">Todas as doenças</option>
-                                    <option value="dengue">Dengue</option>
-                                    <option value="zika">Zika</option>
-                                    <option value="chikungunya">Chikungunya</option>
-                                    <option value="covid">COVID-19</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="documents-list" id="documents-list">
-                            <!-- Documentos serão carregados dinamicamente -->
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Tela de Configurações -->
-                <section class="screen" id="settings-screen" style="display: none;">
-                    <div class="screen-header">
-                        <button class="back-button">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <h2>Configurações</h2>
-                    </div>
-                    <div class="content-container">
-                        <div class="settings-section">
-                            <h3>Conta</h3>
-                            <div class="setting-item">
-                                <div class="setting-info">
-                                    <i class="fas fa-user"></i>
-                                    <div>
-                                        <h4>Perfil</h4>
-                                        <p>Gerencie suas informações pessoais</p>
-                                    </div>
-                                </div>
-                                <i class="fas fa-chevron-right"></i>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-info">
-                                    <i class="fas fa-shield-alt"></i>
-                                    <div>
-                                        <h4>Privacidade</h4>
-                                        <p>Controle suas configurações de privacidade</p>
-                                    </div>
-                                </div>
-                                <i class="fas fa-chevron-right"></i>
-                            </div>
-                        </div>
-
-                        <div class="settings-section">
-                            <h3>Notificações</h3>
-                            <div class="setting-item toggle">
-                                <div class="setting-info">
-                                    <i class="fas fa-bell"></i>
-                                    <div>
-                                        <h4>Notificações por push</h4>
-                                        <p>Receba alertas importantes</p>
-                                    </div>
-                                </div>
-                                <label class="switch">
-                                    <input type="checkbox" checked>
-                                    <span class="slider round"></span>
-                                </label>
-                            </div>
-                            <div class="setting-item toggle">
-                                <div class="setting-info">
-                                    <i class="fas fa-envelope"></i>
-                                    <div>
-                                        <h4>Notificações por e-mail</h4>
-                                        <p>Receba atualizações por e-mail</p>
-                                    </div>
-                                </div>
-                                <label class="switch">
-                                    <input type="checkbox" checked>
-                                    <span class="slider round"></span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="settings-section">
-                            <h3>Geral</h3>
-                            <div class="setting-item">
-                                <div class="setting-info">
-                                    <i class="fas fa-moon"></i>
-                                    <div>
-                                        <h4>Tema</h4>
-                                        <p>Altere para o modo escuro ou claro</p>
-                                    </div>
-                                </div>
-                                <i class="fas fa-chevron-right"></i>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-info">
-                                    <i class="fas fa-language"></i>
-                                    <div>
-                                        <h4>Idioma</h4>
-                                        <p>Português (Brasil)</p>
-                                    </div>
-                                </div>
-                                <i class="fas fa-chevron-right"></i>
-                            </div>
-                        </div>
-
-                        <div class="settings-section">
-                            <h3>Sobre</h3>
-                            <div class="setting-item">
-                                <div class="setting-info">
-                                    <i class="fas fa-info-circle"></i>
-                                    <div>
-                                        <h4>Sobre o EpiConecta</h4>
-                                        <p>Versão 1.0.0</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-info">
-                                    <i class="fas fa-file-alt"></i>
-                                    <div>
-                                        <h4>Termos de Uso</h4>
-                                    </div>
-                                </div>
-                                <i class="fas fa-external-link-alt"></i>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-info">
-                                    <i class="fas fa-lock"></i>
-                                    <div>
-                                        <h4>Política de Privacidade</h4>
-                                    </div>
-                                </div>
-                                <i class="fas fa-external-link-alt"></i>
-                            </div>
-                        </div>
-
-                        <button class="logout-button" id="logout-button">
-                            <i class="fas fa-sign-out-alt"></i>
-                            Sair da Conta
-                        </button>
-                    </div>
-                </section>
-            </main>
-        </div> <!-- End of content-wrapper -->
-
-        <!-- Bottom Navigation -->
-        <nav class="bottom-nav">
-            <a href="#" class="nav-item active" data-screen="dashboard">
-                <i class="fas fa-home"></i>
-                <span>Início</span>
-            </a>
-            <a href="#" class="nav-item" data-screen="chat">
-                <i class="fas fa-comment-medical"></i>
-                <span>Chat</span>
-            </a>
-            <a href="#" class="nav-item" data-screen="library">
-                <i class="fas fa-book-medical"></i>
-                <span>Biblioteca</span>
-            </a>
-            <a href="#" class="nav-item" data-screen="settings">
-                <i class="fas fa-cog"></i>
-                <span>Configurações</span>
-            </a>
-        </nav>
-
-        <!-- Modal de Notificação -->
-        <div class="modal" id="notification-modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 id="notification-modal-title">Título da Notificação</h3>
-                    <button class="close-button" id="close-notification-modal">
-                        <i class="fas fa-times"></i>
+        <!-- Tela de Notificações -->
+        <section class="screen" id="notifications-screen" style="display: none;">
+            <div class="screen-header">
+                <button class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2>Notificações</h2>
+                <div class="header-actions">
+                    <button class="icon-button" id="filter-notifications">
+                        <i class="fas fa-filter"></i>
                     </button>
                 </div>
-                <div class="modal-body" id="notification-modal-body">
-                    <!-- Conteúdo da notificação será inserido aqui -->
+            </div>
+            <div class="content-container">
+                <div class="filter-options" id="notification-filters" style="display: none;">
+                    <h3>Filtrar por:</h3>
+                    <div class="filter-tags">
+                        <button class="filter-tag active" data-filter="all">Todas</button>
+                        <button class="filter-tag" data-filter="alert">Alertas</button>
+                        <button class="filter-tag" data-filter="news">Notícias</button>
+                        <button class="filter-tag" data-filter="update">Atualizações</button>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" id="close-notification-btn">Fechar</button>
-                    <button class="btn btn-primary" id="notification-action-btn">Abrir</button>
+                <div class="notifications-list" id="notifications-list">
+                    <!-- Notificações serão carregadas dinamicamente -->
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Modal de Confirmação -->
-        <div class="modal" id="confirmation-modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 id="confirmation-modal-title">Confirmação</h3>
-                    <button class="close-button" id="close-confirmation-modal">
-                        <i class="fas fa-times"></i>
+        <!-- Tela de Chat -->
+        <section class="screen" id="chat-screen" style="display: none;">
+            <div class="screen-header">
+                <button class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2>Chat Profissional</h2>
+                <div class="header-actions">
+                    <button class="icon-button" id="new-chat">
+                        <i class="fas fa-plus"></i>
                     </button>
                 </div>
-                <div class="modal-body" id="confirmation-modal-body">
-                    <!-- Mensagem de confirmação será inserida aqui -->
+            </div>
+            <div class="chat-container">
+                <div class="chat-rooms" id="chat-rooms">
+                    <!-- Salas de chat serão carregadas dinamicamente -->
                 </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" id="cancel-confirmation-btn">Cancelar</button>
-                    <button class="btn btn-danger" id="confirm-action-btn">Confirmar</button>
+                <div class="chat-messages" id="chat-messages" style="display: none;">
+                    <div class="chat-header">
+                        <button class="back-to-rooms">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <h3 id="current-chat-name">Sala de Chat</h3>
+                        <div class="chat-actions">
+                            <button class="icon-button" id="chat-info">
+                                <i class="fas fa-info-circle"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="messages-container" id="messages-container">
+                        <!-- Mensagens serão carregadas dinamicamente -->
+                    </div>
+                    <div class="message-input-container">
+                        <button class="attachment-button">
+                            <i class="fas fa-paperclip"></i>
+                        </button>
+                        <input type="text" id="message-input" placeholder="Digite sua mensagem...">
+                        <button class="send-button" id="send-message">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Loading Overlay -->
-        <div class="loading-overlay" id="loading-overlay">
-            <div class="loading-spinner"></div>
-            <p id="loading-message">Carregando...</p>
+        <!-- Tela de Biblioteca -->
+        <section class="screen" id="library-screen" style="display: none;">
+            <div class="screen-header">
+                <button class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2>Biblioteca Digital</h2>
+                <div class="header-actions">
+                    <button class="icon-button" id="search-library">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="content-container">
+                <div class="search-container" id="library-search-container" style="display: none;">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="library-search" placeholder="Buscar na biblioteca...">
+                        <button class="clear-search" id="clear-search">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="filter-options">
+                        <select id="document-type-filter">
+                            <option value="all">Todos os tipos</option>
+                            <option value="protocol">Protocolos</option>
+                            <option value="manual">Manuais</option>
+                            <option value="technical-note">Notas Técnicas</option>
+                            <option value="report">Relatórios</option>
+                        </select>
+                        <select id="disease-filter">
+                            <option value="all">Todas as doenças</option>
+                            <option value="dengue">Dengue</option>
+                            <option value="zika">Zika</option>
+                            <option value="chikungunya">Chikungunya</option>
+                            <option value="covid">COVID-19</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="documents-list" id="documents-list">
+                    <!-- Documentos serão carregados dinamicamente -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Tela de Configurações -->
+        <section class="screen" id="settings-screen" style="display: none;">
+            <div class="screen-header">
+                <button class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2>Configurações</h2>
+            </div>
+            <div class="content-container">
+                <div class="settings-section">
+                    <h3>Conta</h3>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <i class="fas fa-user"></i>
+                            <div>
+                                <h4>Perfil</h4>
+                                <p>Gerencie suas informações pessoais</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <i class="fas fa-shield-alt"></i>
+                            <div>
+                                <h4>Privacidade</h4>
+                                <p>Controle suas configurações de privacidade</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>Notificações</h3>
+                    <div class="setting-item toggle">
+                        <div class="setting-info">
+                            <i class="fas fa-bell"></i>
+                            <div>
+                                <h4>Notificações por push</h4>
+                                <p>Receba alertas importantes</p>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item toggle">
+                        <div class="setting-info">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <h4>Notificações por e-mail</h4>
+                                <p>Receba atualizações por e-mail</p>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>Geral</h3>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <i class="fas fa-moon"></i>
+                            <div>
+                                <h4>Tema</h4>
+                                <p>Altere para o modo escuro ou claro</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <i class="fas fa-language"></i>
+                            <div>
+                                <h4>Idioma</h4>
+                                <p>Português (Brasil)</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>Sobre</h3>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <i class="fas fa-info-circle"></i>
+                            <div>
+                                <h4>Sobre o EpiConecta</h4>
+                                <p>Versão 1.0.0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <i class="fas fa-file-alt"></i>
+                            <div>
+                                <h4>Termos de Uso</h4>
+                            </div>
+                        </div>
+                        <i class="fas fa-external-link-alt"></i>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <i class="fas fa-lock"></i>
+                            <div>
+                                <h4>Política de Privacidade</h4>
+                            </div>
+                        </div>
+                        <i class="fas fa-external-link-alt"></i>
+                    </div>
+                </div>
+
+                <button class="logout-button" id="logout-button">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Sair da Conta
+                </button>
+            </div>
+        </section>
+        </main>
+    </div> <!-- End of content-wrapper -->
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active" data-screen="dashboard">
+            <i class="fas fa-home"></i>
+            <span>Início</span>
+        </a>
+        <a href="#" class="nav-item" data-screen="chat">
+            <i class="fas fa-comment-medical"></i>
+            <span>Chat</span>
+        </a>
+        <a href="#" class="nav-item" data-screen="library">
+            <i class="fas fa-book-medical"></i>
+            <span>Biblioteca</span>
+        </a>
+        <a href="#" class="nav-item" data-screen="settings">
+            <i class="fas fa-cog"></i>
+            <span>Configurações</span>
+        </a>
+    </nav>
+
+    <!-- Modal de Notificação -->
+    <div class="modal" id="notification-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="notification-modal-title">Título da Notificação</h3>
+                <button class="close-button" id="close-notification-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="notification-modal-body">
+                <!-- Conteúdo da notificação será inserido aqui -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="close-notification-btn">Fechar</button>
+                <button class="btn btn-primary" id="notification-action-btn">Abrir</button>
+            </div>
         </div>
-        <!-- FAILSAFE: Force remove loading overlay after 4 seconds if app.js fails -->
-        <script>
-            setTimeout(function () {
-                var overlay = document.getElementById('loading-overlay');
-                if (overlay) {
-                    // Log for debugging
-                    console.warn('Loading overlay forced closed by safety timer.');
-                    overlay.style.display = 'none';
-                }
-            }, 4000);
-        </script>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div class="modal" id="confirmation-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="confirmation-modal-title">Confirmação</h3>
+                <button class="close-button" id="close-confirmation-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="confirmation-modal-body">
+                <!-- Mensagem de confirmação será inserida aqui -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancel-confirmation-btn">Cancelar</button>
+                <button class="btn btn-danger" id="confirm-action-btn">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p id="loading-message">Carregando...</p>
+    </div>
+    <!-- FAILSAFE: Force remove loading overlay after 4 seconds if app.js fails -->
+    <script>
+        setTimeout(function () {
+            var overlay = document.getElementById('loading-overlay');
+            if (overlay) {
+                // Log for debugging
+                console.warn('Loading overlay forced closed by safety timer.');
+                overlay.style.display = 'none';
+            }
+        }, 4000);
+    </script>
     </div>
 
     <!-- Scripts -->

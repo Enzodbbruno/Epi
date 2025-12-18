@@ -1181,6 +1181,297 @@ const SettingsModule = {
   }
 };
 
+// Módulo de Triagem de Sintomas
+const SymptomsModule = {
+  selectedSymptoms: new Set(),
+
+  // Base de Dados de Sintomas (Categorizada)
+  symptomsData: {
+    'Gerais': [
+      { id: 'febre', label: 'Febre Alta (>38°C)' },
+      { id: 'febre_baixa', label: 'Febre Baixa' },
+      { id: 'fadiga', label: 'Cansaço/Fadiga Extrema' },
+      { id: 'mal_estar', label: 'Mal-estar Geral' },
+      { id: 'perda_apetite', label: 'Perda de Apetite' },
+      { id: 'calafrios', label: 'Calafrios' }
+    ],
+    'Dores': [
+      { id: 'dor_cabeca', label: 'Dor de Cabeça' },
+      { id: 'dor_atras_olhos', label: 'Dor atrás dos Olhos' },
+      { id: 'dor_corpo', label: 'Dor no Corpo' },
+      { id: 'dor_articulacoes', label: 'Dor nas Articulações' },
+      { id: 'dor_muscular', label: 'Dor Muscular (Mialgia)' },
+      { id: 'dor_garganta', label: 'Dor de Garganta' }
+    ],
+    'Respiratório': [
+      { id: 'tosse_seca', label: 'Tosse Seca' },
+      { id: 'tosse_produtiva', label: 'Tosse com Catarro' },
+      { id: 'falta_ar', label: 'Falta de Ar / Dificuldade para Respirar' },
+      { id: 'coriza', label: 'Coriza / Nariz Escorrendo' },
+      { id: 'congestao', label: 'Nariz Entupido' },
+      { id: 'espirros', label: 'Espirros Frequentes' }
+    ],
+    'Gastrointestinal': [
+      { id: 'nauseas', label: 'Náuseas / Enjoo' },
+      { id: 'vomitos', label: 'Vômitos' },
+      { id: 'diarreia', label: 'Diarreia' },
+      { id: 'dor_abdominal', label: 'Dor Abdominal' }
+    ],
+    'Pele e Outros': [
+      { id: 'manchas', label: 'Manchas Vermelhas na Pele' },
+      { id: 'coceira', label: 'Coceira' },
+      { id: 'sangramento', label: 'Sangramento (Gengiva/Nariz)' },
+      { id: 'olhos_vermelhos', label: 'Olhos Vermelhos (Conjuntivite)' },
+      { id: 'perda_olfato', label: 'Perda de Olfato/Paladar' }
+    ]
+  },
+
+  // Base de Dados de Doenças e Regras
+  diseases: [
+    {
+      id: 'dengue',
+      name: 'Dengue',
+      description: 'Doença viral transmitida pelo mosquito Aedes aegypti.',
+      symptoms: ['febre', 'dor_atras_olhos', 'dor_muscular', 'dor_articulacoes', 'manchas', 'nauseas', 'mal_estar', 'dor_cabeca'],
+      mandatory: ['febre'], // Sintomas que aumentam muito a chance
+      weight: 1.2 // Peso para desempate
+    },
+    {
+      id: 'covid',
+      name: 'COVID-19',
+      description: 'Infecção respiratória causada pelo coronavírus SARS-CoV-2.',
+      symptoms: ['febre', 'tosse_seca', 'fadiga', 'perda_olfato', 'dor_garganta', 'dor_cabeca', 'falta_ar', 'coriza'],
+      mandatory: ['tosse_seca', 'perda_olfato'],
+      weight: 1.1
+    },
+    {
+      id: 'gripe',
+      name: 'Influenza (Gripe)',
+      description: 'Infecção viral aguda do sistema respiratório.',
+      symptoms: ['febre', 'tosse_seca', 'dor_garganta', 'coriza', 'dor_muscular', 'dor_cabeca', 'calafrios', 'fadiga'],
+      mandatory: ['febre', 'tosse_seca'],
+      weight: 1.0
+    },
+    {
+      id: 'chikungunya',
+      name: 'Chikungunya',
+      description: 'Doença viral caracterizada por fortes dores nas articulações.',
+      symptoms: ['febre', 'dor_articulacoes', 'dor_muscular', 'dor_cabeca', 'manchas', 'nauseas', 'olhos_vermelhos'],
+      mandatory: ['dor_articulacoes'],
+      weight: 1.2
+    },
+    {
+      id: 'zika',
+      name: 'Zika Vírus',
+      description: 'Doença viral que pode causar febre baixa e erupções cutâneas.',
+      symptoms: ['febre_baixa', 'manchas', 'coceira', 'dor_muscular', 'olhos_vermelhos', 'dor_articulações', 'dor_cabeca'],
+      mandatory: ['manchas', 'coceira'],
+      weight: 1.0
+    },
+    {
+      id: 'resfriado',
+      name: 'Resfriado Comum',
+      description: 'Infecção viral leve das vias aéreas superiores.',
+      symptoms: ['coriza', 'congestao', 'espirros', 'dor_garganta', 'tosse_produtiva', 'febre_baixa', 'mal_estar'],
+      mandatory: ['coriza', 'espirros'],
+      weight: 0.8
+    },
+    {
+      id: 'gastro',
+      name: 'Gastroenterite Viral',
+      description: 'Inflamação do estômago e intestinos.',
+      symptoms: ['diarreia', 'vomitos', 'nauseas', 'dor_abdominal', 'febre', 'calafrios', 'dor_cabeca'],
+      mandatory: ['diarreia', 'vomitos'],
+      weight: 1.0
+    }
+  ],
+
+  init() {
+    this.renderSymptoms();
+    this.setupEventListeners();
+  },
+
+  renderSymptoms() {
+    const grid = document.getElementById('symptoms-grid');
+    if (!grid) return;
+
+    grid.innerHTML = '';
+
+    Object.entries(this.symptomsData).forEach(([category, symptoms]) => {
+      const categoryDiv = document.createElement('div');
+      categoryDiv.className = 'symptom-category';
+
+      const icon = this.getCategoryIcon(category);
+
+      categoryDiv.innerHTML = `
+        <h4 class="category-title"><i class="fas fa-${icon}"></i> ${category}</h4>
+        <div class="chips-container" id="cat-${category}"></div>
+      `;
+
+      grid.appendChild(categoryDiv);
+
+      const chipsContainer = categoryDiv.querySelector('.chips-container');
+      symptoms.forEach(sym => {
+        const chip = document.createElement('div');
+        chip.className = 'symptom-chip';
+        chip.dataset.id = sym.id;
+        chip.textContent = sym.label;
+
+        chip.addEventListener('click', () => this.toggleSymptom(chip, sym.id));
+
+        chipsContainer.appendChild(chip);
+      });
+    });
+  },
+
+  getCategoryIcon(category) {
+    const map = {
+      'Gerais': 'thermometer-half',
+      'Dores': 'head-side-virus',
+      'Respiratório': 'lungs',
+      'Gastrointestinal': 'stomach', // Note: Check fa icon availability
+      'Pele e Outros': 'allergies'
+    };
+    return map[category] || 'notes-medical';
+  },
+
+  toggleSymptom(chipElement, symptomId) {
+    if (this.selectedSymptoms.has(symptomId)) {
+      this.selectedSymptoms.delete(symptomId);
+      chipElement.classList.remove('selected');
+    } else {
+      this.selectedSymptoms.add(symptomId);
+      chipElement.classList.add('selected');
+    }
+  },
+
+  setupEventListeners() {
+    const analyzeBtn = document.getElementById('analyze-symptoms-btn');
+    const clearBtn = document.getElementById('clear-symptoms-btn');
+
+    if (analyzeBtn) {
+      analyzeBtn.addEventListener('click', () => this.analyzeSymptoms());
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        this.selectedSymptoms.clear();
+        document.querySelectorAll('.symptom-chip').forEach(c => c.classList.remove('selected'));
+        document.getElementById('diagnosis-results').classList.add('hidden');
+      });
+    }
+  },
+
+  analyzeSymptoms() {
+    if (this.selectedSymptoms.size === 0) {
+      alert('Por favor, selecione pelo menos um sintoma.');
+      return;
+    }
+
+    const results = [];
+    const selectedList = Array.from(this.selectedSymptoms);
+
+    this.diseases.forEach(disease => {
+      let matches = 0;
+      let mandatoryMatches = 0;
+      const matchedSymptoms = [];
+
+      selectedList.forEach(userSym => {
+        if (disease.symptoms.includes(userSym)) {
+          matches++;
+          matchedSymptoms.push(userSym);
+        }
+      });
+
+      if (disease.mandatory) {
+        disease.mandatory.forEach(m => {
+          if (this.selectedSymptoms.has(m)) mandatoryMatches++;
+        });
+      }
+
+      // Cálculo de pontuação básico (Peso + Coincidências)
+      // Normaliza pela quantidade total de sintomas da doença para evitar favorecer doenças com listas enormes
+      const coverage = matches / disease.symptoms.length;
+
+      // Bonus para sintomas obrigatórios/chave
+      const keyBonus = disease.mandatory ? (mandatoryMatches / disease.mandatory.length) * 0.5 : 0;
+
+      let score = (coverage + keyBonus) * 100;
+
+      if (score > 100) score = 100;
+
+      // Só mostra se tiver uma relevância mínima
+      if (score > 20) {
+        results.push({
+          ...disease,
+          score: parseFloat(score.toFixed(1)),
+          matchedSymptoms: matchedSymptoms
+        });
+      }
+    });
+
+    results.sort((a, b) => b.score - a.score);
+    this.renderResults(results);
+  },
+
+  renderResults(results) {
+    const container = document.getElementById('diagnosis-results');
+    const list = document.getElementById('results-list');
+
+    if (!container || !list) return;
+
+    container.classList.remove('hidden');
+    list.innerHTML = '';
+
+    if (results.length === 0) {
+      list.innerHTML = `<p class="text-center">Nenhuma patologia correspondente encontrada com base nesses sintomas específicos.</p>`;
+      return;
+    }
+
+    results.forEach(res => {
+      let matchClass = 'match-low';
+      let matchLabel = 'Baixa Probabilidade';
+
+      if (res.score >= 55) { // Adjusted threshold
+        matchClass = 'match-high';
+        matchLabel = 'Alta Probabilidade';
+      } else if (res.score >= 35) {
+        matchClass = 'match-medium';
+        matchLabel = 'Média Probabilidade';
+      }
+
+      const div = document.createElement('div');
+      div.className = `diagnosis-card ${matchClass}`;
+
+      // Get readable labels for matched symptoms
+      const symptomLabels = res.matchedSymptoms.map(sid => {
+        // Find in any category
+        for (const cat in this.symptomsData) {
+          const found = this.symptomsData[cat].find(s => s.id === sid);
+          if (found) return found.label;
+        }
+        return sid;
+      });
+
+      div.innerHTML = `
+        <div class="diagnosis-header">
+            <span class="diagnosis-name">${res.name}</span>
+            <span class="match-score">${matchLabel} (${Math.round(res.score)}%)</span>
+        </div>
+        <p class="diagnosis-details">${res.description}</p>
+        <div class="matched-symptoms-list">
+            ${symptomLabels.map(l => `<span class="mini-tag"><i class="fas fa-check"></i> ${l}</span>`).join('')}
+        </div>
+      `;
+
+      list.appendChild(div);
+    });
+
+    // Scroll to results
+    container.scrollIntoView({ behavior: 'smooth' });
+  }
+};
+
 // Módulo Principal do Aplicativo
 const App = {
   currentScreen: 'dashboard',
@@ -1199,9 +1490,32 @@ const App = {
       ChatModule.init();
       LibraryModule.init();
       SettingsModule.init();
+      SymptomsModule.init(); // Init Symptoms
 
       // Mostra a tela inicial
       this.showScreen('dashboard');
+
+      // ... (existing code)
+
+      onScreenShow(screenId) {
+        switch (screenId) {
+          case 'notifications':
+            // Atualiza a lista de notificações
+            NotificationsModule.renderNotifications();
+            break;
+          case 'chat':
+            // Atualiza a lista de salas de chat
+            ChatModule.renderChatRooms();
+            break;
+          case 'library':
+            // Atualiza a lista de documentos
+            LibraryModule.renderDocuments();
+            break;
+          case 'symptoms':
+            // Ensure UI is clean or ready?
+            break;
+        }
+      },
 
       console.log('Aplicativo EpiConecta inicializado com sucesso!');
     } catch (error) {
@@ -1313,6 +1627,10 @@ const App = {
       case 'library':
         // Atualiza a lista de documentos
         LibraryModule.renderDocuments();
+        break;
+      case 'symptoms':
+        // Sintomas já são renderizados no init e o estado é mantido, 
+        // mas poderíamos resetar se quiséssemos.
         break;
     }
   },
