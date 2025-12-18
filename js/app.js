@@ -1207,6 +1207,18 @@ const App = {
   },
 
   setupNavigation() {
+    // Desktop Navigation (Sidebar)
+    const desktopNavItems = document.querySelectorAll('.desktop-nav-item');
+    desktopNavItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        const screen = item.dataset.screen;
+        if (screen) {
+          this.showScreen(screen);
+        }
+      });
+    });
+
     // Navegação pelo menu inferior
     const navItems = document.querySelectorAll('.bottom-nav .nav-item');
     navItems.forEach(item => {
@@ -1269,7 +1281,7 @@ const App = {
   },
 
   updateActiveNavItem(screenId) {
-    const navItems = document.querySelectorAll('.nav-item');
+    const navItems = document.querySelectorAll('.nav-item, .desktop-nav-item');
     navItems.forEach(item => {
       if (item.dataset.screen === screenId) {
         item.classList.add('active');
