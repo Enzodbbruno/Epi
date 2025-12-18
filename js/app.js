@@ -559,13 +559,24 @@ const ChatModule = {
 
     this.currentRoom = room;
 
-    // Esconde a lista de salas e mostra a conversa
+    // Esconde a lista de salas e mostra a conversa (APENAS MOBILE)
+    const isMobile = window.innerWidth < 1024;
+
+    // Elements references
     const roomsContainer = document.getElementById('chat-rooms');
     const messagesContainer = document.getElementById('chat-messages');
     const chatHeader = document.querySelector('.chat-header h3');
 
-    if (roomsContainer) roomsContainer.style.display = 'none';
-    if (messagesContainer) messagesContainer.style.display = 'block';
+    // On mobile, we toggle visibility. On desktop, both are visible via CSS.
+    if (isMobile) {
+      if (roomsContainer) roomsContainer.style.display = 'none';
+      if (messagesContainer) messagesContainer.style.display = 'block';
+    } else {
+      // Desktop: Ensure both are visible (resets any previous inline styles)
+      if (roomsContainer) roomsContainer.style.display = 'block';
+      if (messagesContainer) messagesContainer.style.display = 'flex';
+    }
+
     if (chatHeader) chatHeader.textContent = room.name;
 
     // Renderiza as mensagens
