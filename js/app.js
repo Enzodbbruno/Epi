@@ -807,32 +807,34 @@ const LibraryModule = {
       return;
     }
 
+    // Use grid layout
+    container.className = 'documents-grid';
+
     container.innerHTML = filteredDocs.map(doc => `
-      <div class="document-item" data-id="${doc.id}">
-        <div class="document-icon">
+      <div class="document-card" data-id="${doc.id}">
+        <div class="doc-icon-wrapper ${doc.format.toLowerCase()}">
           <i class="${this.getDocumentIcon(doc.format)}"></i>
         </div>
-        <div class="document-info">
-          <h4 class="document-title">${doc.title}</h4>
-          <div class="document-meta">
-            <span class="document-type">${this.formatDocumentType(doc.type)}</span>
-            <span class="document-size">${doc.size}</span>
-            <span class="document-date">${new Date(doc.uploadDate).toLocaleDateString('pt-BR')}</span>
+        <button class="doc-download-btn" data-id="${doc.id}" title="Baixar">
+             <i class="fas fa-download"></i>
+        </button>
+        <div class="doc-info">
+          <h4 class="doc-title" title="${doc.title}">${doc.title}</h4>
+          <div class="doc-meta">
+            <span>${doc.format.toUpperCase()}</span>
+            <span>•</span>
+            <span>${doc.size}</span>
           </div>
-          <div class="document-tags">
-            ${doc.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+          <div class="doc-tags">
+            ${doc.tags.slice(0, 2).map(tag => `<span class="doc-tag">${tag}</span>`).join('')}
+            ${doc.tags.length > 2 ? `<span class="doc-tag">+${doc.tags.length - 2}</span>` : ''}
           </div>
-        </div>
-        <div class="document-actions">
-          <button class="download-button" data-id="${doc.id}">
-            <i class="fas fa-download"></i>
-          </button>
         </div>
       </div>
     `).join('');
 
     // Adiciona os event listeners para os botões de download
-    document.querySelectorAll('.download-button').forEach(button => {
+    document.querySelectorAll('.doc-download-btn').forEach(button => {
       button.addEventListener('click', (e) => {
         e.stopPropagation();
         const docId = button.dataset.id;
@@ -841,7 +843,7 @@ const LibraryModule = {
     });
 
     // Adiciona os event listeners para os itens do documento
-    document.querySelectorAll('.document-item').forEach(item => {
+    document.querySelectorAll('.document-card').forEach(item => {
       item.addEventListener('click', () => {
         const docId = item.dataset.id;
         this.previewDocument(docId);
