@@ -444,6 +444,17 @@
             <div class="loading-spinner"></div>
             <p id="loading-message">Carregando...</p>
         </div>
+        <!-- FAILSAFE: Force remove loading overlay after 4 seconds if app.js fails -->
+        <script>
+            setTimeout(function () {
+                var overlay = document.getElementById('loading-overlay');
+                if (overlay) {
+                    // Log for debugging
+                    console.warn('Loading overlay forced closed by safety timer.');
+                    overlay.style.display = 'none';
+                }
+            }, 4000);
+        </script>
     </div>
 
     <!-- Scripts -->
