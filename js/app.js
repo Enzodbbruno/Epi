@@ -286,18 +286,24 @@ const NotificationsModule = {
     }
 
     container.innerHTML = filtered.map(notif => `
-      <div class="notification-item ${notif.read ? 'read' : ''}" data-id="${notif.id}">
+      <div class="notification-item priority-${notif.priority || 'low'} ${notif.read ? '' : 'unread'}" data-id="${notif.id}">
         <div class="notification-icon">
           <i class="fas fa-${this.getNotificationIcon(notif.type)}"></i>
         </div>
         <div class="notification-content">
-          <h4 class="notification-title">${notif.title}</h4>
-          <p class="notification-preview">${notif.message}</p>
-          <span class="notification-time">${this.formatDate(notif.date)}</span>
+          <div class="notif-header" style="display:flex; justify-content:space-between;">
+             <h4 class="notif-title">${notif.title}</h4>
+             <span class="notif-badge">${this.formatDate(notif.date)}</span>
+          </div>
+          <p class="notif-message">${notif.message}</p>
+          <div class="notif-meta">
+             <span class="notif-badge" style="background:#e0e0e0;">${notif.category || 'Geral'}</span>
+             ${notif.action ? `<span style="color:var(--primary-color); font-weight:500;">Toque para ver</span>` : ''}
+          </div>
         </div>
         <div class="notification-actions">
-          <button class="mark-as-read" data-id="${notif.id}">
-            <i class="${notif.read ? 'fas fa-check-circle' : 'far fa-circle'}"></i>
+          <button class="icon-button mark-as-read" data-id="${notif.id}" title="${notif.read ? 'Marcar como não lida' : 'Marcar como lida'}">
+            <i class="${notif.read ? 'fas fa-check-circle' : 'far fa-circle'}" style="color: ${notif.read ? 'var(--secondary-color)' : 'var(--text-secondary)'}"></i>
           </button>
         </div>
       </div>
