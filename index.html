@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EpiConecta - Vigilância Epidemiológica</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- App Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-shield-virus"></i>
+                    <h1>EpiConecta</h1>
+                </div>
+                <div class="user-menu">
+                    <i class="fas fa-bell"></i>
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <section class="welcome-section">
+                <h2>Bem-vindo(a), Profissional</h2>
+                <p>Segunda-feira, 18 de Dezembro de 2025</p>
+            </section>
+
+            <section class="quick-actions">
+                <div class="action-card" id="notifications">
+                    <div class="icon-container">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h3>Notificações</h3>
+                    <p>Alertas e boletins</p>
+                </div>
+                <div class="action-card" id="chat">
+                    <div class="icon-container">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3>Chat Profissional</h3>
+                    <p>Converse com a equipe</p>
+                </div>
+                <div class="action-card" id="library">
+                    <div class="icon-container">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3>Biblioteca</h3>
+                    <p>Materiais de referência</p>
+                </div>
+            </section>
+
+            <section class="alerts-section">
+                <div class="section-header">
+                    <h2>Alertas Recentes</h2>
+                    <a href="#" class="see-all">Ver todos</a>
+                </div>
+                <div class="alert-card">
+                    <div class="alert-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="alert-content">
+                        <h3>Alerta: Aumento de casos de Dengue</h3>
+                        <p>Região Sul - 15 novos casos confirmados</p>
+                        <span class="alert-time">Há 2 horas</span>
+                    </div>
+                </div>
+                <div class="alert-card">
+                    <div class="alert-icon">
+                        <i class="fas fa-syringe"></i>
+                    </div>
+                    <div class="alert-content">
+                        <h3>Campanha de Vacinação</h3>
+                        <p>Influenza - Atualização do público-alvo</p>
+                        <span class="alert-time">Ontem</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Início</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-comment-medical"></i>
+                <span>Chat</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-book-medical"></i>
+                <span>Biblioteca</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Configurações</span>
+            </a>
+        </nav>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
