@@ -690,6 +690,14 @@ body {
         display: flex;
     }
 
+    .app-header {
+        display: none;
+    }
+
+    .bottom-nav {
+        display: none;
+    }
+
     /* 3. Main Content */
     .content-wrapper {
         flex-direction: column;
