@@ -1186,6 +1186,7 @@ const App = {
   currentScreen: 'dashboard',
 
   init() {
+    this.startSafetyTimeout(); // Safety failsafe
     this.setupNavigation();
     this.setupUI();
     this.loadInitialData();
@@ -1515,10 +1516,21 @@ const App = {
   },
 
   hideLoading() {
-    const loadingOverlay = document.getElementById('loading-overlay');
-    if (loadingOverlay) {
-      loadingOverlay.classList.remove('active');
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+      overlay.classList.remove('active'); // Changed from 'add('hidden')' to 'remove('active')' to match showLoading
+      setTimeout(() => {
+        // Use a slight delay to allow transition to finish before removal/hiding completely if needed
+        overlay.style.display = 'none';
+      }, 500);
     }
+  },
+
+  // Add a safety timeout to initialization
+  startSafetyTimeout() {
+    setTimeout(() => {
+      this.hideLoading();
+    }, 5000); // Force hide after 5 seconds max
   },
 
   openModal(modalId) {
