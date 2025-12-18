@@ -679,6 +679,156 @@ body {
 }
 
 /* ==========================================================================
+   #NEW MODULE STYLES (Grid & Card Layouts)
+   ========================================================================== */
+
+/* 1. SYMPTOMS GRID */
+.symptoms-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    /* 1 column on mobile */
+    gap: var(--spacing-md);
+    padding-bottom: 20px;
+}
+
+.symptom-category {
+    background: var(--surface-card);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    box-shadow: var(--shadow-sm);
+    /* The "Outer Square" look */
+    border: 1px solid var(--border-color);
+}
+
+.symptom-category h4 {
+    margin-bottom: var(--spacing-md);
+    color: var(--primary-color);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chips-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    /* "Squares" */
+    gap: 12px;
+}
+
+.symptom-chip {
+    background: #F5F5F5;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 16px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80px;
+    /* Square-ish */
+    user-select: none;
+}
+
+.symptom-chip:hover {
+    background: #E0E0E0;
+}
+
+.symptom-chip.selected {
+    background: var(--primary-light);
+    border-color: var(--primary-color);
+    color: var(--primary-dark);
+}
+
+/* 2. NOTIFICATIONS GRID */
+.notifications-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+    padding-bottom: 20px;
+}
+
+.notification-item {
+    background: var(--surface-card);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    gap: 12px;
+    align-items: start;
+    border: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+
+.notification-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* 3. DOCUMENTS GRID (Library) */
+.documents-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--spacing-md);
+    padding-bottom: 20px;
+}
+
+.document-card {
+    background: var(--surface-card);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    transition: var(--transition);
+    cursor: pointer;
+    height: 100%;
+}
+
+.document-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-color);
+}
+
+.doc-icon-wrapper {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    color: var(--text-secondary);
+}
+
+.doc-icon-wrapper.pdf {
+    color: #F44336;
+}
+
+.doc-info {
+    width: 100%;
+}
+
+.doc-title {
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.doc-meta {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+/* ==========================================================================
    #DESKTOP RESPONSIVE MODE (Minimum 1024px)
    ========================================================================== */
 @media (min-width: 1024px) {
@@ -763,5 +913,14 @@ body {
     .chat-header .back-to-rooms {
         display: none;
         /* No back button on desktop */
+    }
+
+    /* Desktop Specific Grid Overrides */
+    .symptoms-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .notifications-list {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     }
 }
