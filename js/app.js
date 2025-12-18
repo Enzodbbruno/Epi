@@ -12,7 +12,7 @@ const sampleData = {
     emailNotifications: true,
     darkMode: false
   },
-  
+
   notifications: [
     {
       id: 'notif-001',
@@ -56,7 +56,7 @@ const sampleData = {
       }
     }
   ],
-  
+
   chatRooms: [
     {
       id: 'room-001',
@@ -107,7 +107,7 @@ const sampleData = {
       color: '#fb8c00'
     }
   ],
-  
+
   messages: {
     'room-001': [
       {
@@ -136,7 +136,7 @@ const sampleData = {
       }
     ]
   },
-  
+
   documents: [
     {
       id: 'doc-001',
@@ -191,7 +191,7 @@ const sampleData = {
       thumbnail: '/thumbnails/pdf-icon.png'
     }
   ],
-  
+
   alerts: [
     {
       id: 'alert-001',
@@ -225,17 +225,17 @@ const sampleData = {
 // Módulo de Notificações
 const NotificationsModule = {
   notifications: [],
-  
+
   init() {
     this.notifications = [...sampleData.notifications];
     this.renderNotifications();
     this.setupEventListeners();
   },
-  
+
   getUnreadCount() {
     return this.notifications.filter(notif => !notif.read).length;
   },
-  
+
   markAsRead(notificationId) {
     const notification = this.notifications.find(n => n.id === notificationId);
     if (notification) {
@@ -244,22 +244,22 @@ const NotificationsModule = {
       this.renderNotifications();
     }
   },
-  
+
   markAllAsRead() {
     this.notifications.forEach(notif => notif.read = true);
     this.updateNotificationBadge();
     this.renderNotifications();
   },
-  
+
   filterByType(type) {
     if (type === 'all') return this.notifications;
     return this.notifications.filter(notif => notif.type === type);
   },
-  
+
   updateNotificationBadge() {
     const badge = document.getElementById('notification-badge');
     if (!badge) return;
-    
+
     const count = this.getUnreadCount();
     if (count > 0) {
       badge.textContent = count > 9 ? '9+' : count;
@@ -268,13 +268,13 @@ const NotificationsModule = {
       badge.style.display = 'none';
     }
   },
-  
+
   renderNotifications(filter = 'all') {
     const container = document.getElementById('notifications-list');
     if (!container) return;
-    
+
     const filtered = filter === 'all' ? this.notifications : this.filterByType(filter);
-    
+
     if (filtered.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
@@ -284,7 +284,7 @@ const NotificationsModule = {
       `;
       return;
     }
-    
+
     container.innerHTML = filtered.map(notif => `
       <div class="notification-item ${notif.read ? 'read' : ''}" data-id="${notif.id}">
         <div class="notification-icon">
@@ -302,7 +302,7 @@ const NotificationsModule = {
         </div>
       </div>
     `).join('');
-    
+
     // Adiciona os event listeners
     document.querySelectorAll('.mark-as-read').forEach(button => {
       button.addEventListener('click', (e) => {
@@ -311,7 +311,7 @@ const NotificationsModule = {
         this.markAsRead(notificationId);
       });
     });
-    
+
     document.querySelectorAll('.notification-item').forEach(item => {
       item.addEventListener('click', () => {
         const notificationId = item.dataset.id;
@@ -319,7 +319,7 @@ const NotificationsModule = {
       });
     });
   },
-  
+
   getNotificationIcon(type) {
     const icons = {
       alert: 'exclamation-triangle',
@@ -327,15 +327,15 @@ const NotificationsModule = {
       update: 'sync-alt',
       default: 'bell'
     };
-    
+
     return icons[type] || icons.default;
   },
-  
+
   formatDate(dateString) {
     const date = new Date(dateString);
     const now = new Date();
     const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
-    
+
     if (diffInHours < 1) {
       const diffInMinutes = Math.floor((now - date) / (1000 * 60));
       return `Há ${diffInMinutes} min`;
@@ -347,16 +347,16 @@ const NotificationsModule = {
       return date.toLocaleDateString('pt-BR');
     }
   },
-  
+
   handleNotificationClick(notificationId) {
     const notification = this.notifications.find(n => n.id === notificationId);
     if (!notification) return;
-    
+
     // Marca como lida ao clicar
     if (!notification.read) {
       this.markAsRead(notificationId);
     }
-    
+
     // Executa a ação associada à notificação
     if (notification.action) {
       switch (notification.action.type) {
@@ -375,7 +375,7 @@ const NotificationsModule = {
       }
     }
   },
-  
+
   openDocument(documentId) {
     // Lógica para abrir o documento
     const document = sampleData.documents.find(doc => doc.id === documentId);
@@ -385,22 +385,22 @@ const NotificationsModule = {
       // window.open(document.url, '_blank');
     }
   },
-  
+
   showUpdateModal(version) {
     // Lógica para mostrar o modal de atualização
     const modal = document.getElementById('confirmation-modal');
     const modalTitle = document.getElementById('confirmation-modal-title');
     const modalBody = document.getElementById('confirmation-modal-body');
     const confirmBtn = document.getElementById('confirm-action-btn');
-    
+
     if (!modal || !modalTitle || !modalBody || !confirmBtn) return;
-    
+
     modalTitle.textContent = 'Atualização Disponível';
     modalBody.innerHTML = `
       <p>Uma nova versão do aplicativo (${version}) está disponível. Deseja atualizar agora?</p>
       <p class="small">Recomendamos que você esteja conectado a uma rede Wi-Fi para realizar a atualização.</p>
     `;
-    
+
     confirmBtn.textContent = 'Atualizar Agora';
     confirmBtn.onclick = () => {
       this.showToast('Iniciando atualização...', 'info');
@@ -410,22 +410,22 @@ const NotificationsModule = {
         this.closeModal('confirmation-modal');
       }, 2000);
     };
-    
+
     this.openModal('confirmation-modal');
   },
-  
+
   showToast(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.textContent = message;
-    
+
     document.body.appendChild(toast);
-    
+
     // Mostra o toast
     setTimeout(() => {
       toast.classList.add('show');
     }, 100);
-    
+
     // Remove o toast após 3 segundos
     setTimeout(() => {
       toast.classList.remove('show');
@@ -434,7 +434,7 @@ const NotificationsModule = {
       }, 300);
     }, 3000);
   },
-  
+
   openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
@@ -442,7 +442,7 @@ const NotificationsModule = {
       document.body.style.overflow = 'hidden';
     }
   },
-  
+
   closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
@@ -450,7 +450,7 @@ const NotificationsModule = {
       document.body.style.overflow = '';
     }
   },
-  
+
   setupEventListeners() {
     // Filtro de notificações
     const filterButtons = document.querySelectorAll('.filter-tag');
@@ -462,7 +462,7 @@ const NotificationsModule = {
         this.renderNotifications(filter);
       });
     });
-    
+
     // Botão de alternar filtros
     const filterToggle = document.getElementById('filter-notifications');
     const filterPanel = document.getElementById('notification-filters');
@@ -471,7 +471,7 @@ const NotificationsModule = {
         filterPanel.style.display = filterPanel.style.display === 'none' ? 'block' : 'none';
       });
     }
-    
+
     // Fechar modais
     document.addEventListener('click', (e) => {
       if (e.target.classList.contains('modal') || e.target.classList.contains('close-button')) {
@@ -481,7 +481,7 @@ const NotificationsModule = {
         }
       }
     });
-    
+
     // Botões de confirmação
     const closeNotificationBtn = document.getElementById('close-notification-btn');
     if (closeNotificationBtn) {
@@ -489,14 +489,14 @@ const NotificationsModule = {
         this.closeModal('notification-modal');
       });
     }
-    
+
     const cancelConfirmationBtn = document.getElementById('cancel-confirmation-btn');
     if (cancelConfirmationBtn) {
       cancelConfirmationBtn.addEventListener('click', () => {
         this.closeModal('confirmation-modal');
       });
     }
-    
+
     // Atualiza o badge de notificações ao carregar a página
     this.updateNotificationBadge();
   }
@@ -506,17 +506,17 @@ const NotificationsModule = {
 const ChatModule = {
   currentRoom: null,
   messages: {},
-  
+
   init() {
     this.messages = { ...sampleData.messages };
     this.renderChatRooms();
     this.setupEventListeners();
   },
-  
+
   renderChatRooms() {
     const container = document.getElementById('chat-rooms');
     if (!container) return;
-    
+
     if (sampleData.chatRooms.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
@@ -527,7 +527,7 @@ const ChatModule = {
       `;
       return;
     }
-    
+
     container.innerHTML = sampleData.chatRooms.map(room => `
       <div class="chat-room" data-id="${room.id}">
         <div class="chat-avatar" style="background-color: ${room.color}">
@@ -543,7 +543,7 @@ const ChatModule = {
         </div>
       </div>
     `).join('');
-    
+
     // Adiciona os event listeners para as salas de chat
     document.querySelectorAll('.chat-room').forEach(roomEl => {
       roomEl.addEventListener('click', () => {
@@ -552,35 +552,35 @@ const ChatModule = {
       });
     });
   },
-  
+
   openChatRoom(roomId) {
     const room = sampleData.chatRooms.find(r => r.id === roomId);
     if (!room) return;
-    
+
     this.currentRoom = room;
-    
+
     // Esconde a lista de salas e mostra a conversa
     const roomsContainer = document.getElementById('chat-rooms');
     const messagesContainer = document.getElementById('chat-messages');
     const chatHeader = document.querySelector('.chat-header h3');
-    
+
     if (roomsContainer) roomsContainer.style.display = 'none';
     if (messagesContainer) messagesContainer.style.display = 'block';
     if (chatHeader) chatHeader.textContent = room.name;
-    
+
     // Renderiza as mensagens
     this.renderMessages(roomId);
-    
+
     // Rola para a última mensagem
     this.scrollToBottom();
   },
-  
+
   renderMessages(roomId) {
     const container = document.getElementById('messages-container');
     if (!container) return;
-    
+
     const messages = this.messages[roomId] || [];
-    
+
     if (messages.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
@@ -591,7 +591,7 @@ const ChatModule = {
       `;
       return;
     }
-    
+
     container.innerHTML = messages.map(msg => `
       <div class="message ${msg.senderId === 'user-001' ? 'sent' : 'received'}" data-id="${msg.id}">
         <div class="message-sender">
@@ -607,92 +607,96 @@ const ChatModule = {
       </div>
     `).join('');
   },
-  
+
   sendMessage(content) {
     if (!this.currentRoom || !content.trim()) return;
-    
+
     const newMessage = {
       id: `msg-${Date.now()}`,
-      senderId: 'user-001', // ID do usuário atual
+      senderId: 'user-001',
       senderName: sampleData.user.name,
       content: content.trim(),
       timestamp: new Date().toISOString(),
       read: false
     };
-    
-    // Adiciona a mensagem ao histórico
+
+    // Add message to local history
     if (!this.messages[this.currentRoom.id]) {
       this.messages[this.currentRoom.id] = [];
     }
-    
+
     this.messages[this.currentRoom.id].push(newMessage);
-    
-    // Atualiza a última mensagem na lista de salas
+
+    // Update rooms list preview
     const room = sampleData.chatRooms.find(r => r.id === this.currentRoom.id);
     if (room) {
       room.lastMessage = content.length > 30 ? content.substring(0, 30) + '...' : content;
       room.lastMessageTime = newMessage.timestamp;
-      
-      // Se não for o remetente, incrementa a contagem de não lidas
-      if (room.id !== this.currentRoom.id) {
-        room.unreadCount = (room.unreadCount || 0) + 1;
-      }
     }
-    
-    // Atualiza a interface
+
+    // Render and Scroll
     this.renderMessages(this.currentRoom.id);
     this.scrollToBottom();
-    
-    // Simula uma resposta automática (apenas para demonstração)
-    if (Math.random() > 0.5) {
-      this.simulateResponse();
-    }
+
+    // SMART BOT LOGIC
+    this.generateSmartResponse(content);
   },
-  
-  simulateResponse() {
-    const responses = [
-      'Entendido, obrigado pelo aviso!',
-      'Vou verificar e te retorno em breve.',
-      'Ótimo ponto! Vamos discutir isso na próxima reunião.',
-      'Preciso confirmar essa informação e te retorno.',
-      'Alguém mais tem alguma informação sobre isso?'
-    ];
-    
-    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-    
+
+  generateSmartResponse(userMessage) {
+    const msg = userMessage.toLowerCase();
+    let responseText = '';
+
+    // Keyword Matching Logic
+    if (msg.includes('dengue')) {
+      responseText = 'Sobre a **Dengue**: O boletim atual indica alta na região Sul. Recomenda-se intensificar visitas domiciliares e verificação de focos de água parada. Protocolo: verifique febre alta, dor retroorbital e manchas vermelhas.';
+    } else if (msg.includes('vacina') || msg.includes('campanha') || msg.includes('gripe')) {
+      responseText = 'A **Campanha de Vacinação** (Influenza) foi antecipada para o dia 20/12. O público-alvo inicial são idosos e profissionais de saúde. Verifique o estoque na sua UBS.';
+    } else if (msg.includes('zika') || msg.includes('microcefalia')) {
+      responseText = 'Casos de **Zika** estão estáveis. Lembre-se de orientar gestantes sobre o uso de repelentes e roupas longas. Notificação compulsória imediata para suspeitas.';
+    } else if (msg.includes('chikungunya') || msg.includes('dores')) {
+      responseText = 'Para **Chikungunya**, a atenção principal é para dores articulares intensas. O manejo clínico envolve hidratação e analgésicos (evitar AINES em suspeita de dengue).';
+    } else if (msg.includes('boletim') || msg.includes('relatório') || msg.includes('dados')) {
+      responseText = 'O último **Boletim Epidemiológico** está disponível na Biblioteca Digital. Acesse a aba "Biblioteca" e busque por "Relatório Anual 2025".';
+    } else if (msg.includes('olá') || msg.includes('bom dia') || msg.includes('boa tarde')) {
+      responseText = 'Olá! Sou o assistente virtual do EpiConecta. Posso ajudar com informações sobre Dengue, Zika, Vacinação e Protocolos. O que você precisa?';
+    } else {
+      responseText = 'Recebi sua mensagem. Para informações específicas, tente citar palavras-chave como "Dengue", "Vacinação", "Protocolo" ou "Relatório".';
+    }
+
+    // Simulate typing delay
     setTimeout(() => {
       const botMessage = {
         id: `msg-${Date.now()}`,
         senderId: 'bot-001',
-        senderName: 'Bot de Suporte',
-        content: randomResponse,
+        senderName: 'Assistente EpiConecta',
+        content: responseText,
         timestamp: new Date().toISOString(),
         read: false
       };
-      
+
       this.messages[this.currentRoom.id].push(botMessage);
       this.renderMessages(this.currentRoom.id);
       this.scrollToBottom();
-    }, 1000 + Math.random() * 2000); // Resposta entre 1-3 segundos
+    }, 1500);
   },
-  
+
   formatTime(timestamp) {
     const date = new Date(timestamp);
     return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   },
-  
+
   scrollToBottom() {
     const container = document.getElementById('messages-container');
     if (container) {
       container.scrollTop = container.scrollHeight;
     }
   },
-  
+
   setupEventListeners() {
     // Envio de mensagem
     const messageInput = document.getElementById('message-input');
     const sendButton = document.getElementById('send-message');
-    
+
     const sendMessageHandler = () => {
       if (messageInput && messageInput.value.trim()) {
         this.sendMessage(messageInput.value);
@@ -700,11 +704,11 @@ const ChatModule = {
         messageInput.focus();
       }
     };
-    
+
     if (sendButton) {
       sendButton.addEventListener('click', sendMessageHandler);
     }
-    
+
     if (messageInput) {
       messageInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
@@ -712,22 +716,22 @@ const ChatModule = {
         }
       });
     }
-    
+
     // Voltar para a lista de salas
     const backToRooms = document.querySelector('.back-to-rooms');
     if (backToRooms) {
       backToRooms.addEventListener('click', () => {
         const roomsContainer = document.getElementById('chat-rooms');
         const messagesContainer = document.getElementById('chat-messages');
-        
+
         if (roomsContainer) roomsContainer.style.display = 'block';
         if (messagesContainer) messagesContainer.style.display = 'none';
-        
+
         // Atualiza a lista de salas para refletir as últimas mensagens
         this.renderChatRooms();
       });
     }
-    
+
     // Novo chat
     const newChatButton = document.getElementById('new-chat');
     if (newChatButton) {
@@ -735,7 +739,7 @@ const ChatModule = {
         alert('Funcionalidade de novo chat será implementada em breve!');
       });
     }
-    
+
     // Anexar arquivo
     const attachmentButton = document.querySelector('.attachment-button');
     if (attachmentButton) {
@@ -749,38 +753,38 @@ const ChatModule = {
 // Módulo da Biblioteca
 const LibraryModule = {
   documents: [],
-  
+
   init() {
     this.documents = [...sampleData.documents];
     this.renderDocuments();
     this.setupEventListeners();
   },
-  
+
   renderDocuments(filter = { type: 'all', disease: 'all', search: '' }) {
     const container = document.getElementById('documents-list');
     if (!container) return;
-    
+
     let filteredDocs = [...this.documents];
-    
+
     // Aplica os filtros
     if (filter.type !== 'all') {
       filteredDocs = filteredDocs.filter(doc => doc.type === filter.type);
     }
-    
+
     if (filter.disease !== 'all') {
-      filteredDocs = filteredDocs.filter(doc => 
+      filteredDocs = filteredDocs.filter(doc =>
         doc.tags.some(tag => tag.toLowerCase() === filter.disease.toLowerCase())
       );
     }
-    
+
     if (filter.search) {
       const searchTerm = filter.search.toLowerCase();
-      filteredDocs = filteredDocs.filter(doc => 
+      filteredDocs = filteredDocs.filter(doc =>
         doc.title.toLowerCase().includes(searchTerm) ||
         doc.tags.some(tag => tag.toLowerCase().includes(searchTerm))
       );
     }
-    
+
     if (filteredDocs.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
@@ -791,7 +795,7 @@ const LibraryModule = {
       `;
       return;
     }
-    
+
     container.innerHTML = filteredDocs.map(doc => `
       <div class="document-item" data-id="${doc.id}">
         <div class="document-icon">
@@ -815,7 +819,7 @@ const LibraryModule = {
         </div>
       </div>
     `).join('');
-    
+
     // Adiciona os event listeners para os botões de download
     document.querySelectorAll('.download-button').forEach(button => {
       button.addEventListener('click', (e) => {
@@ -824,7 +828,7 @@ const LibraryModule = {
         this.downloadDocument(docId);
       });
     });
-    
+
     // Adiciona os event listeners para os itens do documento
     document.querySelectorAll('.document-item').forEach(item => {
       item.addEventListener('click', () => {
@@ -833,7 +837,7 @@ const LibraryModule = {
       });
     });
   },
-  
+
   getDocumentIcon(format) {
     const icons = {
       'pdf': 'far fa-file-pdf',
@@ -848,10 +852,10 @@ const LibraryModule = {
       'png': 'far fa-file-image',
       'default': 'far fa-file'
     };
-    
+
     return icons[format.toLowerCase()] || icons.default;
   },
-  
+
   formatDocumentType(type) {
     const types = {
       'protocol': 'Protocolo',
@@ -860,20 +864,20 @@ const LibraryModule = {
       'report': 'Relatório',
       'default': 'Documento'
     };
-    
+
     return types[type] || types.default;
   },
-  
+
   downloadDocument(docId) {
     const doc = this.documents.find(d => d.id === docId);
     if (!doc) return;
-    
+
     // Simula o download
     console.log(`Iniciando download: ${doc.title}`);
-    
+
     // Atualiza a contagem de downloads
     doc.downloadCount++;
-    
+
     // Mostra feedback visual
     const button = document.querySelector(`.download-button[data-id="${docId}"]`);
     if (button) {
@@ -885,22 +889,22 @@ const LibraryModule = {
         }, 2000);
       }
     }
-    
+
     // Em um aplicativo real, isso iniciaria o download do arquivo
     // window.open(doc.url, '_blank');
   },
-  
+
   previewDocument(docId) {
     const doc = this.documents.find(d => d.id === docId);
     if (!doc) return;
-    
+
     // Em um aplicativo real, isso abriria um visualizador de PDF
     const modal = document.getElementById('notification-modal');
     const modalTitle = document.getElementById('notification-modal-title');
     const modalBody = document.getElementById('notification-modal-body');
-    
+
     if (!modal || !modalTitle || !modalBody) return;
-    
+
     modalTitle.textContent = doc.title;
     modalBody.innerHTML = `
       <div class="document-preview">
@@ -926,11 +930,11 @@ const LibraryModule = {
         </button>
       </div>
     `;
-    
+
     // Configura os botões de ação
     const openBtn = document.getElementById('open-document');
     const downloadBtn = document.getElementById('download-document');
-    
+
     if (openBtn) {
       openBtn.addEventListener('click', () => {
         // Em um aplicativo real, isso abriria o visualizador de PDF
@@ -939,17 +943,17 @@ const LibraryModule = {
         this.closeModal('notification-modal');
       });
     }
-    
+
     if (downloadBtn) {
       downloadBtn.addEventListener('click', () => {
         this.downloadDocument(docId);
         this.closeModal('notification-modal');
       });
     }
-    
+
     this.openModal('notification-modal');
   },
-  
+
   openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
@@ -957,7 +961,7 @@ const LibraryModule = {
       document.body.style.overflow = 'hidden';
     }
   },
-  
+
   closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
@@ -965,7 +969,7 @@ const LibraryModule = {
       document.body.style.overflow = '';
     }
   },
-  
+
   setupEventListeners() {
     // Barra de pesquisa
     const searchButton = document.getElementById('search-library');
@@ -974,19 +978,19 @@ const LibraryModule = {
     const clearSearch = document.getElementById('clear-search');
     const typeFilter = document.getElementById('document-type-filter');
     const diseaseFilter = document.getElementById('disease-filter');
-    
+
     // Alterna a visibilidade da barra de pesquisa
     if (searchButton && searchContainer) {
       searchButton.addEventListener('click', () => {
         const isVisible = searchContainer.style.display === 'block';
         searchContainer.style.display = isVisible ? 'none' : 'block';
-        
+
         if (!isVisible && searchInput) {
           searchInput.focus();
         }
       });
     }
-    
+
     // Limpa a pesquisa
     if (clearSearch && searchInput) {
       clearSearch.addEventListener('click', () => {
@@ -994,27 +998,27 @@ const LibraryModule = {
         this.applyFilters();
       });
     }
-    
+
     // Aplica os filtros ao digitar
     if (searchInput) {
       searchInput.addEventListener('input', () => {
         this.applyFilters();
       });
     }
-    
+
     // Aplica os filtros ao mudar os seletores
     if (typeFilter) {
       typeFilter.addEventListener('change', () => {
         this.applyFilters();
       });
     }
-    
+
     if (diseaseFilter) {
       diseaseFilter.addEventListener('change', () => {
         this.applyFilters();
       });
     }
-    
+
     // Fecha a barra de pesquisa ao clicar fora
     document.addEventListener('click', (e) => {
       if (searchContainer && searchButton && !searchContainer.contains(e.target) && e.target !== searchButton) {
@@ -1022,18 +1026,18 @@ const LibraryModule = {
       }
     });
   },
-  
+
   applyFilters() {
     const searchInput = document.getElementById('library-search');
     const typeFilter = document.getElementById('document-type-filter');
     const diseaseFilter = document.getElementById('disease-filter');
-    
+
     const filters = {
       type: typeFilter ? typeFilter.value : 'all',
       disease: diseaseFilter ? diseaseFilter.value : 'all',
       search: searchInput ? searchInput.value.trim() : ''
     };
-    
+
     this.renderDocuments(filters);
   }
 };
@@ -1044,27 +1048,27 @@ const SettingsModule = {
     this.loadUserData();
     this.setupEventListeners();
   },
-  
+
   loadUserData() {
     const userName = document.getElementById('user-name');
     if (userName) {
       userName.textContent = sampleData.user.name;
     }
-    
+
     // Configura os toggles
     this.setupToggle('notifications-toggle', sampleData.user.notificationsEnabled);
     this.setupToggle('email-toggle', sampleData.user.emailNotifications);
     this.setupToggle('dark-mode-toggle', sampleData.user.darkMode);
   },
-  
+
   setupToggle(toggleId, isChecked) {
     const toggle = document.getElementById(toggleId);
     if (toggle) {
       toggle.checked = isChecked;
-      
+
       toggle.addEventListener('change', (e) => {
         const isEnabled = e.target.checked;
-        
+
         // Atualiza os dados do usuário
         switch (toggleId) {
           case 'notifications-toggle':
@@ -1084,26 +1088,26 @@ const SettingsModule = {
       });
     }
   },
-  
+
   toggleDarkMode(enable) {
     document.body.classList.toggle('dark-mode', enable);
-    
+
     // Salva a preferência no localStorage
     localStorage.setItem('darkMode', enable ? 'enabled' : 'disabled');
   },
-  
+
   showToast(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.textContent = message;
-    
+
     document.body.appendChild(toast);
-    
+
     // Mostra o toast
     setTimeout(() => {
       toast.classList.add('show');
     }, 100);
-    
+
     // Remove o toast após 3 segundos
     setTimeout(() => {
       toast.classList.remove('show');
@@ -1112,7 +1116,7 @@ const SettingsModule = {
       }, 300);
     }, 3000);
   },
-  
+
   setupEventListeners() {
     // Botão de logout
     const logoutButton = document.getElementById('logout-button');
@@ -1122,7 +1126,7 @@ const SettingsModule = {
           // Em um aplicativo real, isso faria logout do usuário
           console.log('Usuário deslogado');
           this.showToast('Você saiu da sua conta com sucesso', 'success');
-          
+
           // Redireciona para a tela de login após um curto atraso
           setTimeout(() => {
             // window.location.href = 'login.html';
@@ -1130,7 +1134,7 @@ const SettingsModule = {
         }
       });
     }
-    
+
     // Links de termos e política de privacidade
     const termsLinks = document.querySelectorAll('[href*="termos"]');
     termsLinks.forEach(link => {
@@ -1139,7 +1143,7 @@ const SettingsModule = {
         alert('Termos de Uso serão exibidos aqui.');
       });
     });
-    
+
     const privacyLinks = document.querySelectorAll('[href*="privacidade"]');
     privacyLinks.forEach(link => {
       link.addEventListener('click', (e) => {
@@ -1147,7 +1151,7 @@ const SettingsModule = {
         alert('Política de Privacidade será exibida aqui.');
       });
     });
-    
+
     // Configura o tema escuro com base na preferência salva
     const savedTheme = localStorage.getItem('darkMode');
     if (savedTheme === 'enabled') {
@@ -1161,24 +1165,24 @@ const SettingsModule = {
 // Módulo Principal do Aplicativo
 const App = {
   currentScreen: 'dashboard',
-  
+
   init() {
     this.setupNavigation();
     this.setupUI();
     this.loadInitialData();
     this.setupServiceWorker();
     this.checkConnectionStatus();
-    
+
     // Inicializa os módulos
     try {
       NotificationsModule.init();
       ChatModule.init();
       LibraryModule.init();
       SettingsModule.init();
-      
+
       // Mostra a tela inicial
       this.showScreen('dashboard');
-      
+
       console.log('Aplicativo EpiConecta inicializado com sucesso!');
     } catch (error) {
       console.error('Erro na inicialização:', error);
@@ -1187,10 +1191,10 @@ const App = {
       // Garante que o loading seja removido
       setTimeout(() => {
         this.hideLoading();
-      }, 500); 
+      }, 500);
     }
   },
-  
+
   setupNavigation() {
     // Navegação pelo menu inferior
     const navItems = document.querySelectorAll('.bottom-nav .nav-item');
@@ -1203,7 +1207,7 @@ const App = {
         }
       });
     });
-    
+
     // Navegação pelos cards da tela inicial
     const actionCards = document.querySelectorAll('.action-card');
     actionCards.forEach(card => {
@@ -1212,7 +1216,7 @@ const App = {
         this.showScreen(screen);
       });
     });
-    
+
     // Botão de voltar
     const backButtons = document.querySelectorAll('.back-button');
     backButtons.forEach(button => {
@@ -1222,37 +1226,37 @@ const App = {
       });
     });
   },
-  
+
   showScreen(screenId) {
     // Esconde todas as telas
     const screens = document.querySelectorAll('.screen');
     screens.forEach(screen => {
       screen.style.display = 'none';
     });
-    
+
     // Mostra a tela solicitada
     const targetScreen = document.getElementById(`${screenId}-screen`);
     if (targetScreen) {
       targetScreen.style.display = 'block';
       this.currentScreen = screenId;
-      
+
       // Atualiza o menu ativo
       this.updateActiveNavItem(screenId);
-      
+
       // Rola para o topo
       window.scrollTo(0, 0);
-      
+
       // Executa ações específicas ao mostrar determinadas telas
       this.onScreenShow(screenId);
     }
   },
-  
+
   showPreviousScreen() {
     // Lógica para voltar à tela anterior
     // Por enquanto, sempre volta para o dashboard
     this.showScreen('dashboard');
   },
-  
+
   updateActiveNavItem(screenId) {
     const navItems = document.querySelectorAll('.nav-item');
     navItems.forEach(item => {
@@ -1263,7 +1267,7 @@ const App = {
       }
     });
   },
-  
+
   onScreenShow(screenId) {
     switch (screenId) {
       case 'notifications':
@@ -1280,11 +1284,11 @@ const App = {
         break;
     }
   },
-  
+
   setupUI() {
     // Atualiza a data atual
     this.updateCurrentDate();
-    
+
     // Configura o botão de notificações
     const notificationsButton = document.getElementById('notifications-button');
     if (notificationsButton) {
@@ -1293,7 +1297,7 @@ const App = {
         this.showScreen('notifications');
       });
     }
-    
+
     // Configura o botão do perfil do usuário
     const userMenuButton = document.getElementById('user-menu-button');
     if (userMenuButton) {
@@ -1301,7 +1305,7 @@ const App = {
         this.showScreen('settings');
       });
     }
-    
+
     // Configura o botão "Ver todos" dos alertas
     const viewAllAlerts = document.getElementById('view-all-alerts');
     if (viewAllAlerts) {
@@ -1311,40 +1315,40 @@ const App = {
       });
     }
   },
-  
+
   updateCurrentDate() {
     const dateElement = document.getElementById('current-date');
     if (dateElement) {
-      const options = { 
-        weekday: 'long', 
-        day: '2-digit', 
-        month: 'long', 
+      const options = {
+        weekday: 'long',
+        day: '2-digit',
+        month: 'long',
         year: 'numeric',
         timeZone: 'America/Sao_Paulo'
       };
-      
+
       const now = new Date();
       dateElement.textContent = now.toLocaleDateString('pt-BR', options);
     }
   },
-  
+
   loadInitialData() {
     // Carrega os alertas recentes
     this.renderRecentAlerts();
-    
+
     // Simula um carregamento inicial
     this.showLoading('Carregando dados...');
     setTimeout(() => {
       this.hideLoading();
     }, 1000);
   },
-  
+
   renderRecentAlerts() {
     const container = document.getElementById('recent-alerts');
     if (!container) return;
-    
+
     const recentAlerts = sampleData.alerts.slice(0, 3); // Mostra apenas os 3 alertas mais recentes
-    
+
     if (recentAlerts.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
@@ -1354,7 +1358,7 @@ const App = {
       `;
       return;
     }
-    
+
     container.innerHTML = recentAlerts.map(alert => `
       <div class="alert-card" data-id="${alert.id}">
         <div class="alert-icon">
@@ -1367,7 +1371,7 @@ const App = {
         </div>
       </div>
     `).join('');
-    
+
     // Adiciona os event listeners para os cartões de alerta
     document.querySelectorAll('.alert-card').forEach(card => {
       card.addEventListener('click', () => {
@@ -1376,12 +1380,12 @@ const App = {
       });
     });
   },
-  
+
   formatAlertTime(timestamp) {
     const date = new Date(timestamp);
     const now = new Date();
     const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
-    
+
     if (diffInHours < 1) {
       const diffInMinutes = Math.floor((now - date) / (1000 * 60));
       return `Há ${diffInMinutes} min`;
@@ -1393,18 +1397,18 @@ const App = {
       return date.toLocaleDateString('pt-BR');
     }
   },
-  
+
   showAlertDetails(alertId) {
     const alert = sampleData.alerts.find(a => a.id === alertId);
     if (!alert) return;
-    
+
     const modal = document.getElementById('notification-modal');
     const modalTitle = document.getElementById('notification-modal-title');
     const modalBody = document.getElementById('notification-modal-body');
     const actionBtn = document.getElementById('notification-action-btn');
-    
+
     if (!modal || !modalTitle || !modalBody || !actionBtn) return;
-    
+
     modalTitle.textContent = alert.title;
     modalBody.innerHTML = `
       <div class="alert-details">
@@ -1415,10 +1419,10 @@ const App = {
         </div>
       </div>
     `;
-    
+
     // Configura o botão de ação com base no tipo de alerta
     let actionText = 'Ver Detalhes';
-    
+
     if (alert.action) {
       switch (alert.action.type) {
         case 'openLink':
@@ -1432,7 +1436,7 @@ const App = {
           break;
       }
     }
-    
+
     actionBtn.textContent = actionText;
     actionBtn.onclick = () => {
       if (alert.action) {
@@ -1451,10 +1455,10 @@ const App = {
       }
       this.closeModal('notification-modal');
     };
-    
+
     this.openModal('notification-modal');
   },
-  
+
   formatAlertCategory(category) {
     const categories = {
       'dengue': 'Dengue',
@@ -1462,30 +1466,30 @@ const App = {
       'vaccination': 'Vacinação',
       'general': 'Geral'
     };
-    
+
     return categories[category] || category;
   },
-  
+
   showLoading(message = 'Carregando...') {
     const loadingOverlay = document.getElementById('loading-overlay');
     const loadingMessage = document.getElementById('loading-message');
-    
+
     if (loadingOverlay) {
       loadingOverlay.classList.add('active');
     }
-    
+
     if (loadingMessage) {
       loadingMessage.textContent = message;
     }
   },
-  
+
   hideLoading() {
     const loadingOverlay = document.getElementById('loading-overlay');
     if (loadingOverlay) {
       loadingOverlay.classList.remove('active');
     }
   },
-  
+
   openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
@@ -1493,7 +1497,7 @@ const App = {
       document.body.style.overflow = 'hidden';
     }
   },
-  
+
   closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
@@ -1501,7 +1505,7 @@ const App = {
       document.body.style.overflow = '';
     }
   },
-  
+
   setupServiceWorker() {
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -1513,17 +1517,17 @@ const App = {
       });
     }
   },
-  
+
   checkConnectionStatus() {
     const updateConnectionStatus = () => {
       const isOnline = navigator.onLine;
       const statusElement = document.getElementById('connection-status');
-      
+
       if (statusElement) {
         statusElement.textContent = isOnline ? 'Online' : 'Offline';
         statusElement.className = isOnline ? 'online' : 'offline';
       }
-      
+
       // Mostra uma notificação quando o status da conexão mudar
       if (isOnline) {
         this.showToast('Você está online', 'success');
@@ -1531,27 +1535,27 @@ const App = {
         this.showToast('Você está offline. Algumas funcionalidades podem estar limitadas.', 'warning');
       }
     };
-    
+
     // Verifica o status da conexão quando a página carrega
     updateConnectionStatus();
-    
+
     // Monitora mudanças no status da conexão
     window.addEventListener('online', updateConnectionStatus);
     window.addEventListener('offline', updateConnectionStatus);
   },
-  
+
   showToast(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.textContent = message;
-    
+
     document.body.appendChild(toast);
-    
+
     // Mostra o toast
     setTimeout(() => {
       toast.classList.add('show');
     }, 100);
-    
+
     // Remove o toast após 3 segundos
     setTimeout(() => {
       toast.classList.remove('show');

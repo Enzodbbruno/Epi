@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="EpiConecta - Sistema de Vigilância Epidemiológica e Comunicação em Saúde">
-    <meta name="keywords" content="saúde, vigilância epidemiológica, epidemiologia, saúde pública, notificações, chat profissional, biblioteca digital">
+    <meta name="keywords"
+        content="saúde, vigilância epidemiológica, epidemiologia, saúde pública, notificações, chat profissional, biblioteca digital">
     <meta name="author" content="EpiConecta">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#1a73e8">
@@ -15,9 +17,9 @@
     <meta name="msapplication-TileColor" content="#1a73e8">
     <meta name="msapplication-TileImage" content="/icons/ms-icon-144x144.png">
     <meta name="msapplication-config" content="browserconfig.xml">
-    
+
     <title>EpiConecta - Vigilância Epidemiológica</title>
-    
+
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
@@ -25,327 +27,359 @@
     <link rel="icon" type="image/png" sizes="96x96" href="icons/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
     <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-icon-180x180.png">
-    
+
     <!-- CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    
+
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
-    
+
     <!-- iOS -->
-    <link rel="apple-touch-startup-image" href="icons/apple-splash-2048-2732.jpg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
-    <link rel="apple-touch-startup-image" href="icons/apple-splash-2732-2048.jpg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link rel="apple-touch-startup-image" href="icons/apple-splash-2048-2732.jpg"
+        media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="icons/apple-splash-2732-2048.jpg"
+        media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+
 <body>
     <div class="app-container">
-        <!-- App Header -->
-        <header class="app-header">
-            <div class="header-content">
-                <div class="logo" id="logo">
-                    <i class="fas fa-shield-virus"></i>
-                    <h1>EpiConecta</h1>
-                </div>
-                <div class="header-actions">
-                    <button class="icon-button" id="notifications-button">
-                        <i class="fas fa-bell"></i>
-                        <span class="badge" id="notification-badge">2</span>
-                    </button>
-                    <div class="user-avatar" id="user-menu-button">
-                        <i class="fas fa-user"></i>
-                    </div>
-                </div>
+        <!-- Desktop Sidebar (Visible only on Desktop via CSS) -->
+        <aside class="desktop-sidebar">
+            <div class="logo" style="padding: 24px; color: var(--primary-color);">
+                <i class="fas fa-shield-virus"></i>
+                <h1>EpiConecta</h1>
             </div>
-        </header>
+            <nav class="desktop-nav">
+                <a href="#" class="desktop-nav-item active" data-screen="dashboard">
+                    <i class="fas fa-home"></i> <span>Início</span>
+                </a>
+                <a href="#" class="desktop-nav-item" data-screen="notifications">
+                    <i class="fas fa-bell"></i> <span>Notificações</span>
+                </a>
+                <a href="#" class="desktop-nav-item" data-screen="chat">
+                    <i class="fas fa-comments"></i> <span>Chat Profissional</span>
+                </a>
+                <a href="#" class="desktop-nav-item" data-screen="library">
+                    <i class="fas fa-book-medical"></i> <span>Biblioteca</span>
+                </a>
+                <a href="#" class="desktop-nav-item" data-screen="settings">
+                    <i class="fas fa-cog"></i> <span>Configurações</span>
+                </a>
+            </nav>
+        </aside>
 
-        <!-- Main Content -->
-        <main class="main-content" id="main-content">
-            <!-- Tela Inicial (Dashboard) -->
-            <section class="screen" id="dashboard-screen">
-                <section class="welcome-section">
-                    <h2>Bem-vindo(a), <span id="user-name">Profissional</span></h2>
-                    <p id="current-date">Carregando...</p>
-                </section>
-
-                <section class="quick-actions">
-                    <div class="action-card" id="notifications-card">
-                        <div class="icon-container">
+        <!-- Main Content Wrapper -->
+        <div class="content-wrapper">
+            <!-- Header Mobile Only -->
+            <header class="app-header">
+                <div class="header-content">
+                    <div class="logo" id="logo">
+                        <i class="fas fa-shield-virus"></i>
+                        <h1>EpiConecta</h1>
+                    </div>
+                    <div class="header-actions">
+                        <button class="icon-button" id="notifications-button">
                             <i class="fas fa-bell"></i>
+                            <span class="badge" id="notification-badge">2</span>
+                        </button>
+                        <div class="user-avatar" id="user-menu-button">
+                            <span>JS</span>
                         </div>
-                        <h3>Notificações</h3>
-                        <p>Alertas e boletins</p>
                     </div>
-                    <div class="action-card" id="chat-card">
-                        <div class="icon-container">
-                            <i class="fas fa-comments"></i>
+                </div>
+            </header>
+
+            <main class="main-content" id="main-content">
+                <!-- Tela Inicial (Dashboard) -->
+                <section class="screen" id="dashboard-screen">
+                    <section class="welcome-section">
+                        <h2>Bem-vindo(a), <span id="user-name">Profissional</span></h2>
+                        <p id="current-date">Carregando...</p>
+                    </section>
+
+                    <section class="quick-actions">
+                        <div class="action-card" id="notifications-card">
+                            <div class="icon-container">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <h3>Notificações</h3>
+                            <p>Alertas e boletins</p>
                         </div>
-                        <h3>Chat Profissional</h3>
-                        <p>Converse com a equipe</p>
-                    </div>
-                    <div class="action-card" id="library-card">
-                        <div class="icon-container">
-                            <i class="fas fa-book"></i>
+                        <div class="action-card" id="chat-card">
+                            <div class="icon-container">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <h3>Chat Profissional</h3>
+                            <p>Converse com a equipe</p>
                         </div>
-                        <h3>Biblioteca</h3>
-                        <p>Materiais de referência</p>
-                    </div>
+                        <div class="action-card" id="library-card">
+                            <div class="icon-container">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <h3>Biblioteca</h3>
+                            <p>Materiais de referência</p>
+                        </div>
+                    </section>
+
+                    <section class="alerts-section">
+                        <div class="section-header">
+                            <h2>Alertas Recentes</h2>
+                            <a href="#" class="see-all" id="view-all-alerts">Ver todos</a>
+                        </div>
+                        <div id="recent-alerts">
+                            <!-- Alertas serão carregados dinamicamente -->
+                        </div>
+                    </section>
                 </section>
 
-                <section class="alerts-section">
-                    <div class="section-header">
-                        <h2>Alertas Recentes</h2>
-                        <a href="#" class="see-all" id="view-all-alerts">Ver todos</a>
-                    </div>
-                    <div id="recent-alerts">
-                        <!-- Alertas serão carregados dinamicamente -->
-                    </div>
-                </section>
-            </section>
-
-            <!-- Tela de Notificações -->
-            <section class="screen" id="notifications-screen" style="display: none;">
-                <div class="screen-header">
-                    <button class="back-button">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
-                    <h2>Notificações</h2>
-                    <div class="header-actions">
-                        <button class="icon-button" id="filter-notifications">
-                            <i class="fas fa-filter"></i>
+                <!-- Tela de Notificações -->
+                <section class="screen" id="notifications-screen" style="display: none;">
+                    <div class="screen-header">
+                        <button class="back-button">
+                            <i class="fas fa-arrow-left"></i>
                         </button>
-                    </div>
-                </div>
-                <div class="content-container">
-                    <div class="filter-options" id="notification-filters" style="display: none;">
-                        <h3>Filtrar por:</h3>
-                        <div class="filter-tags">
-                            <button class="filter-tag active" data-filter="all">Todas</button>
-                            <button class="filter-tag" data-filter="alert">Alertas</button>
-                            <button class="filter-tag" data-filter="news">Notícias</button>
-                            <button class="filter-tag" data-filter="update">Atualizações</button>
-                        </div>
-                    </div>
-                    <div class="notifications-list" id="notifications-list">
-                        <!-- Notificações serão carregadas dinamicamente -->
-                    </div>
-                </div>
-            </section>
-
-            <!-- Tela de Chat -->
-            <section class="screen" id="chat-screen" style="display: none;">
-                <div class="screen-header">
-                    <button class="back-button">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
-                    <h2>Chat Profissional</h2>
-                    <div class="header-actions">
-                        <button class="icon-button" id="new-chat">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="chat-container">
-                    <div class="chat-rooms" id="chat-rooms">
-                        <!-- Salas de chat serão carregadas dinamicamente -->
-                    </div>
-                    <div class="chat-messages" id="chat-messages" style="display: none;">
-                        <div class="chat-header">
-                            <button class="back-to-rooms">
-                                <i class="fas fa-arrow-left"></i>
+                        <h2>Notificações</h2>
+                        <div class="header-actions">
+                            <button class="icon-button" id="filter-notifications">
+                                <i class="fas fa-filter"></i>
                             </button>
-                            <h3 id="current-chat-name">Sala de Chat</h3>
-                            <div class="chat-actions">
-                                <button class="icon-button" id="chat-info">
-                                    <i class="fas fa-info-circle"></i>
+                        </div>
+                    </div>
+                    <div class="content-container">
+                        <div class="filter-options" id="notification-filters" style="display: none;">
+                            <h3>Filtrar por:</h3>
+                            <div class="filter-tags">
+                                <button class="filter-tag active" data-filter="all">Todas</button>
+                                <button class="filter-tag" data-filter="alert">Alertas</button>
+                                <button class="filter-tag" data-filter="news">Notícias</button>
+                                <button class="filter-tag" data-filter="update">Atualizações</button>
+                            </div>
+                        </div>
+                        <div class="notifications-list" id="notifications-list">
+                            <!-- Notificações serão carregadas dinamicamente -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Tela de Chat -->
+                <section class="screen" id="chat-screen" style="display: none;">
+                    <div class="screen-header">
+                        <button class="back-button">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <h2>Chat Profissional</h2>
+                        <div class="header-actions">
+                            <button class="icon-button" id="new-chat">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chat-container">
+                        <div class="chat-rooms" id="chat-rooms">
+                            <!-- Salas de chat serão carregadas dinamicamente -->
+                        </div>
+                        <div class="chat-messages" id="chat-messages" style="display: none;">
+                            <div class="chat-header">
+                                <button class="back-to-rooms">
+                                    <i class="fas fa-arrow-left"></i>
+                                </button>
+                                <h3 id="current-chat-name">Sala de Chat</h3>
+                                <div class="chat-actions">
+                                    <button class="icon-button" id="chat-info">
+                                        <i class="fas fa-info-circle"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="messages-container" id="messages-container">
+                                <!-- Mensagens serão carregadas dinamicamente -->
+                            </div>
+                            <div class="message-input-container">
+                                <button class="attachment-button">
+                                    <i class="fas fa-paperclip"></i>
+                                </button>
+                                <input type="text" id="message-input" placeholder="Digite sua mensagem...">
+                                <button class="send-button" id="send-message">
+                                    <i class="fas fa-paper-plane"></i>
                                 </button>
                             </div>
                         </div>
-                        <div class="messages-container" id="messages-container">
-                            <!-- Mensagens serão carregadas dinamicamente -->
-                        </div>
-                        <div class="message-input-container">
-                            <button class="attachment-button">
-                                <i class="fas fa-paperclip"></i>
-                            </button>
-                            <input type="text" id="message-input" placeholder="Digite sua mensagem...">
-                            <button class="send-button" id="send-message">
-                                <i class="fas fa-paper-plane"></i>
+                    </div>
+                </section>
+
+                <!-- Tela de Biblioteca -->
+                <section class="screen" id="library-screen" style="display: none;">
+                    <div class="screen-header">
+                        <button class="back-button">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <h2>Biblioteca Digital</h2>
+                        <div class="header-actions">
+                            <button class="icon-button" id="search-library">
+                                <i class="fas fa-search"></i>
                             </button>
                         </div>
                     </div>
-                </div>
-            </section>
+                    <div class="content-container">
+                        <div class="search-container" id="library-search-container" style="display: none;">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="library-search" placeholder="Buscar na biblioteca...">
+                                <button class="clear-search" id="clear-search">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="filter-options">
+                                <select id="document-type-filter">
+                                    <option value="all">Todos os tipos</option>
+                                    <option value="protocol">Protocolos</option>
+                                    <option value="manual">Manuais</option>
+                                    <option value="technical-note">Notas Técnicas</option>
+                                    <option value="report">Relatórios</option>
+                                </select>
+                                <select id="disease-filter">
+                                    <option value="all">Todas as doenças</option>
+                                    <option value="dengue">Dengue</option>
+                                    <option value="zika">Zika</option>
+                                    <option value="chikungunya">Chikungunya</option>
+                                    <option value="covid">COVID-19</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="documents-list" id="documents-list">
+                            <!-- Documentos serão carregados dinamicamente -->
+                        </div>
+                    </div>
+                </section>
 
-            <!-- Tela de Biblioteca -->
-            <section class="screen" id="library-screen" style="display: none;">
-                <div class="screen-header">
-                    <button class="back-button">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
-                    <h2>Biblioteca Digital</h2>
-                    <div class="header-actions">
-                        <button class="icon-button" id="search-library">
-                            <i class="fas fa-search"></i>
+                <!-- Tela de Configurações -->
+                <section class="screen" id="settings-screen" style="display: none;">
+                    <div class="screen-header">
+                        <button class="back-button">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <h2>Configurações</h2>
+                    </div>
+                    <div class="content-container">
+                        <div class="settings-section">
+                            <h3>Conta</h3>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <i class="fas fa-user"></i>
+                                    <div>
+                                        <h4>Perfil</h4>
+                                        <p>Gerencie suas informações pessoais</p>
+                                    </div>
+                                </div>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <div>
+                                        <h4>Privacidade</h4>
+                                        <p>Controle suas configurações de privacidade</p>
+                                    </div>
+                                </div>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h3>Notificações</h3>
+                            <div class="setting-item toggle">
+                                <div class="setting-info">
+                                    <i class="fas fa-bell"></i>
+                                    <div>
+                                        <h4>Notificações por push</h4>
+                                        <p>Receba alertas importantes</p>
+                                    </div>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item toggle">
+                                <div class="setting-info">
+                                    <i class="fas fa-envelope"></i>
+                                    <div>
+                                        <h4>Notificações por e-mail</h4>
+                                        <p>Receba atualizações por e-mail</p>
+                                    </div>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h3>Geral</h3>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <i class="fas fa-moon"></i>
+                                    <div>
+                                        <h4>Tema</h4>
+                                        <p>Altere para o modo escuro ou claro</p>
+                                    </div>
+                                </div>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <i class="fas fa-language"></i>
+                                    <div>
+                                        <h4>Idioma</h4>
+                                        <p>Português (Brasil)</p>
+                                    </div>
+                                </div>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h3>Sobre</h3>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <i class="fas fa-info-circle"></i>
+                                    <div>
+                                        <h4>Sobre o EpiConecta</h4>
+                                        <p>Versão 1.0.0</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <i class="fas fa-file-alt"></i>
+                                    <div>
+                                        <h4>Termos de Uso</h4>
+                                    </div>
+                                </div>
+                                <i class="fas fa-external-link-alt"></i>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <i class="fas fa-lock"></i>
+                                    <div>
+                                        <h4>Política de Privacidade</h4>
+                                    </div>
+                                </div>
+                                <i class="fas fa-external-link-alt"></i>
+                            </div>
+                        </div>
+
+                        <button class="logout-button" id="logout-button">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Sair da Conta
                         </button>
                     </div>
-                </div>
-                <div class="content-container">
-                    <div class="search-container" id="library-search-container" style="display: none;">
-                        <div class="search-box">
-                            <i class="fas fa-search"></i>
-                            <input type="text" id="library-search" placeholder="Buscar na biblioteca...">
-                            <button class="clear-search" id="clear-search">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        <div class="filter-options">
-                            <select id="document-type-filter">
-                                <option value="all">Todos os tipos</option>
-                                <option value="protocol">Protocolos</option>
-                                <option value="manual">Manuais</option>
-                                <option value="technical-note">Notas Técnicas</option>
-                                <option value="report">Relatórios</option>
-                            </select>
-                            <select id="disease-filter">
-                                <option value="all">Todas as doenças</option>
-                                <option value="dengue">Dengue</option>
-                                <option value="zika">Zika</option>
-                                <option value="chikungunya">Chikungunya</option>
-                                <option value="covid">COVID-19</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="documents-list" id="documents-list">
-                        <!-- Documentos serão carregados dinamicamente -->
-                    </div>
-                </div>
-            </section>
-
-            <!-- Tela de Configurações -->
-            <section class="screen" id="settings-screen" style="display: none;">
-                <div class="screen-header">
-                    <button class="back-button">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
-                    <h2>Configurações</h2>
-                </div>
-                <div class="content-container">
-                    <div class="settings-section">
-                        <h3>Conta</h3>
-                        <div class="setting-item">
-                            <div class="setting-info">
-                                <i class="fas fa-user"></i>
-                                <div>
-                                    <h4>Perfil</h4>
-                                    <p>Gerencie suas informações pessoais</p>
-                                </div>
-                            </div>
-                            <i class="fas fa-chevron-right"></i>
-                        </div>
-                        <div class="setting-item">
-                            <div class="setting-info">
-                                <i class="fas fa-shield-alt"></i>
-                                <div>
-                                    <h4>Privacidade</h4>
-                                    <p>Controle suas configurações de privacidade</p>
-                                </div>
-                            </div>
-                            <i class="fas fa-chevron-right"></i>
-                        </div>
-                    </div>
-
-                    <div class="settings-section">
-                        <h3>Notificações</h3>
-                        <div class="setting-item toggle">
-                            <div class="setting-info">
-                                <i class="fas fa-bell"></i>
-                                <div>
-                                    <h4>Notificações por push</h4>
-                                    <p>Receba alertas importantes</p>
-                                </div>
-                            </div>
-                            <label class="switch">
-                                <input type="checkbox" checked>
-                                <span class="slider round"></span>
-                            </label>
-                        </div>
-                        <div class="setting-item toggle">
-                            <div class="setting-info">
-                                <i class="fas fa-envelope"></i>
-                                <div>
-                                    <h4>Notificações por e-mail</h4>
-                                    <p>Receba atualizações por e-mail</p>
-                                </div>
-                            </div>
-                            <label class="switch">
-                                <input type="checkbox" checked>
-                                <span class="slider round"></span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="settings-section">
-                        <h3>Geral</h3>
-                        <div class="setting-item">
-                            <div class="setting-info">
-                                <i class="fas fa-moon"></i>
-                                <div>
-                                    <h4>Tema</h4>
-                                    <p>Altere para o modo escuro ou claro</p>
-                                </div>
-                            </div>
-                            <i class="fas fa-chevron-right"></i>
-                        </div>
-                        <div class="setting-item">
-                            <div class="setting-info">
-                                <i class="fas fa-language"></i>
-                                <div>
-                                    <h4>Idioma</h4>
-                                    <p>Português (Brasil)</p>
-                                </div>
-                            </div>
-                            <i class="fas fa-chevron-right"></i>
-                        </div>
-                    </div>
-
-                    <div class="settings-section">
-                        <h3>Sobre</h3>
-                        <div class="setting-item">
-                            <div class="setting-info">
-                                <i class="fas fa-info-circle"></i>
-                                <div>
-                                    <h4>Sobre o EpiConecta</h4>
-                                    <p>Versão 1.0.0</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="setting-item">
-                            <div class="setting-info">
-                                <i class="fas fa-file-alt"></i>
-                                <div>
-                                    <h4>Termos de Uso</h4>
-                                </div>
-                            </div>
-                            <i class="fas fa-external-link-alt"></i>
-                        </div>
-                        <div class="setting-item">
-                            <div class="setting-info">
-                                <i class="fas fa-lock"></i>
-                                <div>
-                                    <h4>Política de Privacidade</h4>
-                                </div>
-                            </div>
-                            <i class="fas fa-external-link-alt"></i>
-                        </div>
-                    </div>
-
-                    <button class="logout-button" id="logout-button">
-                        <i class="fas fa-sign-out-alt"></i>
-                        Sair da Conta
-                    </button>
-                </div>
-            </section>
-        </main>
+                </section>
+            </main>
+        </div> <!-- End of content-wrapper -->
 
         <!-- Bottom Navigation -->
         <nav class="bottom-nav">
@@ -518,4 +552,5 @@
     </template>
 
     <script src="js/app.js" type="module"></script>
+
 </html>
