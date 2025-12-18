@@ -1676,8 +1676,11 @@ const App = {
   },
 
   renderRecentAlerts() {
-    const container = document.getElementById('recent-alerts');
-    if (!container) return;
+    const container = document.querySelector('#recent-alerts'); // Use querySelector for flexibility
+    if (!container) {
+      console.warn('Recent Alerts container not found!');
+      return;
+    }
 
     const recentAlerts = sampleData.alerts.slice(0, 3); // Mostra apenas os 3 alertas mais recentes
 

@@ -682,24 +682,10 @@ body {
    #DESKTOP RESPONSIVE MODE (Minimum 1024px)
    ========================================================================== */
 @media (min-width: 1024px) {
-
-    /* 1. Layout Structure */
     .app-container {
         flex-direction: row;
-        /* Sidebar | Content */
     }
 
-    .app-header {
-        display: none;
-        /* Hide mobile header */
-    }
-
-    .bottom-nav {
-        display: none;
-        /* Hide bottom nav */
-    }
-
-    /* 2. Sidebar Navigation */
     .desktop-sidebar {
         display: flex;
     }
