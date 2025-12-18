@@ -201,6 +201,8 @@ body {
    ========================================================================== */
 .content-wrapper {
     display: flex;
+    flex-direction: column;
+    /* Fix for mobile layout */
     flex: 1;
     overflow: hidden;
     /* Prevent body scroll */
