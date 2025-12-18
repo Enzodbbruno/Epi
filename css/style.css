@@ -237,10 +237,16 @@ body {
 
 .quick-actions {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    /* 3 columns mobile */
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 columns mobile */
     gap: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
+}
+
+@media (min-width: 768px) {
+    .quick-actions {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
 
 .action-card {
