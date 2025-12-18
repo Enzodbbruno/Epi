@@ -1497,25 +1497,7 @@ const App = {
 
       // ... (existing code)
 
-      onScreenShow(screenId) {
-        switch (screenId) {
-          case 'notifications':
-            // Atualiza a lista de notificações
-            NotificationsModule.renderNotifications();
-            break;
-          case 'chat':
-            // Atualiza a lista de salas de chat
-            ChatModule.renderChatRooms();
-            break;
-          case 'library':
-            // Atualiza a lista de documentos
-            LibraryModule.renderDocuments();
-            break;
-          case 'symptoms':
-            // Ensure UI is clean or ready?
-            break;
-        }
-      },
+
 
       console.log('Aplicativo EpiConecta inicializado com sucesso!');
     } catch (error) {
