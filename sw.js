@@ -1,5 +1,5 @@
 // Nome do cache
-const CACHE_NAME = 'epiconecta-v1';
+const CACHE_NAME = 'epiconecta-v2';
 // Arquivos para armazenar em cache
 const urlsToCache = [
   '/',
@@ -67,7 +67,7 @@ self.addEventListener('fetch', event => {
           if (response) {
             return response;
           }
-          
+
           // Se não estiver no cache, busca na rede e armazena
           return fetch(event.request).then(response => {
             // Verifica se recebemos uma resposta válida
@@ -125,9 +125,9 @@ self.addEventListener('push', event => {
 // Ação ao clicar na notificação
 self.addEventListener('notificationclick', event => {
   event.notification.close();
-  
+
   const urlToOpen = event.notification.data.url || '/';
-  
+
   event.waitUntil(
     clients.matchAll({ type: 'window' })
       .then(windowClients => {
@@ -138,7 +138,7 @@ self.addEventListener('notificationclick', event => {
             return client.focus();
           }
         }
-        
+
         // Se não encontrou, abre uma nova aba
         if (clients.openWindow) {
           return clients.openWindow(urlToOpen);
