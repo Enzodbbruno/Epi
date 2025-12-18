@@ -1170,15 +1170,25 @@ const App = {
     this.checkConnectionStatus();
     
     // Inicializa os módulos
-    NotificationsModule.init();
-    ChatModule.init();
-    LibraryModule.init();
-    SettingsModule.init();
-    
-    // Mostra a tela inicial
-    this.showScreen('dashboard');
-    
-    console.log('Aplicativo EpiConecta inicializado com sucesso!');
+    try {
+      NotificationsModule.init();
+      ChatModule.init();
+      LibraryModule.init();
+      SettingsModule.init();
+      
+      // Mostra a tela inicial
+      this.showScreen('dashboard');
+      
+      console.log('Aplicativo EpiConecta inicializado com sucesso!');
+    } catch (error) {
+      console.error('Erro na inicialização:', error);
+      this.showToast('Erro ao carregar o aplicativo', 'error');
+    } finally {
+      // Garante que o loading seja removido
+      setTimeout(() => {
+        this.hideLoading();
+      }, 500); 
+    }
   },
   
   setupNavigation() {
