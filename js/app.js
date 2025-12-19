@@ -1624,12 +1624,12 @@ const AnalyticsModule = {
 // Módulo do Mapa Epidemiológico (Leaflet + Geolocation)
 // Módulo do Mapa Epidemiológico (True Heatmap + Disease Filter)
 // Módulo do Mapa Epidemiológico (Cluster Map + Disease Icons)
-// Módulo do Mapa Epidemiológico (Severity Dot Map)
+// Módulo do Mapa Epidemiológico (Smart Majority Clusters)
 const MapModule = {
   map: null,
+  clusterGroup: null,
   userLocation: null,
   currentDisease: 'dengue',
-  markers: [],
 
   // Coordenadas padrão (Brasília)
   defaultCoords: [-15.7975, -47.8919],
@@ -1674,7 +1674,7 @@ const MapModule = {
         this.currentDisease = e.target.value;
         const center = this.map ? this.map.getCenter() : { lat: this.defaultCoords[0], lng: this.defaultCoords[1] };
         if (this.map) {
-          this.generateDotData(center.lat, center.lng);
+          this.generateSmartData(center.lat, center.lng);
         }
       });
     }
@@ -1712,7 +1712,7 @@ const MapModule = {
   loadMapAt(lat, lng) {
     if (this.map) {
       this.map.flyTo([lat, lng], 13);
-      this.generateDotData(lat, lng);
+      this.generateSmartData(lat, lng);
       return;
     }
 
@@ -1725,22 +1725,56 @@ const MapModule = {
         maxZoom: 19
       }).addTo(this.map);
 
-      this.generateDotData(lat, lng);
+      // INITIALIZE SMART CLUSTER GROUP
+      this.clusterGroup = L.markerClusterGroup({
+        maxClusterRadius: 60, // Slightly larger radius
+        spiderfyOnMaxZoom: true,
+        showCoverageOnHover: false,
+        zoomToBoundsOnClick: true,
+
+        // CRITICAL: Custom Logic for Majority Rule
+        iconCreateFunction: (cluster) => {
+          const markers = cluster.getAllChildMarkers();
+          let counts = { severe: 0, warning: 0, recovered: 0 };
+
+          // Count severity of all children
+          markers.forEach(m => {
+            const sev = m.options.severityStatus; // Custom property attached
+            if (sev) counts[sev]++;
+          });
+
+          // Determine Winner
+          let winnerClass = 'cluster-recovered'; // Default
+          let max = counts.recovered;
+
+          if (counts.warning > max) { max = counts.warning; winnerClass = 'cluster-warning'; }
+          if (counts.severe > max) { max = counts.severe; winnerClass = 'cluster-severe'; }
+
+          return L.divIcon({
+            html: `<div>${cluster.getChildCount()}</div>`,
+            className: `smart-cluster ${winnerClass}`,
+            iconSize: L.point(40, 40)
+          });
+        }
+      });
+      this.map.addLayer(this.clusterGroup);
+
+      this.generateSmartData(lat, lng);
       this.addLegend();
     }, 100);
   },
 
-  generateDotData(lat, lng) {
-    // Clear old markers
-    this.markers.forEach(m => this.map.removeLayer(m));
-    this.markers = [];
+  generateSmartData(lat, lng) {
+    if (!this.clusterGroup) return;
+    this.clusterGroup.clearLayers();
 
     let count = 200;
     let radius = 0.05;
 
-    // Adjust density by disease
     if (this.currentDisease === 'dengue') { count = 350; radius = 0.07; }
     if (this.currentDisease === 'covid') { count = 250; radius = 0.04; }
+
+    const markers = [];
 
     for (let i = 0; i < count; i++) {
       const spreadX = (Math.random() - 0.5) * radius * 2;
@@ -1748,34 +1782,33 @@ const MapModule = {
 
       // Determine Severity
       const r = Math.random();
-      let sevColor, sevLabel;
+      let sevColor, sevLabel, sevStatus;
 
       // Weighted probabilities based on disease
       let chanceSevere = 0.1;
       let chanceWarning = 0.4;
 
-      if (this.currentDisease === 'covid') { chanceSevere = 0.3; chanceWarning = 0.6; }
-      if (this.currentDisease === 'zika') { chanceSevere = 0.05; chanceWarning = 0.3; }
+      if (this.currentDisease === 'covid') { chanceSevere = 0.3; chanceWarning = 0.6; } // More severe
 
       if (r < chanceSevere) {
-        sevColor = '#D32F2F'; // Red (Severe)
-        sevLabel = 'Caso Grave';
+        sevColor = '#D32F2F'; sevLabel = 'Caso Grave'; sevStatus = 'severe';
       } else if (r < chanceWarning) {
-        sevColor = '#FFA000'; // Orange (Suspect)
-        sevLabel = 'Em Análise';
+        sevColor = '#FFA000'; sevLabel = 'Em Análise'; sevStatus = 'warning';
       } else {
-        sevColor = '#388E3C'; // Green (Recovered)
-        sevLabel = 'Recuperado';
+        sevColor = '#388E3C'; sevLabel = 'Recuperado'; sevStatus = 'recovered';
       }
 
+      // Individual Marker Style (White Border Dot)
       const circle = L.circleMarker([lat + spreadX, lng + spreadY], {
         radius: 6,
         fillColor: sevColor,
         color: '#fff',
         weight: 1,
         opacity: 1,
-        fillOpacity: 0.9
-      }).addTo(this.map); // Add directly to map (no cluster)
+        fillOpacity: 0.9,
+        // CRITICAL: Attach Data for Cluster Logic
+        severityStatus: sevStatus
+      });
 
       circle.bindPopup(`
                 <div style="text-align: center;">
@@ -1784,8 +1817,10 @@ const MapModule = {
                     <small>Atualizado: 10 min atrás</small>
                 </div>
             `);
-      this.markers.push(circle);
+      markers.push(circle);
     }
+
+    this.clusterGroup.addLayers(markers);
   },
 
   addLegend() {
@@ -1803,18 +1838,18 @@ const MapModule = {
 
   updateLegendContent(div) {
     div.innerHTML = `
-            <strong>Gravidade dos Casos</strong><br>
+            <strong>Gravidade (Maioria)</strong><br>
             <div class="legend-item" style="margin-top:5px;">
                 <div class="legend-icon" style="background:#D32F2F"></div>
-                <span>Grave / Confirmado</span>
+                <span>Grave / Predominante</span>
             </div>
             <div class="legend-item">
                 <div class="legend-icon" style="background:#FFA000"></div>
-                <span>Suspeito / Em Análise</span>
+                <span>Suspeito / Predominante</span>
             </div>
             <div class="legend-item">
                 <div class="legend-icon" style="background:#388E3C"></div>
-                <span>Recuperado / Monitorado</span>
+                <span>Recuperado / Predominante</span>
             </div>
         `;
   }
