@@ -1642,6 +1642,7 @@ const App = {
       SymptomsModule.init(); // Init Symptoms
       NewsModule.init(); // Init News Carousel
       AnalyticsModule.init(); // Init Analytics
+      MapModule.init(); // Init Map Listener
 
       // Mostra a tela inicial
       this.showScreen('dashboard');
