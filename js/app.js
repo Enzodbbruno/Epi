@@ -1472,6 +1472,155 @@ const SymptomsModule = {
   }
 };
 
+// Módulo de Notícias (Carousel)
+const NewsModule = {
+  news: [
+    {
+      id: 1,
+      title: 'Vacinação contra Dengue Ampliada',
+      summary: 'Confira os novos grupos prioritários e locais de vacinação.',
+      image: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+      badge: 'Campanha'
+    },
+    {
+      id: 2,
+      title: 'Boletim Epidemiológico: Semana 50',
+      summary: 'Queda de 15% nos casos de Arboviroses na região.',
+      image: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+      badge: 'Relatório'
+    },
+    {
+      id: 3,
+      title: 'Curso de Capacitação em Vigilância',
+      summary: 'Inscrições abertas para profissionais da rede municipal.',
+      image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+      badge: 'Educação'
+    }
+  ],
+  currentIndex: 0,
+  interval: null,
+
+  init() {
+    this.renderNews();
+    this.startAutoPlay();
+  },
+
+  renderNews() {
+    const container = document.getElementById('news-carousel');
+    const indicators = document.getElementById('carousel-indicators');
+    if (!container || !indicators) return;
+
+    container.innerHTML = this.news.map((item, index) => `
+      <div class="news-card ${index === 0 ? 'active' : ''}" data-index="${index}" style="background-image: url('${item.image}')">
+        <div class="news-content">
+          <span class="news-badge">${item.badge}</span>
+          <h3 class="news-title">${item.title}</h3>
+          <p class="news-snippet">${item.summary}</p>
+        </div>
+      </div>
+    `).join('');
+
+    indicators.innerHTML = this.news.map((_, index) => `
+      <div class="indicator ${index === 0 ? 'active' : ''}" data-index="${index}"></div>
+    `).join('');
+
+    // Click events for indicators
+    indicators.querySelectorAll('.indicator').forEach(ind => {
+      ind.addEventListener('click', (e) => {
+        this.goToSlide(parseInt(e.target.dataset.index));
+        this.resetAutoPlay();
+      });
+    });
+  },
+
+  goToSlide(index) {
+    this.currentIndex = index;
+    const cards = document.querySelectorAll('.news-card');
+    const indicators = document.querySelectorAll('.indicator');
+
+    cards.forEach(c => c.classList.remove('active'));
+    indicators.forEach(i => i.classList.remove('active'));
+
+    if (cards[index]) cards[index].classList.add('active');
+    if (indicators[index]) indicators[index].classList.add('active');
+  },
+
+  nextSlide() {
+    let next = this.currentIndex + 1;
+    if (next >= this.news.length) next = 0;
+    this.goToSlide(next);
+  },
+
+  startAutoPlay() {
+    this.interval = setInterval(() => this.nextSlide(), 5000); // 5 seconds
+  },
+
+  resetAutoPlay() {
+    clearInterval(this.interval);
+    this.startAutoPlay();
+  }
+};
+
+// Módulo de Estatísticas (Analytics)
+const AnalyticsModule = {
+  metrics: {
+    active: 1240,
+    admitted: 45,
+    recovered: 8900
+  },
+
+  init() {
+    this.renderDashboard();
+    this.setupRefresh();
+  },
+
+  renderDashboard() {
+    // Populate simple metrics
+    const activeEl = document.getElementById('metric-active');
+    const admittedEl = document.getElementById('metric-admitted');
+    const recoveredEl = document.getElementById('metric-recovered');
+
+    if (activeEl) this.animateValue(activeEl, 0, this.metrics.active, 1500);
+    if (admittedEl) this.animateValue(admittedEl, 0, this.metrics.admitted, 1000);
+    if (recoveredEl) this.animateValue(recoveredEl, 0, this.metrics.recovered, 2000);
+
+    // Animate CSS Charts (Simple trick: set height after load)
+    const bars = document.querySelectorAll('.simple-bar-chart .bar');
+    // Using setTimeout to trigger CSS transition
+    setTimeout(() => {
+      // Force relayout if needed, or just let CSS height transition kick in naturally if heights are inline.
+      // Since heights are inline in HTML, we might need to "reset" them to 0 and then back to value to animate.
+      // For simplicity in this demo, we assume they animate on view or we just leave them static.
+    }, 500);
+  },
+
+  animateValue(obj, start, end, duration) {
+    let startTimestamp = null;
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString('pt-BR');
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      }
+    };
+    window.requestAnimationFrame(step);
+  },
+
+  setupRefresh() {
+    const btn = document.getElementById('refresh-analytics');
+    if (btn) {
+      btn.addEventListener('click', () => {
+        btn.querySelector('i').classList.add('fa-spin');
+        setTimeout(() => {
+          this.renderDashboard(); // Re-run animation
+          btn.querySelector('i').classList.remove('fa-spin');
+        }, 1000);
+      });
+    }
+  }
+};
+
 // Módulo Principal do Aplicativo
 const App = {
   currentScreen: 'dashboard',
@@ -1491,6 +1640,8 @@ const App = {
       LibraryModule.init();
       SettingsModule.init();
       SymptomsModule.init(); // Init Symptoms
+      NewsModule.init(); // Init News Carousel
+      AnalyticsModule.init(); // Init Analytics
 
       // Mostra a tela inicial
       this.showScreen('dashboard');

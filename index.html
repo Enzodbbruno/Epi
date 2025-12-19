@@ -59,6 +59,9 @@
                 <a href="#" class="desktop-nav-item" data-screen="notifications">
                     <i class="fas fa-bell"></i> <span>Notificações</span>
                 </a>
+                <a href="#" class="desktop-nav-item" data-screen="analytics">
+                    <i class="fas fa-chart-line"></i> <span>Estatísticas</span>
+                </a>
                 <a href="#" class="desktop-nav-item" data-screen="symptoms">
                     <i class="fas fa-notes-medical"></i> <span>Triagem</span>
                 </a>
@@ -103,6 +106,14 @@
                         <p id="current-date">Carregando...</p>
                     </section>
 
+                    <!-- News Carousel Section -->
+                    <section class="news-carousel-section">
+                        <div class="carousel-container" id="news-carousel">
+                            <!-- News Cards injected via JS -->
+                        </div>
+                        <div class="carousel-indicators" id="carousel-indicators"></div>
+                    </section>
+
                     <section class="quick-actions">
                         <div class="action-card" id="notifications-card">
                             <div class="icon-container">
@@ -110,6 +121,13 @@
                             </div>
                             <h3>Notificações</h3>
                             <p>Alertas e boletins</p>
+                        </div>
+                        <div class="action-card" id="analytics-card">
+                            <div class="icon-container">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h3>Estatísticas</h3>
+                            <p>Dados epidemiológicos</p>
                         </div>
                         <div class="action-card" id="chat-card">
                             <div class="icon-container">
@@ -146,8 +164,95 @@
                         </div>
                     </section>
 
-                </section>
                 </section> <!-- End of dashboard-screen -->
+
+                <!-- Tela de Estatísticas (Analytics) -->
+                <section class="screen" id="analytics-screen" style="display: none;">
+                    <div class="screen-header">
+                        <button class="back-button">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <h2>Dados Epidemiológicos</h2>
+                        <div class="header-actions">
+                            <button class="icon-button" id="refresh-analytics">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="content-container">
+                        <!-- Key Metrics Grid -->
+                        <div class="analytics-metrics-grid">
+                            <div class="metric-card alert">
+                                <div class="metric-icon"><i class="fas fa-virus"></i></div>
+                                <h3>Casos Ativos</h3>
+                                <p class="metric-value" id="metric-active">Carregando...</p>
+                                <span class="metric-trend up"><i class="fas fa-arrow-up"></i> +12% esta semana</span>
+                            </div>
+                            <div class="metric-card warning">
+                                <div class="metric-icon"><i class="fas fa-procedures"></i></div>
+                                <h3>Internações</h3>
+                                <p class="metric-value" id="metric-admitted">Carregando...</p>
+                                <span class="metric-trend stable"><i class="fas fa-minus"></i> Estável</span>
+                            </div>
+                            <div class="metric-card success">
+                                <div class="metric-icon"><i class="fas fa-heartbeat"></i></div>
+                                <h3>Recuperados</h3>
+                                <p class="metric-value" id="metric-recovered">Carregando...</p>
+                                <span class="metric-trend up"><i class="fas fa-arrow-up"></i> +5% hoje</span>
+                            </div>
+                        </div>
+
+                        <!-- Charts Section -->
+                        <div class="analytics-charts-section">
+                            <div class="chart-card large">
+                                <h3>Curva de Contágio (Semanal)</h3>
+                                <div class="chart-box" id="chart-contagion">
+                                    <!-- Simple CSS Chart Placeholder -->
+                                    <div class="simple-bar-chart">
+                                        <div class="bar" style="height: 40%;" title="Seg"></div>
+                                        <div class="bar" style="height: 65%;" title="Ter"></div>
+                                        <div class="bar" style="height: 55%;" title="Qua"></div>
+                                        <div class="bar" style="height: 80%;" title="Qui"></div>
+                                        <div class="bar" style="height: 70%;" title="Sex"></div>
+                                        <div class="bar" style="height: 90%;" title="Sáb"></div>
+                                        <div class="bar" style="height: 30%;" title="Dom"></div>
+                                    </div>
+                                    <div class="chart-labels">
+                                        <span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span><span>Dom</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="chart-card">
+                                <h3>Distribuição por Zona</h3>
+                                <div class="chart-box" id="chart-zones">
+                                    <div class="zone-list">
+                                        <div class="zone-item"><span class="zone-name">Zona Norte</span>
+                                            <div class="progress-bar">
+                                                <div class="fill" style="width: 70%; background: #e57373;"></div>
+                                            </div>
+                                        </div>
+                                        <div class="zone-item"><span class="zone-name">Zona Sul</span>
+                                            <div class="progress-bar">
+                                                <div class="fill" style="width: 30%; background: #81c784;"></div>
+                                            </div>
+                                        </div>
+                                        <div class="zone-item"><span class="zone-name">Zona Leste</span>
+                                            <div class="progress-bar">
+                                                <div class="fill" style="width: 55%; background: #ffb74d;"></div>
+                                            </div>
+                                        </div>
+                                        <div class="zone-item"><span class="zone-name">Zona Oeste</span>
+                                            <div class="progress-bar">
+                                                <div class="fill" style="width: 45%; background: #64b5f6;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
                 <!-- Tela de Triagem (Symptoms) -->
                 <section class="screen" id="symptoms-screen" style="display: none;">
