@@ -1,11 +1,11 @@
 // Nome do cache
-const CACHE_NAME = 'epiconecta-v2';
+const CACHE_NAME = 'epiconecta-v3-premium';
 // Arquivos para armazenar em cache
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/css/style.css',
-  '/js/app-modules.js',
+  './',
+  './index.html',
+  './css/style.css',
+  './js/app.js',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css',
   'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap',
   // Ícones e imagens podem ser adicionados aqui

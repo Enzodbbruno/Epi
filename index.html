@@ -769,4 +769,27 @@
 
     <script src="js/app.js?v=3" type="module"></script>
 
+    <script>
+        // FORÇAR ATUALIZAÇÃO DO CACHE (Dev Fix)
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function (registrations) {
+                for (let registration of registrations) {
+                    registration.update();
+                    console.log("Service Worker Updated triggered");
+                }
+            });
+        }
+
+        // Leaflet Check
+        window.addEventListener('load', () => {
+            // Delay check slightly
+            setTimeout(() => {
+                if (typeof L === 'undefined') {
+                    console.error("Leaflet.js not loaded!");
+                    // Fallback logic could go here
+                }
+            }, 1000);
+        });
+    </script>
+
 </html>
