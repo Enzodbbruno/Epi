@@ -40,6 +40,7 @@
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
 
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
@@ -216,6 +217,13 @@
                                         style="background:var(--secondary-color); font-size: 0.7rem; vertical-align: middle;">AO
                                         VIVO</span></h3>
                                 <div class="location-selector" style="display: flex; gap: 8px;">
+                                    <select id="disease-select" class="form-select"
+                                        style="padding: 8px; border-radius: 8px; border: 1px solid var(--border-color); background: #fff; font-weight: 500;">
+                                        <option value="dengue">🦟 Dengue</option>
+                                        <option value="covid">🦠 COVID-19</option>
+                                        <option value="influenza">🤒 Influenza</option>
+                                        <option value="zika">🔬 Zika Vírus</option>
+                                    </select>
                                     <select id="municipality-select" class="form-select"
                                         style="padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);">
                                         <option value="gps">📍 Minha Localização (GPS)</option>

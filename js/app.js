@@ -1622,10 +1622,12 @@ const AnalyticsModule = {
 };
 
 // Módulo do Mapa Epidemiológico (Leaflet + Geolocation)
+// Módulo do Mapa Epidemiológico (True Heatmap + Disease Filter)
 const MapModule = {
   map: null,
+  heatLayer: null,
   userLocation: null,
-  markers: [],
+  currentDisease: 'dengue', // Padrão
 
   // Coordenadas padrão (Brasília)
   defaultCoords: [-15.7975, -47.8919],
@@ -1645,20 +1647,31 @@ const MapModule = {
 
   setupEventListeners() {
     const enableBtn = document.getElementById('enable-location-btn');
-    const select = document.getElementById('municipality-select');
+    const selectCity = document.getElementById('municipality-select');
+    const selectDisease = document.getElementById('disease-select');
 
     if (enableBtn) {
       enableBtn.onclick = () => this.requestLocation();
     }
 
-    if (select) {
-      select.addEventListener('change', (e) => {
+    if (selectCity) {
+      selectCity.addEventListener('change', (e) => {
         const value = e.target.value;
         if (value === 'gps') {
           this.requestLocation();
         } else if (this.cities[value]) {
           this.loadMapAt(this.cities[value][0], this.cities[value][1]);
           document.getElementById('map-permission-overlay').style.display = 'none';
+        }
+      });
+    }
+
+    if (selectDisease) {
+      selectDisease.addEventListener('change', (e) => {
+        this.currentDisease = e.target.value;
+        const center = this.map ? this.map.getCenter() : { lat: this.defaultCoords[0], lng: this.defaultCoords[1] };
+        if (this.map) {
+          this.generateHeatmapData(center.lat, center.lng);
         }
       });
     }
@@ -1694,14 +1707,12 @@ const MapModule = {
   },
 
   loadMapAt(lat, lng) {
-    // Se mapa já existe, flyTo
     if (this.map) {
       this.map.flyTo([lat, lng], 13);
-      this.generateMockData(lat, lng);
+      this.generateHeatmapData(lat, lng);
       return;
     }
 
-    // Init Mapa
     setTimeout(() => {
       this.map = L.map('epidemiological-map').setView([lat, lng], 13);
 
@@ -1711,36 +1722,67 @@ const MapModule = {
         maxZoom: 19
       }).addTo(this.map);
 
-      this.generateMockData(lat, lng);
+      this.generateHeatmapData(lat, lng);
     }, 100);
   },
 
-  generateMockData(lat, lng) {
-    this.markers.forEach(m => this.map.removeLayer(m));
-    this.markers = [];
+  generateHeatmapData(lat, lng) {
+    // Remove camada anterior
+    if (this.heatLayer) {
+      this.map.removeLayer(this.heatLayer);
+    }
 
-    for (let i = 0; i < 50; i++) {
-      const latOffset = (Math.random() - 0.5) * 0.04;
-      const lngOffset = (Math.random() - 0.5) * 0.04;
+    let points = [];
+    let intensity = 0.5;
+    let radius = 0.03;
+    let count = 200;
 
-      const r = Math.random();
-      let color = '#4CAF50';
-      let status = 'Recuperado';
+    // Configuração por Doença
+    switch (this.currentDisease) {
+      case 'dengue':
+        count = 400; // Alta disseminação
+        radius = 0.05;
+        intensity = 0.8;
+        break;
+      case 'covid':
+        count = 150; // Clusters
+        radius = 0.02;
+        intensity = 1.0;
+        break;
+      case 'influenza':
+        count = 250;
+        radius = 0.04;
+        intensity = 0.6;
+        break;
+      case 'zika':
+        count = 80; // Baixa
+        radius = 0.06;
+        intensity = 0.4;
+        break;
+    }
 
-      if (r < 0.2) { color = '#F44336'; status = 'Caso Ativo (Grave)'; }
-      else if (r < 0.5) { color = '#FF9800'; status = 'Em Monitoramento'; }
+    for (let i = 0; i < count; i++) {
+      // Distribuição Gaussiana simplificada (mais pontos no centro)
+      const spreadX = (Math.random() - 0.5 + (Math.random() - 0.5)) * radius;
+      const spreadY = (Math.random() - 0.5 + (Math.random() - 0.5)) * radius;
 
-      const circle = L.circleMarker([lat + latOffset, lng + lngOffset], {
-        radius: 8,
-        fillColor: color,
-        color: "#fff",
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.8
+      // Intensidade randomizada
+      const val = Math.random() * intensity;
+
+      points.push([lat + spreadX, lng + spreadY, val]);
+    }
+
+    // Criar Heatmap
+    // Requer leaflet-heat.js
+    if (L.heatLayer) {
+      this.heatLayer = L.heatLayer(points, {
+        radius: 25,
+        blur: 15,
+        maxZoom: 17,
+        gradient: { 0.4: 'blue', 0.65: 'lime', 1: 'red' }
       }).addTo(this.map);
-
-      circle.bindPopup(`<b>${status}</b><br>Atualizado há ${Math.floor(Math.random() * 24)}h`);
-      this.markers.push(circle);
+    } else {
+      console.error("Leaflet Heat não carregado properly.");
     }
   }
 };
