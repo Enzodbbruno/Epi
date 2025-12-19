@@ -1621,6 +1621,130 @@ const AnalyticsModule = {
   }
 };
 
+// Módulo do Mapa Epidemiológico (Leaflet + Geolocation)
+const MapModule = {
+  map: null,
+  userLocation: null,
+  markers: [],
+
+  // Coordenadas padrão (Brasília)
+  defaultCoords: [-15.7975, -47.8919],
+
+  // Cidades Predefinidas
+  cities: {
+    'saopaulo': [-23.5505, -46.6333],
+    'rio': [-22.9068, -43.1729],
+    'brasilia': [-15.7975, -47.8919],
+    'salvador': [-12.9774, -38.5016],
+    'manaus': [-3.1190, -60.0217]
+  },
+
+  init() {
+    this.setupEventListeners();
+  },
+
+  setupEventListeners() {
+    const enableBtn = document.getElementById('enable-location-btn');
+    const select = document.getElementById('municipality-select');
+
+    if (enableBtn) {
+      enableBtn.onclick = () => this.requestLocation();
+    }
+
+    if (select) {
+      select.addEventListener('change', (e) => {
+        const value = e.target.value;
+        if (value === 'gps') {
+          this.requestLocation();
+        } else if (this.cities[value]) {
+          this.loadMapAt(this.cities[value][0], this.cities[value][1]);
+          document.getElementById('map-permission-overlay').style.display = 'none';
+        }
+      });
+    }
+  },
+
+  requestLocation() {
+    const overlay = document.getElementById('map-permission-overlay');
+    const btn = document.getElementById('enable-location-btn');
+
+    if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Localizando...';
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          this.userLocation = [position.coords.latitude, position.coords.longitude];
+          this.loadMapAt(this.userLocation[0], this.userLocation[1]);
+          if (overlay) overlay.style.display = 'none';
+          if (btn) btn.innerHTML = 'Ativar Localização';
+        },
+        (error) => {
+          console.error("Erro GPS:", error);
+          alert("Não foi possível obter sua localização. Mostrando São Paulo por padrão.");
+          this.loadMapAt(this.cities['saopaulo'][0], this.cities['saopaulo'][1]);
+          if (overlay) overlay.style.display = 'none';
+          if (btn) btn.innerHTML = 'Ativar Localização';
+        }
+      );
+    } else {
+      alert("Seu navegador não suporta Geolocalização.");
+      this.loadMapAt(this.cities['saopaulo'][0], this.cities['saopaulo'][1]);
+      if (overlay) overlay.style.display = 'none';
+    }
+  },
+
+  loadMapAt(lat, lng) {
+    // Se mapa já existe, flyTo
+    if (this.map) {
+      this.map.flyTo([lat, lng], 13);
+      this.generateMockData(lat, lng);
+      return;
+    }
+
+    // Init Mapa
+    setTimeout(() => {
+      this.map = L.map('epidemiological-map').setView([lat, lng], 13);
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+        subdomains: 'abcd',
+        maxZoom: 19
+      }).addTo(this.map);
+
+      this.generateMockData(lat, lng);
+    }, 100);
+  },
+
+  generateMockData(lat, lng) {
+    this.markers.forEach(m => this.map.removeLayer(m));
+    this.markers = [];
+
+    for (let i = 0; i < 50; i++) {
+      const latOffset = (Math.random() - 0.5) * 0.04;
+      const lngOffset = (Math.random() - 0.5) * 0.04;
+
+      const r = Math.random();
+      let color = '#4CAF50';
+      let status = 'Recuperado';
+
+      if (r < 0.2) { color = '#F44336'; status = 'Caso Ativo (Grave)'; }
+      else if (r < 0.5) { color = '#FF9800'; status = 'Em Monitoramento'; }
+
+      const circle = L.circleMarker([lat + latOffset, lng + lngOffset], {
+        radius: 8,
+        fillColor: color,
+        color: "#fff",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8
+      }).addTo(this.map);
+
+      circle.bindPopup(`<b>${status}</b><br>Atualizado há ${Math.floor(Math.random() * 24)}h`);
+      this.markers.push(circle);
+    }
+  }
+};
+
 // Expose to Window for Debugging/Inline access
 window.MapModule = MapModule;
 
