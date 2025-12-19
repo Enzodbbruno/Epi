@@ -1624,24 +1624,35 @@ const AnalyticsModule = {
 // Módulo do Mapa Epidemiológico (Leaflet + Geolocation)
 // Módulo do Mapa Epidemiológico (True Heatmap + Disease Filter)
 // Módulo do Mapa Epidemiológico (Cluster Map + Disease Icons)
-// Módulo do Mapa Epidemiológico (Smart Majority Clusters)
+// Módulo do Mapa Epidemiológico (Proportional Bubble Map - JHU Style)
 const MapModule = {
   map: null,
-  clusterGroup: null,
   userLocation: null,
   currentDisease: 'dengue',
+  layerGroup: null,
+
+  // Configurações de Cores (Severity Gradient)
+  colors: {
+    low: '#FFD54F',    // Amarelo (Baixo)
+    medium: '#FF9800', // Laranja (Médio)
+    high: '#F44336',   // Vermelho (Alto)
+    critical: '#B71C1C' // Vermelho Escuro (Crítico)
+  },
 
   // Coordenadas padrão (Brasília)
   defaultCoords: [-15.7975, -47.8919],
 
   // Cidades Predefinidas
   cities: {
-    'saopaulo': [-23.5505, -46.6333],
-    'rio': [-22.9068, -43.1729],
-    'brasilia': [-15.7975, -47.8919],
-    'salvador': [-12.9774, -38.5016],
-    'manaus': [-3.1190, -60.0217]
+    'saopaulo': { coords: [-23.5505, -46.6333], label: 'São Paulo' },
+    'rio': { coords: [-22.9068, -43.1729], label: 'Rio de Janeiro' },
+    'brasilia': { coords: [-15.7975, -47.8919], label: 'Brasília' },
+    'salvador': { coords: [-12.9774, -38.5016], label: 'Salvador' },
+    'manaus': { coords: [-3.1190, -60.0217], label: 'Manaus' }
   },
+
+  // Centróides de Bairros (Mock Data de Pontos Fixos)
+  // Para simplificar, geraremos offsets fixos baseados na cidade selecionada
 
   init() {
     this.setupEventListeners();
@@ -1662,7 +1673,7 @@ const MapModule = {
         if (value === 'gps') {
           this.requestLocation();
         } else if (this.cities[value]) {
-          this.loadMapAt(this.cities[value][0], this.cities[value][1]);
+          this.loadMapAt(this.cities[value].coords[0], this.cities[value].coords[1]);
           const overlay = document.getElementById('map-permission-overlay');
           if (overlay) overlay.style.display = 'none';
         }
@@ -1674,7 +1685,7 @@ const MapModule = {
         this.currentDisease = e.target.value;
         const center = this.map ? this.map.getCenter() : { lat: this.defaultCoords[0], lng: this.defaultCoords[1] };
         if (this.map) {
-          this.generateSmartData(center.lat, center.lng);
+          this.generateBubbleData(center.lat, center.lng);
         }
       });
     }
@@ -1697,138 +1708,124 @@ const MapModule = {
         (error) => {
           console.error("Erro GPS:", error);
           alert("Não foi possível obter sua localização. Mostrando São Paulo por padrão.");
-          this.loadMapAt(this.cities['saopaulo'][0], this.cities['saopaulo'][1]);
+          this.loadMapAt(this.cities['saopaulo'].coords[0], this.cities['saopaulo'].coords[1]);
           if (overlay) overlay.style.display = 'none';
           if (btn) btn.innerHTML = 'Ativar Localização';
         }
       );
     } else {
       alert("Seu navegador não suporta Geolocalização.");
-      this.loadMapAt(this.cities['saopaulo'][0], this.cities['saopaulo'][1]);
+      this.loadMapAt(this.cities['saopaulo'].coords[0], this.cities['saopaulo'].coords[1]);
       if (overlay) overlay.style.display = 'none';
     }
   },
 
   loadMapAt(lat, lng) {
     if (this.map) {
-      this.map.flyTo([lat, lng], 13);
-      this.generateSmartData(lat, lng);
+      this.map.flyTo([lat, lng], 12); // Slightly zoomed out for bubble view
+      this.generateBubbleData(lat, lng);
       return;
     }
 
     setTimeout(() => {
-      this.map = L.map('epidemiological-map').setView([lat, lng], 13);
+      this.map = L.map('epidemiological-map', {
+        zoomControl: false // Custom control look maybe later
+      }).setView([lat, lng], 12);
 
+      L.control.zoom({ position: 'topright' }).addTo(this.map);
+
+      // Using a cleaner, simpler map style (CartoDB Light)
       L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+        attribution: '&copy; OpenStreetMap &copy; CARTO',
         subdomains: 'abcd',
         maxZoom: 19
       }).addTo(this.map);
 
-      // INITIALIZE SMART CLUSTER GROUP
-      this.clusterGroup = L.markerClusterGroup({
-        maxClusterRadius: 60, // Slightly larger radius
-        spiderfyOnMaxZoom: true,
-        showCoverageOnHover: false,
-        zoomToBoundsOnClick: true,
+      this.layerGroup = L.layerGroup().addTo(this.map);
 
-        // CRITICAL: Custom Logic for Majority Rule
-        iconCreateFunction: (cluster) => {
-          const markers = cluster.getAllChildMarkers();
-          let counts = { severe: 0, warning: 0, recovered: 0 };
-
-          // Count severity of all children
-          markers.forEach(m => {
-            const sev = m.options.severityStatus; // Custom property attached
-            if (sev) counts[sev]++;
-          });
-
-          // Determine Winner
-          let winnerClass = 'cluster-recovered'; // Default
-          let max = counts.recovered;
-
-          if (counts.warning > max) { max = counts.warning; winnerClass = 'cluster-warning'; }
-          if (counts.severe > max) { max = counts.severe; winnerClass = 'cluster-severe'; }
-
-          return L.divIcon({
-            html: `<div title="Grave: ${counts.severe}\nSuspeito: ${counts.warning}\nRecuperado: ${counts.recovered}">${cluster.getChildCount()}</div>`,
-            className: `smart-cluster ${winnerClass}`,
-            iconSize: L.point(40, 40)
-          });
-        }
-      });
-      this.map.addLayer(this.clusterGroup);
-
-      this.generateSmartData(lat, lng);
+      this.generateBubbleData(lat, lng);
       this.addLegend();
     }, 100);
   },
 
-  generateSmartData(lat, lng) {
-    if (!this.clusterGroup) return;
-    this.clusterGroup.clearLayers();
+  generateBubbleData(lat, lng) {
+    if (!this.layerGroup) return;
+    this.layerGroup.clearLayers();
 
-    let count = 200;
-    let radius = 0.05;
+    // 1. Define Mock Neighborhoods (Fixed offsets from center)
+    const neighborhoods = [
+      { name: 'Centro', offset: [0, 0] },
+      { name: 'Zona Norte', offset: [0.05, -0.02] },
+      { name: 'Zona Sul', offset: [-0.06, 0.03] },
+      { name: 'Zona Leste', offset: [-0.02, 0.08] },
+      { name: 'Zona Oeste', offset: [0.03, -0.07] },
+      { name: 'Novo Distrito', offset: [0.08, 0.05] },
+      { name: 'Vila Antiga', offset: [-0.08, -0.04] }
+    ];
 
-    if (this.currentDisease === 'dengue') { count = 350; radius = 0.07; }
-    if (this.currentDisease === 'covid') { count = 250; radius = 0.04; }
+    neighborhoods.forEach(hood => {
+      // 2. Generate Random Case Counts
+      let cases = Math.floor(Math.random() * 500) + 20; // 20 to 520 cases
 
-    const markers = [];
+      // Disease Multipliers
+      if (this.currentDisease === 'covid') cases *= 1.5;
+      if (this.currentDisease === 'zika') cases *= 0.3;
 
-    for (let i = 0; i < count; i++) {
-      const spreadX = (Math.random() - 0.5) * radius * 2;
-      const spreadY = (Math.random() - 0.5) * radius * 2;
+      cases = Math.floor(cases);
 
-      // Determine Severity
-      const r = Math.random();
-      let sevColor, sevLabel, sevStatus;
+      // 3. Determine Radius and Color
+      // Radius proportional to sqrt of area (cases) for perception accuracy
+      const radius = Math.sqrt(cases) * 1.5;
 
-      // Weighted probabilities based on disease
-      let chanceSevere = 0.1;
-      let chanceWarning = 0.4;
+      let color = this.colors.low;
+      if (cases > 100) color = this.colors.medium;
+      if (cases > 300) color = this.colors.high;
+      if (cases > 600) color = this.colors.critical;
 
-      if (this.currentDisease === 'covid') { chanceSevere = 0.3; chanceWarning = 0.6; } // More severe
-
-      if (r < chanceSevere) {
-        sevColor = '#D32F2F'; sevLabel = 'Caso Grave'; sevStatus = 'severe';
-      } else if (r < chanceWarning) {
-        sevColor = '#FFA000'; sevLabel = 'Em Análise'; sevStatus = 'warning';
-      } else {
-        sevColor = '#388E3C'; sevLabel = 'Recuperado'; sevStatus = 'recovered';
-      }
-
-      // Individual Marker Style (White Border Dot)
-      const circle = L.circleMarker([lat + spreadX, lng + spreadY], {
-        radius: 6,
-        fillColor: sevColor,
-        color: '#fff',
+      // 4. Create Circle Marker
+      const circle = L.circleMarker([lat + hood.offset[0], lng + hood.offset[1]], {
+        radius: radius,
+        fillColor: color,
+        color: color,
         weight: 1,
-        opacity: 1,
-        fillOpacity: 0.9,
-        // CRITICAL: Attach Data for Cluster Logic
-        severityStatus: sevStatus
+        opacity: 0.8,
+        fillOpacity: 0.5 // Semi-transparent for density look
       });
 
+      // 5. Tooltip/Popup
+      const disLabel = this.currentDisease.charAt(0).toUpperCase() + this.currentDisease.slice(1);
+
       circle.bindPopup(`
-                <div style="text-align: center;">
-                    <strong style="color:${sevColor}">${sevLabel}</strong><br>
-                    Doença: ${this.currentDisease.toUpperCase()}<br>
-                    <small>Atualizado: 10 min atrás</small>
+                <div style="text-align: center; min-width: 120px;">
+                    <strong style="font-size: 1.1em; color: ${color}">${hood.name}</strong>
+                    <hr style="margin: 5px 0; border: 0; border-top: 1px solid #eee;">
+                    <div style="font-size: 0.9em; color: #666;">${disLabel}</div>
+                    <div style="font-size: 1.4em; font-weight: bold; color: #333;">${cases}</div>
+                    <div style="font-size: 0.8em; color: #999;">Casos Confirmados</div>
                 </div>
             `);
-      markers.push(circle);
-    }
 
-    this.clusterGroup.addLayers(markers);
+      // Hover interactions
+      circle.on('mouseover', function (e) {
+        this.openPopup();
+        this.setStyle({ fillOpacity: 0.8, weight: 2 });
+      });
+      circle.on('mouseout', function (e) {
+        this.closePopup();
+        this.setStyle({ fillOpacity: 0.5, weight: 1 });
+      });
+
+      this.layerGroup.addLayer(circle);
+    });
   },
 
   addLegend() {
+    if (document.querySelector('.map-legend')) return; // Avoid duplicates
+
     const legend = L.control({ position: 'bottomleft' });
 
     legend.onAdd = (map) => {
       const div = L.DomUtil.create('div', 'map-legend');
-      div.id = 'map-legend-content';
       this.updateLegendContent(div);
       return div;
     };
@@ -1838,18 +1835,21 @@ const MapModule = {
 
   updateLegendContent(div) {
     div.innerHTML = `
-            <strong>Gravidade (Maioria)</strong><br>
-            <div class="legend-item" style="margin-top:5px;">
-                <div class="legend-icon" style="background:#D32F2F"></div>
-                <span>Grave / Predominante</span>
+            <strong>Densidade de Casos</strong><br>
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+                <div style="width: 10px; height: 10px; border-radius: 50%; background: ${this.colors.low}; opacity: 0.6;"></div>
+                <span style="font-size: 0.8rem;">Baixo</span>
             </div>
-            <div class="legend-item">
-                <div class="legend-icon" style="background:#FFA000"></div>
-                <span>Suspeito / Predominante</span>
+             <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 16px; height: 16px; border-radius: 50%; background: ${this.colors.medium}; opacity: 0.6;"></div>
+                <span style="font-size: 0.8rem;">Médio</span>
             </div>
-            <div class="legend-item">
-                <div class="legend-icon" style="background:#388E3C"></div>
-                <span>Recuperado / Predominante</span>
+             <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 24px; height: 24px; border-radius: 50%; background: ${this.colors.high}; opacity: 0.6;"></div>
+                <span style="font-size: 0.8rem;">Alto</span>
+            </div>
+            <div style="margin-top: 8px; font-size: 0.7rem; color: #666; font-style: italic;">
+                * Tamanho proporcional<br>ao nº de casos
             </div>
         `;
   }
