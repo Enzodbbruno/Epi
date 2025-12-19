@@ -1751,7 +1751,7 @@ const MapModule = {
           if (counts.severe > max) { max = counts.severe; winnerClass = 'cluster-severe'; }
 
           return L.divIcon({
-            html: `<div>${cluster.getChildCount()}</div>`,
+            html: `<div title="Grave: ${counts.severe}\nSuspeito: ${counts.warning}\nRecuperado: ${counts.recovered}">${cluster.getChildCount()}</div>`,
             className: `smart-cluster ${winnerClass}`,
             iconSize: L.point(40, 40)
           });
