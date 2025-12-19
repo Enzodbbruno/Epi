@@ -1624,6 +1624,282 @@ const AnalyticsModule = {
 // Módulo do Mapa Epidemiológico (Leaflet + Geolocation)
 // Módulo do Mapa Epidemiológico (True Heatmap + Disease Filter)
 // Módulo do Mapa Epidemiológico (Cluster Map + Disease Icons)
+// Módulo de Pacientes (Prontuário Eletrônico)
+const PatientModule = {
+  // Banco de Dados Simulado
+  mockDB: [
+    {
+      id: 1,
+      name: 'Maria de Lourdes Souza',
+      age: 68,
+      sex: 'Fem',
+      blood: 'A+',
+      cns: '700501249875',
+      cpf: '123.456.789-00',
+      photo: 'https://ui-avatars.com/api/?name=Maria+Lourdes&background=random&size=128',
+      badges: [
+        { text: 'Hipertensa', type: 'warning' },
+        { text: 'Diabética', type: 'warning' },
+        { text: 'Alergia: Penicilina', type: 'danger' }
+      ],
+      allergies: ['Penicilina', 'Dipirona'],
+      vitals: { bp: '135/85', weight: '72', heartRate: '78' },
+      history: [
+        { date: '15/12/2025', title: 'Consulta Cardiologia', desc: 'Retorno de rotina. Pressão controlada.' },
+        { date: '02/10/2025', title: 'Exames Laboratoriais', desc: 'Glicemia em jejum: 110 mg/dL.' },
+        { date: '12/05/2025', title: 'Vacina Gripe', desc: 'Campanha Anual 2025.' }
+      ],
+      vaccines: [
+        { name: 'Influenza (Gripe)', date: '12/05/2025' },
+        { name: 'COVID-19 Reforço', date: '20/02/2025' },
+        { name: 'Hepatite B', date: '10/01/2020' }
+      ]
+    },
+    {
+      id: 2,
+      name: 'João Pedro Alves',
+      age: 5,
+      sex: 'Masc',
+      blood: 'O+',
+      cns: '890012356789',
+      cpf: '555.444.333-22',
+      photo: 'https://ui-avatars.com/api/?name=Joao+Pedro&background=random&size=128',
+      badges: [
+        { text: 'Asma', type: 'info' }
+      ],
+      allergies: ['Poeria', 'Ácaro'],
+      vitals: { bp: '100/60', weight: '22', heartRate: '90' },
+      history: [
+        { date: '10/12/2025', title: 'Pediatra', desc: 'Crise de asma leve. Prescrito nebulização.' },
+        { date: '15/08/2025', title: 'Vacinação', desc: 'Tetra Viral.' }
+      ],
+      vaccines: [
+        { name: 'Tetra Viral', date: '15/08/2025' },
+        { name: 'Poliomielite', date: '10/02/2023' },
+        { name: 'BCG', date: '20/05/2020' }
+      ]
+    },
+    {
+      id: 3,
+      name: 'Ana Clara Silva',
+      age: 34,
+      sex: 'Fem',
+      blood: 'AB-',
+      cns: '201098765432',
+      cpf: '987.654.321-11',
+      photo: 'https://ui-avatars.com/api/?name=Ana+Clara&background=random&size=128',
+      badges: [
+        { text: 'Gestante (20 sem)', type: 'info' }
+      ],
+      allergies: [],
+      vitals: { bp: '110/70', weight: '68', heartRate: '82' },
+      history: [
+        { date: '18/12/2025', title: 'Pré-Natal', desc: 'Consulta mensal. Batimentos fetais normais.' },
+        { date: '20/11/2025', title: 'Ultrassom Morfológico', desc: 'Desenvolvimento adequado.' }
+      ],
+      vaccines: [
+        { name: 'dTpa', date: '20/11/2025' },
+        { name: 'Influenza', date: '10/04/2025' }
+      ]
+    }
+  ],
+
+  init() {
+    this.setupEventListeners();
+    this.renderRecents();
+  },
+
+  setupEventListeners() {
+    const searchBtn = document.getElementById('patient-search-btn');
+    const searchInput = document.getElementById('patient-search-input');
+    const backBtn = document.getElementById('back-to-search-btn');
+
+    // Search Action
+    searchBtn.addEventListener('click', () => {
+      this.handleSearch(searchInput.value);
+    });
+
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') this.handleSearch(searchInput.value);
+    });
+
+    // Back Action
+    backBtn.addEventListener('click', () => {
+      document.getElementById('patient-profile-view').style.display = 'none';
+      document.querySelector('.patient-search-container').style.display = 'block';
+      document.getElementById('patient-recents').style.display = 'block';
+      document.getElementById('patient-results').style.display = 'none'; // reset results or check logic
+
+      // logic check: if we had searches, maybe show results again? for now, clean reset
+      document.getElementById('patient-results').style.display = 'none';
+    });
+
+    // Tabs
+    const tabs = document.querySelectorAll('.p-tab');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Remove active class from all
+        tabs.forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.p-tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.p-tab-content').forEach(c => c.style.display = 'none');
+
+        // Activate clicked
+        tab.classList.add('active');
+        const targetId = tab.dataset.tab;
+        const targetContent = document.getElementById(targetId);
+        targetContent.classList.add('active');
+        targetContent.style.display = 'block';
+      });
+    });
+  },
+
+  handleSearch(term) {
+    if (!term) return;
+    term = term.toLowerCase().replace(/[.\-]/g, ''); // Clean CPF/CNS chars
+
+    const results = this.mockDB.filter(p => {
+      const cleanCpf = p.cpf.replace(/[.\-]/g, '');
+      const name = p.name.toLowerCase();
+      const cns = p.cns;
+
+      return name.includes(term) || cleanCpf.includes(term) || cns.includes(term);
+    });
+
+    this.renderResults(results);
+  },
+
+  renderResults(results) {
+    const container = document.getElementById('results-list');
+    const section = document.getElementById('patient-results');
+    const recentsIndex = document.getElementById('patient-recents');
+
+    container.innerHTML = '';
+    recentsIndex.style.display = 'none';
+    section.style.display = 'block';
+
+    if (results.length === 0) {
+      container.innerHTML = '<div style="text-align:center; color:#888; padding:20px;">Nenhum paciente encontrado.</div>';
+      return;
+    }
+
+    results.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'patient-card-item';
+      card.innerHTML = `
+                <div class="p-item-photo">
+                    <img src="${p.photo}" alt="${p.name}">
+                </div>
+                <div class="p-item-info">
+                    <h4>${p.name}</h4>
+                    <p>CNS: ${p.cns}</p>
+                    <p>${p.age} anos • ${p.sex}</p>
+                </div>
+            `;
+      card.onclick = () => this.openProfile(p);
+      container.appendChild(card);
+    });
+  },
+
+  renderRecents() {
+    const container = document.getElementById('recent-patients-list');
+    // Mock Recents (Just showing Maria for now)
+    const recent = [this.mockDB[0]];
+
+    container.innerHTML = '';
+    recent.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'patient-card-item';
+      card.innerHTML = `
+                <div class="p-item-photo">
+                    <img src="${p.photo}" alt="${p.name}">
+                </div>
+                <div class="p-item-info">
+                    <h4>${p.name}</h4>
+                    <p>Acessado há 2 horas</p>
+                </div>
+            `;
+      card.onclick = () => this.openProfile(p);
+      container.appendChild(card);
+    });
+  },
+
+  openProfile(patient) {
+    // Toggle Views
+    document.querySelector('.patient-search-container').style.display = 'none';
+    document.getElementById('patient-recents').style.display = 'none';
+    document.getElementById('patient-results').style.display = 'none';
+    document.getElementById('patient-profile-view').style.display = 'block';
+
+    // Populate Header
+    document.getElementById('p-photo').src = patient.photo;
+    document.getElementById('p-name').innerText = patient.name;
+    document.getElementById('p-age').innerText = `${patient.age} anos`;
+    document.getElementById('p-sex').innerText = patient.sex;
+    document.getElementById('p-blood').innerText = patient.blood;
+    document.getElementById('p-cns').innerText = patient.cns;
+
+    // Populate Badges
+    const badgesContainer = document.getElementById('p-badges');
+    badgesContainer.innerHTML = '';
+    patient.badges.forEach(b => {
+      const span = document.createElement('span');
+      span.className = `p-badge ${b.type}`;
+      span.innerText = b.text;
+      badgesContainer.appendChild(span);
+    });
+
+    // Summary Tab
+    const allergiesList = document.getElementById('p-allergies-list');
+    allergiesList.innerHTML = '';
+    if (patient.allergies.length > 0) {
+      patient.allergies.forEach(a => {
+        const li = document.createElement('li');
+        li.innerText = a;
+        allergiesList.appendChild(li);
+      });
+      document.getElementById('p-allergies-box').style.display = 'block';
+    } else {
+      document.getElementById('p-allergies-box').style.display = 'none';
+    }
+
+    // Vitals
+    document.getElementById('v-bp').innerText = patient.vitals.bp;
+    document.getElementById('v-weight').innerText = patient.vitals.weight;
+
+    // History Tab
+    const timeline = document.getElementById('p-timeline');
+    timeline.innerHTML = '';
+    patient.history.forEach(h => {
+      const item = document.createElement('div');
+      item.className = 'timeline-item';
+      item.innerHTML = `
+                <div class="timeline-date">${h.date}</div>
+                <div class="timeline-content">
+                    <h4>${h.title}</h4>
+                    <p>${h.desc}</p>
+                </div>
+             `;
+      timeline.appendChild(item);
+    });
+
+    // Vaccines Tab
+    const vList = document.getElementById('p-vaccines-list');
+    vList.innerHTML = '';
+    patient.vaccines.forEach(v => {
+      const item = document.createElement('div');
+      item.className = 'patient-card-item'; // reuse style
+      item.style.marginBottom = '10px';
+      item.innerHTML = `
+                <div class="p-item-info">
+                    <h4>${v.name}</h4>
+                    <p>Aplicado em: ${v.date}</p>
+                </div>
+            `;
+      vList.appendChild(item);
+    });
+  }
+};
+
 // Módulo do Mapa Epidemiológico (Proportional Bubble Map - Real Neighborhoods)
 const MapModule = {
   map: null,
@@ -1930,6 +2206,7 @@ const App = {
       NewsModule.init(); // Init News Carousel
       AnalyticsModule.init(); // Init Analytics
       MapModule.init(); // Init Map Listener
+      PatientModule.init(); // Init Patient Module
 
       // Mostra a tela inicial
       this.showScreen('dashboard');

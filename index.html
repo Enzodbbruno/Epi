@@ -602,10 +602,14 @@
                 <i class="fas fa-book-medical"></i>
                 <span>Biblioteca</span>
             </a>
-            <a href="#" class="nav-item" data-screen="settings">
-                <i class="fas fa-cog"></i>
-                <span>Configurações</span>
-            </a>
+            <button class="nav-item" data-target="patients-screen">
+                <i class="fas fa-user-injured"></i>
+                <span>Pacientes</span>
+            </button>
+            <button class="nav-item" data-target="profile-screen">
+                <i class="fas fa-user"></i>
+                <span>Perfil</span>
+            </button>
         </nav>
 
         <!-- Modal de Notificação -->
@@ -646,7 +650,139 @@
             </div>
         </div>
 
-        <!-- Loading Overlay -->
+        <!-- TELA DE PACIENTES (NOVO) -->
+        <section id="patients-screen" class="screen" style="display: none;">
+            <header class="app-header">
+                <div class="logo-area">
+                    <div class="logo-icon"><i class="fas fa-user-injured"></i></div>
+                    <h1>Prontuário Eletrônico</h1>
+                </div>
+                <div class="user-profile-icon">
+                    <img src="https://ui-avatars.com/api/?name=Dr+Silva&background=0D8ABC&color=fff" alt="Perfil">
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                <!-- Search Area -->
+                <div class="patient-search-container">
+                    <div class="search-box-large">
+                        <input type="text" id="patient-search-input" placeholder="Pesquisar por CPF, CNS ou Nome..."
+                            autocomplete="off">
+                        <button id="patient-search-btn"><i class="fas fa-search"></i></button>
+                    </div>
+                    <div class="search-tags">
+                        <span>Ex: 123.456.789-00</span>
+                        <span>Ex: Maria Silva</span>
+                    </div>
+                </div>
+
+                <!-- Pre-Results Area (Recents) -->
+                <div id="patient-recents" class="patient-section">
+                    <h3><i class="fas fa-history"></i> Acessados Recentemente</h3>
+                    <div class="patient-list" id="recent-patients-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Results Area -->
+                <div id="patient-results" class="patient-section" style="display:none;">
+                    <h3>Resultados da Busca</h3>
+                    <div class="patient-list" id="results-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Detailed Profile View (Initially Hidden) -->
+                <div id="patient-profile-view" class="patient-profile-view" style="display:none;">
+                    <button id="back-to-search-btn" class="back-btn"><i class="fas fa-arrow-left"></i> Voltar</button>
+
+                    <!-- Profile Header -->
+                    <div class="patient-header-card">
+                        <div class="patient-photo-large">
+                            <img id="p-photo" src="" alt="Paciente">
+                        </div>
+                        <div class="patient-info-main">
+                            <h2 id="p-name">Nome do Paciente</h2>
+                            <div class="p-badges" id="p-badges">
+                                <!-- Badges -->
+                            </div>
+                            <div class="p-meta-grid">
+                                <div class="p-meta-item">
+                                    <span class="label">Idade</span>
+                                    <span class="value" id="p-age">--</span>
+                                </div>
+                                <div class="p-meta-item">
+                                    <span class="label">Sexo</span>
+                                    <span class="value" id="p-sex">--</span>
+                                </div>
+                                <div class="p-meta-item">
+                                    <span class="label">Tip. Sang.</span>
+                                    <span class="value" id="p-blood">--</span>
+                                </div>
+                                <div class="p-meta-item">
+                                    <span class="label">CNS</span>
+                                    <span class="value" id="p-cns">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabs for Medical Record -->
+                    <div class="patient-tabs">
+                        <button class="p-tab active" data-tab="p-summary">Resumo</button>
+                        <button class="p-tab" data-tab="p-history">Histórico</button>
+                        <button class="p-tab" data-tab="p-vaccines">Vacinas</button>
+                    </div>
+
+                    <!-- Tab Content -->
+                    <div class="p-tab-content active" id="p-summary">
+                        <div class="p-alert-box" id="p-allergies-box">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Alergias</h4>
+                            <ul id="p-allergies-list"></ul>
+                        </div>
+                        <div class="p-section-title">Condições Crônicas</div>
+                        <div class="p-conditions-grid" id="p-conditions-list">
+                            <!-- Cards -->
+                        </div>
+
+                        <div class="p-section-title">Sinais Vitais (Última Consulta)</div>
+                        <div class="vitals-grid">
+                            <div class="vital-card">
+                                <div class="icon"><i class="fas fa-heartbeat"></i></div>
+                                <div class="data">
+                                    <span class="val" id="v-bp">120/80</span>
+                                    <span class="unit">mmHg</span>
+                                </div>
+                                <div class="lbl">Pressão</div>
+                            </div>
+                            <div class="vital-card">
+                                <div class="icon"><i class="fas fa-weight"></i></div>
+                                <div class="data">
+                                    <span class="val" id="v-weight">70</span>
+                                    <span class="unit">kg</span>
+                                </div>
+                                <div class="lbl">Peso</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-tab-content" id="p-history" style="display:none;">
+                        <div class="timeline" id="p-timeline">
+                            <!-- Timeline Items -->
+                        </div>
+                    </div>
+
+                    <div class="p-tab-content" id="p-vaccines" style="display:none;">
+                        <div class="vaccine-list" id="p-vaccines-list">
+                            <!-- Vaccines -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Modals (Overlay) -->
         <div class="loading-overlay" id="loading-overlay">
             <div class="loading-spinner"></div>
             <p id="loading-message">Carregando...</p>
