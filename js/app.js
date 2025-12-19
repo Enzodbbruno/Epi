@@ -1709,15 +1709,22 @@ const MapModule = {
         }
       });
     }
-
     if (selectDisease) {
       selectDisease.addEventListener('change', (e) => {
         this.currentDisease = e.target.value;
-        // Try to determine current city context from map center or selector
+        // Determine current city context correctly
         const selectCity = document.getElementById('municipality-select');
-        const currentCity = selectCity && selectCity.value !== 'gps' ? selectCity.value : 'saopaulo';
+        let currentCity = 'saopaulo';
 
-        const center = this.map ? this.map.getCenter() : { lat: this.cities['saopaulo'].coords[0], lng: this.cities['saopaulo'].coords[1] };
+        if (selectCity) {
+          if (selectCity.value === 'gps') {
+            currentCity = 'gps';
+          } else {
+            currentCity = selectCity.value;
+          }
+        }
+
+        const center = this.map ? this.map.getCenter() : { lat: this.defaultCoords[0], lng: this.defaultCoords[1] };
         if (this.map) {
           this.generateBubbleData(center.lat, center.lng, currentCity);
         }
