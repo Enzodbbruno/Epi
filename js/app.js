@@ -1621,6 +1621,9 @@ const AnalyticsModule = {
   }
 };
 
+// Expose to Window for Debugging/Inline access
+window.MapModule = MapModule;
+
 // Módulo Principal do Aplicativo
 const App = {
   currentScreen: 'dashboard',

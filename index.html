@@ -238,7 +238,9 @@
                                     <h4>Precisamos da sua localização</h4>
                                     <p style="color: var(--text-secondary); margin-bottom: 20px; max-width: 300px;">Para
                                         mostrar os dados da sua região, por favor permita o acesso ao GPS.</p>
-                                    <button class="btn btn-primary" id="enable-location-btn">Ativar Localização</button>
+                                    <button class="btn btn-primary" id="enable-location-btn"
+                                        onclick="if(window.MapModule) window.MapModule.requestLocation()">Ativar
+                                        Localização</button>
                                 </div>
                             </div>
                         </div>
