@@ -1624,19 +1624,15 @@ const AnalyticsModule = {
 // Módulo do Mapa Epidemiológico (Leaflet + Geolocation)
 // Módulo do Mapa Epidemiológico (True Heatmap + Disease Filter)
 // Módulo do Mapa Epidemiológico (Cluster Map + Disease Icons)
+// Módulo do Mapa Epidemiológico (Severity Dot Map)
 const MapModule = {
   map: null,
-  clusterGroup: null,
   userLocation: null,
   currentDisease: 'dengue',
+  markers: [],
 
-  // Configurações por Doença
-  diseaseConfig: {
-    'dengue': { icon: 'fa-mosquito', color: '#ff9800', label: 'Dengue' }, // Orange
-    'covid': { icon: 'fa-virus', color: '#f44336', label: 'COVID-19' }, // Red
-    'influenza': { icon: 'fa-head-side-cough', color: '#2196f3', label: 'Influenza' }, // Blue
-    'zika': { icon: 'fa-microscope', color: '#9c27b0', label: 'Zika' } // Purple
-  },
+  // Coordenadas padrão (Brasília)
+  defaultCoords: [-15.7975, -47.8919],
 
   // Cidades Predefinidas
   cities: {
@@ -1646,8 +1642,6 @@ const MapModule = {
     'salvador': [-12.9774, -38.5016],
     'manaus': [-3.1190, -60.0217]
   },
-
-  defaultCoords: [-15.7975, -47.8919],
 
   init() {
     this.setupEventListeners();
@@ -1669,7 +1663,6 @@ const MapModule = {
           this.requestLocation();
         } else if (this.cities[value]) {
           this.loadMapAt(this.cities[value][0], this.cities[value][1]);
-          // Esconde overlay de permissão se o user escolher cidade manual
           const overlay = document.getElementById('map-permission-overlay');
           if (overlay) overlay.style.display = 'none';
         }
@@ -1681,8 +1674,7 @@ const MapModule = {
         this.currentDisease = e.target.value;
         const center = this.map ? this.map.getCenter() : { lat: this.defaultCoords[0], lng: this.defaultCoords[1] };
         if (this.map) {
-          this.generateClusterData(center.lat, center.lng);
-          this.updateLegend();
+          this.generateDotData(center.lat, center.lng);
         }
       });
     }
@@ -1720,7 +1712,7 @@ const MapModule = {
   loadMapAt(lat, lng) {
     if (this.map) {
       this.map.flyTo([lat, lng], 13);
-      this.generateClusterData(lat, lng);
+      this.generateDotData(lat, lng);
       return;
     }
 
@@ -1733,76 +1725,67 @@ const MapModule = {
         maxZoom: 19
       }).addTo(this.map);
 
-      // Init Cluster Group
-      this.clusterGroup = L.markerClusterGroup({
-        maxClusterRadius: 50,
-        spiderfyOnMaxZoom: true,
-        showCoverageOnHover: false,
-        zoomToBoundsOnClick: true
-      });
-      this.map.addLayer(this.clusterGroup);
-
-      this.generateClusterData(lat, lng);
+      this.generateDotData(lat, lng);
       this.addLegend();
     }, 100);
   },
 
-  generateClusterData(lat, lng) {
-    if (!this.clusterGroup) return;
-    this.clusterGroup.clearLayers();
+  generateDotData(lat, lng) {
+    // Clear old markers
+    this.markers.forEach(m => this.map.removeLayer(m));
+    this.markers = [];
 
-    let count = 150;
-    let radius = 0.04;
+    let count = 200;
+    let radius = 0.05;
 
-    // Simulação de padrões diferentes
-    if (this.currentDisease === 'dengue') { count = 300; radius = 0.06; } // Espalhado
-    if (this.currentDisease === 'covid') { count = 100; radius = 0.02; } // Concentrado
-
-    const config = this.diseaseConfig[this.currentDisease];
-    const markers = [];
+    // Adjust density by disease
+    if (this.currentDisease === 'dengue') { count = 350; radius = 0.07; }
+    if (this.currentDisease === 'covid') { count = 250; radius = 0.04; }
 
     for (let i = 0; i < count; i++) {
       const spreadX = (Math.random() - 0.5) * radius * 2;
       const spreadY = (Math.random() - 0.5) * radius * 2;
 
-      // Icon
-      const customIcon = L.divIcon({
-        className: 'custom-map-icon',
-        html: `<i class="fas ${config.icon}"></i>`,
-        bgPos: [0, 0],
-        iconSize: [30, 30],
-        iconAnchor: [15, 15]
-      });
-      // Hack to apply dynamic color via style injection isn't consistent in L.divIcon cleanly without CSS classes
-      // So we manually set background in style attr of the icon if possible, but Leaflet creates the div.
-      // Workaround: We style the class in CSS generally, or update logic to append style.
+      // Determine Severity
+      const r = Math.random();
+      let sevColor, sevLabel;
 
-      // Better approach: Let's create the element string with style
-      const coloredIcon = L.divIcon({
-        className: '', // No default class to avoid conflicts
-        html: `<div class="custom-map-icon" style="background-color: ${config.color}; width: 30px; height: 30px;">
-                        <i class="fas ${config.icon}"></i>
-                       </div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 15]
-      });
+      // Weighted probabilities based on disease
+      let chanceSevere = 0.1;
+      let chanceWarning = 0.4;
 
-      const marker = L.marker([lat + spreadX, lng + spreadY], { icon: coloredIcon });
+      if (this.currentDisease === 'covid') { chanceSevere = 0.3; chanceWarning = 0.6; }
+      if (this.currentDisease === 'zika') { chanceSevere = 0.05; chanceWarning = 0.3; }
 
-      let status = "Suspeito";
-      if (Math.random() > 0.7) status = "Confirmado";
+      if (r < chanceSevere) {
+        sevColor = '#D32F2F'; // Red (Severe)
+        sevLabel = 'Caso Grave';
+      } else if (r < chanceWarning) {
+        sevColor = '#FFA000'; // Orange (Suspect)
+        sevLabel = 'Em Análise';
+      } else {
+        sevColor = '#388E3C'; // Green (Recovered)
+        sevLabel = 'Recuperado';
+      }
 
-      marker.bindPopup(`
+      const circle = L.circleMarker([lat + spreadX, lng + spreadY], {
+        radius: 6,
+        fillColor: sevColor,
+        color: '#fff',
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.9
+      }).addTo(this.map); // Add directly to map (no cluster)
+
+      circle.bindPopup(`
                 <div style="text-align: center;">
-                    <strong style="color:${config.color}">${config.label}</strong><br>
-                    Status: ${status}<br>
-                    <small>Atualizado: Agora</small>
+                    <strong style="color:${sevColor}">${sevLabel}</strong><br>
+                    Doença: ${this.currentDisease.toUpperCase()}<br>
+                    <small>Atualizado: 10 min atrás</small>
                 </div>
             `);
-      markers.push(marker);
+      this.markers.push(circle);
     }
-
-    this.clusterGroup.addLayers(markers);
   },
 
   addLegend() {
@@ -1818,22 +1801,20 @@ const MapModule = {
     legend.addTo(this.map);
   },
 
-  updateLegend() {
-    const div = document.getElementById('map-legend-content');
-    if (div) this.updateLegendContent(div);
-  },
-
   updateLegendContent(div) {
-    const config = this.diseaseConfig[this.currentDisease];
     div.innerHTML = `
-            <strong>Legenda</strong><br>
+            <strong>Gravidade dos Casos</strong><br>
             <div class="legend-item" style="margin-top:5px;">
-                <div class="legend-icon" style="background:${config.color}"><i class="fas ${config.icon}"></i></div>
-                <span>${config.label} (Foco)</span>
+                <div class="legend-icon" style="background:#D32F2F"></div>
+                <span>Grave / Confirmado</span>
             </div>
             <div class="legend-item">
-                <div class="legend-icon" style="background:#4CAF50"><i class="fas fa-check"></i></div>
-                <span>Área Controlada</span>
+                <div class="legend-icon" style="background:#FFA000"></div>
+                <span>Suspeito / Em Análise</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon" style="background:#388E3C"></div>
+                <span>Recuperado / Monitorado</span>
             </div>
         `;
   }
