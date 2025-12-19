@@ -1,5 +1,5 @@
 // Nome do cache
-const CACHE_NAME = 'epiconecta-v4-heatmap';
+const CACHE_NAME = 'epiconecta-v5-clusters';
 // Arquivos para armazenar em cache
 const urlsToCache = [
   './',
