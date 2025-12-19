@@ -1624,7 +1624,7 @@ const AnalyticsModule = {
 // Módulo do Mapa Epidemiológico (Leaflet + Geolocation)
 // Módulo do Mapa Epidemiológico (True Heatmap + Disease Filter)
 // Módulo do Mapa Epidemiológico (Cluster Map + Disease Icons)
-// Módulo do Mapa Epidemiológico (Proportional Bubble Map - JHU Style)
+// Módulo do Mapa Epidemiológico (Proportional Bubble Map - Real Neighborhoods)
 const MapModule = {
   map: null,
   userLocation: null,
@@ -1639,9 +1639,6 @@ const MapModule = {
     critical: '#B71C1C' // Vermelho Escuro (Crítico)
   },
 
-  // Coordenadas padrão (Brasília)
-  defaultCoords: [-15.7975, -47.8919],
-
   // Cidades Predefinidas
   cities: {
     'saopaulo': { coords: [-23.5505, -46.6333], label: 'São Paulo' },
@@ -1651,8 +1648,41 @@ const MapModule = {
     'manaus': { coords: [-3.1190, -60.0217], label: 'Manaus' }
   },
 
-  // Centróides de Bairros (Mock Data de Pontos Fixos)
-  // Para simplificar, geraremos offsets fixos baseados na cidade selecionada
+  // Dados Reais de Bairros (Latitude, Longitude)
+  neighborhoodsData: {
+    'saopaulo': [
+      { name: 'Vila Mariana', lat: -23.5837, lng: -46.6339 },
+      { name: 'Mooca', lat: -23.5592, lng: -46.5981 },
+      { name: 'Pinheiros', lat: -23.5653, lng: -46.6914 },
+      { name: 'Itaquera', lat: -23.5344, lng: -46.4515 },
+      { name: 'Santana', lat: -23.4994, lng: -46.6316 },
+      { name: 'Santo Amaro', lat: -23.6559, lng: -46.7027 }
+    ],
+    'rio': [
+      { name: 'Copacabana', lat: -22.9707, lng: -43.1824 },
+      { name: 'Tijuca', lat: -22.9255, lng: -43.2521 },
+      { name: 'Barra da Tijuca', lat: -23.0004, lng: -43.3659 },
+      { name: 'Madureira', lat: -22.8810, lng: -43.3400 },
+      { name: 'Centro', lat: -22.9068, lng: -43.1729 }
+    ],
+    'brasilia': [
+      { name: 'Asa Sul', lat: -15.8131, lng: -47.8961 },
+      { name: 'Asa Norte', lat: -15.7631, lng: -47.8836 },
+      { name: 'Águas Claras', lat: -15.8400, lng: -48.0300 },
+      { name: 'Taguatinga', lat: -15.8333, lng: -48.0564 },
+      { name: 'Plano Piloto', lat: -15.7975, lng: -47.8919 }
+    ],
+    'salvador': [
+      { name: 'Pelourinho', lat: -12.9711, lng: -38.5108 },
+      { name: 'Barra', lat: -13.0084, lng: -38.5283 },
+      { name: 'Rio Vermelho', lat: -13.0125, lng: -38.4906 }
+    ],
+    'manaus': [
+      { name: 'Centro', lat: -3.1190, lng: -60.0217 },
+      { name: 'Adrianópolis', lat: -3.1096, lng: -60.0135 },
+      { name: 'Ponta Negra', lat: -3.0734, lng: -60.0776 }
+    ]
+  },
 
   init() {
     this.setupEventListeners();
@@ -1673,7 +1703,7 @@ const MapModule = {
         if (value === 'gps') {
           this.requestLocation();
         } else if (this.cities[value]) {
-          this.loadMapAt(this.cities[value].coords[0], this.cities[value].coords[1]);
+          this.loadMapAt(this.cities[value].coords[0], this.cities[value].coords[1], value);
           const overlay = document.getElementById('map-permission-overlay');
           if (overlay) overlay.style.display = 'none';
         }
@@ -1683,9 +1713,13 @@ const MapModule = {
     if (selectDisease) {
       selectDisease.addEventListener('change', (e) => {
         this.currentDisease = e.target.value;
-        const center = this.map ? this.map.getCenter() : { lat: this.defaultCoords[0], lng: this.defaultCoords[1] };
+        // Try to determine current city context from map center or selector
+        const selectCity = document.getElementById('municipality-select');
+        const currentCity = selectCity && selectCity.value !== 'gps' ? selectCity.value : 'saopaulo';
+
+        const center = this.map ? this.map.getCenter() : { lat: this.cities['saopaulo'].coords[0], lng: this.cities['saopaulo'].coords[1] };
         if (this.map) {
-          this.generateBubbleData(center.lat, center.lng);
+          this.generateBubbleData(center.lat, center.lng, currentCity);
         }
       });
     }
@@ -1701,40 +1735,40 @@ const MapModule = {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           this.userLocation = [position.coords.latitude, position.coords.longitude];
-          this.loadMapAt(this.userLocation[0], this.userLocation[1]);
+          // Default to SP neighborhood logic if GPS is essentially unknown in this mock
+          this.loadMapAt(this.userLocation[0], this.userLocation[1], 'saopaulo');
           if (overlay) overlay.style.display = 'none';
           if (btn) btn.innerHTML = 'Ativar Localização';
         },
         (error) => {
           console.error("Erro GPS:", error);
           alert("Não foi possível obter sua localização. Mostrando São Paulo por padrão.");
-          this.loadMapAt(this.cities['saopaulo'].coords[0], this.cities['saopaulo'].coords[1]);
+          this.loadMapAt(this.cities['saopaulo'].coords[0], this.cities['saopaulo'].coords[1], 'saopaulo');
           if (overlay) overlay.style.display = 'none';
           if (btn) btn.innerHTML = 'Ativar Localização';
         }
       );
     } else {
       alert("Seu navegador não suporta Geolocalização.");
-      this.loadMapAt(this.cities['saopaulo'].coords[0], this.cities['saopaulo'].coords[1]);
+      this.loadMapAt(this.cities['saopaulo'].coords[0], this.cities['saopaulo'].coords[1], 'saopaulo');
       if (overlay) overlay.style.display = 'none';
     }
   },
 
-  loadMapAt(lat, lng) {
+  loadMapAt(lat, lng, cityKey = 'saopaulo') {
     if (this.map) {
-      this.map.flyTo([lat, lng], 12); // Slightly zoomed out for bubble view
-      this.generateBubbleData(lat, lng);
+      this.map.flyTo([lat, lng], 12);
+      this.generateBubbleData(lat, lng, cityKey);
       return;
     }
 
     setTimeout(() => {
       this.map = L.map('epidemiological-map', {
-        zoomControl: false // Custom control look maybe later
+        zoomControl: false
       }).setView([lat, lng], 12);
 
       L.control.zoom({ position: 'topright' }).addTo(this.map);
 
-      // Using a cleaner, simpler map style (CartoDB Light)
       L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; OpenStreetMap &copy; CARTO',
         subdomains: 'abcd',
@@ -1743,25 +1777,17 @@ const MapModule = {
 
       this.layerGroup = L.layerGroup().addTo(this.map);
 
-      this.generateBubbleData(lat, lng);
+      this.generateBubbleData(lat, lng, cityKey);
       this.addLegend();
     }, 100);
   },
 
-  generateBubbleData(lat, lng) {
+  generateBubbleData(lat, lng, cityKey) {
     if (!this.layerGroup) return;
     this.layerGroup.clearLayers();
 
-    // 1. Define Mock Neighborhoods (Fixed offsets from center)
-    const neighborhoods = [
-      { name: 'Centro', offset: [0, 0] },
-      { name: 'Zona Norte', offset: [0.05, -0.02] },
-      { name: 'Zona Sul', offset: [-0.06, 0.03] },
-      { name: 'Zona Leste', offset: [-0.02, 0.08] },
-      { name: 'Zona Oeste', offset: [0.03, -0.07] },
-      { name: 'Novo Distrito', offset: [0.08, 0.05] },
-      { name: 'Vila Antiga', offset: [-0.08, -0.04] }
-    ];
+    // 1. Get Real Neighborhoods for City
+    const neighborhoods = this.neighborhoodsData[cityKey] || this.neighborhoodsData['saopaulo'];
 
     neighborhoods.forEach(hood => {
       // 2. Generate Random Case Counts
@@ -1782,14 +1808,14 @@ const MapModule = {
       if (cases > 300) color = this.colors.high;
       if (cases > 600) color = this.colors.critical;
 
-      // 4. Create Circle Marker
-      const circle = L.circleMarker([lat + hood.offset[0], lng + hood.offset[1]], {
+      // 4. Create Circle Marker at REAL Coordinates
+      const circle = L.circleMarker([hood.lat, hood.lng], {
         radius: radius,
         fillColor: color,
         color: color,
         weight: 1,
         opacity: 0.8,
-        fillOpacity: 0.5 // Semi-transparent for density look
+        fillOpacity: 0.5
       });
 
       // 5. Tooltip/Popup
@@ -1820,7 +1846,7 @@ const MapModule = {
   },
 
   addLegend() {
-    if (document.querySelector('.map-legend')) return; // Avoid duplicates
+    if (document.querySelector('.map-legend')) return;
 
     const legend = L.control({ position: 'bottomleft' });
 
