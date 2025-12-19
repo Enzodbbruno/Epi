@@ -1735,8 +1735,8 @@ const MapModule = {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           this.userLocation = [position.coords.latitude, position.coords.longitude];
-          // Default to SP neighborhood logic if GPS is essentially unknown in this mock
-          this.loadMapAt(this.userLocation[0], this.userLocation[1], 'saopaulo');
+          // Pass 'gps' to trigger dynamic generation around user
+          this.loadMapAt(this.userLocation[0], this.userLocation[1], 'gps');
           if (overlay) overlay.style.display = 'none';
           if (btn) btn.innerHTML = 'Ativar Localização';
         },
@@ -1786,8 +1786,25 @@ const MapModule = {
     if (!this.layerGroup) return;
     this.layerGroup.clearLayers();
 
-    // 1. Get Real Neighborhoods for City
-    const neighborhoods = this.neighborhoodsData[cityKey] || this.neighborhoodsData['saopaulo'];
+    let neighborhoods;
+
+    // 1. Get Neighborhoods
+    if (this.neighborhoodsData[cityKey]) {
+      // Use predefined real data
+      neighborhoods = this.neighborhoodsData[cityKey];
+    } else {
+      // Dynamic Generation for GPS/Unknown locations
+      // Generate points relative to the provided lat/lng center
+      neighborhoods = [
+        { name: 'Centro Local', lat: lat, lng: lng },
+        { name: 'Região Norte', lat: lat + 0.02, lng: lng },
+        { name: 'Região Sul', lat: lat - 0.02, lng: lng },
+        { name: 'Região Leste', lat: lat, lng: lng + 0.02 },
+        { name: 'Região Oeste', lat: lat, lng: lng - 0.02 },
+        { name: 'Área Industrial', lat: lat + 0.015, lng: lng + 0.015 },
+        { name: 'Área Residencial', lat: lat - 0.015, lng: lng - 0.015 }
+      ];
+    }
 
     neighborhoods.forEach(hood => {
       // 2. Generate Random Case Counts
@@ -1808,7 +1825,7 @@ const MapModule = {
       if (cases > 300) color = this.colors.high;
       if (cases > 600) color = this.colors.critical;
 
-      // 4. Create Circle Marker at REAL Coordinates
+      // 4. Create Circle Marker at coordinates
       const circle = L.circleMarker([hood.lat, hood.lng], {
         radius: radius,
         fillColor: color,

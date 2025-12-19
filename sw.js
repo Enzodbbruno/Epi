@@ -1,5 +1,5 @@
 // Nome do cache
-const CACHE_NAME = 'epiconecta-v10-realhoods';
+const CACHE_NAME = 'epiconecta-v11-fixgps';
 // Arquivos para armazenar em cache
 const urlsToCache = [
   './',
