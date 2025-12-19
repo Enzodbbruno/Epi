@@ -1,5 +1,5 @@
 // Nome do cache
-const CACHE_NAME = 'epiconecta-v13-patients';
+const CACHE_NAME = 'epiconecta-v14-desktopfix';
 // Arquivos para armazenar em cache
 const urlsToCache = [
   './',
