@@ -1701,6 +1701,25 @@ const PatientModule = {
         { name: 'dTpa', date: '20/11/2025' },
         { name: 'Influenza', date: '10/04/2025' }
       ]
+    },
+    {
+      id: 4,
+      name: 'Paciente Exemplo (Usuário)',
+      age: 30,
+      sex: 'Masc',
+      blood: 'O+',
+      cns: '05395045210',
+      cpf: '053.950.452-10',
+      photo: 'https://ui-avatars.com/api/?name=Enzo+User&background=0D8ABC&color=fff',
+      badges: [
+        { text: 'Cadastro Novo', type: 'info' }
+      ],
+      allergies: [],
+      vitals: { bp: '120/80', weight: '75', heartRate: '70' },
+      history: [
+        { date: '19/12/2025', title: 'Primeiro Acesso', desc: 'Cadastro realizado no sistema.' }
+      ],
+      vaccines: []
     }
   ],
 
@@ -1778,7 +1797,12 @@ const PatientModule = {
     section.style.display = 'block';
 
     if (results.length === 0) {
-      container.innerHTML = '<div style="text-align:center; color:#888; padding:20px;">Nenhum paciente encontrado.</div>';
+      container.innerHTML = `
+                <div style="text-align:center; color:#888; padding:30px;">
+                    <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 10px; opacity: 0.5;"></i><br>
+                    Nenhum paciente encontrado.<br>
+                    <small>Tente buscar por <b>"Maria"</b>, <b>"João"</b> ou <b>"05395045210"</b></small>
+                </div>`;
       return;
     }
 
