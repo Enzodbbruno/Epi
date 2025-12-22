@@ -1680,52 +1680,39 @@ const PatientModule = {
         { date: '10/12/2025', title: 'Pediatra', desc: 'Crise de asma leve. Prescrito nebulização.' },
         { date: '15/08/2025', title: 'Vacinação', desc: 'Tetra Viral.' }
       ],
-      vaccines: [
-        { name: 'Tetra Viral', date: '15/08/2025' },
-        { name: 'Poliomielite', date: '10/02/2023' },
-        { name: 'BCG', date: '20/05/2020' }
-      ]
+      conditions: ['Hipertensão', 'Diabetes Tipo 2'],
+      vitals: { bp: '118/76', weight: '68', temp: '36.4', o2: '98' }
+    },
+    {
+      id: 2,
+      name: 'João Pedro Oliveira',
+      age: 35,
+      sex: 'Masculino',
+      cpf: '987.654.321-00',
+      cns: '987 6543 2109 8765',
+      bloodType: 'A+',
+      photo: 'https://ui-avatars.com/api/?name=Joao+Pedro&background=2196f3&color=fff',
+      birthDate: '22/08/1989',
+      allergies: [],
+      conditions: ['Asma'],
+      vitals: { bp: '120/80', weight: '75', temp: '36.5', o2: '97' }
     },
     {
       id: 3,
-      name: 'Ana Clara Silva',
-      age: 34,
-      sex: 'Fem',
-      blood: 'AB-',
-      cns: '201098765432',
-      cpf: '987.654.321-11',
-      photo: 'https://ui-avatars.com/api/?name=Ana+Clara&background=random&size=128',
-      badges: [
-        { text: 'Gestante (20 sem)', type: 'info' }
-      ],
-      allergies: [],
-      vitals: { bp: '110/70', weight: '68', heartRate: '82' },
-      history: [
-        { date: '18/12/2025', title: 'Pré-Natal', desc: 'Consulta mensal. Batimentos fetais normais.' },
-        { date: '20/11/2025', title: 'Ultrassom Morfológico', desc: 'Desenvolvimento adequado.' }
-      ],
-      vaccines: [
-        { name: 'dTpa', date: '20/11/2025' },
-        { name: 'Influenza', date: '10/04/2025' }
-      ]
+      name: 'Ana Carolina Ferreira',
+      age: 28,
+      sex: 'Feminino',
+      cpf: '456.789.123-45',
+      cns: '456 7891 2345 6789',
+      bloodType: 'B+',
+      photo: 'https://ui-avatars.com/api/?name=Ana+Carolina&background=9c27b0&color=fff',
+      birthDate: '10/12/1996',
+      allergies: ['Lactose'],
+      conditions: [],
+      vitals: { bp: '115/75', weight: '62', temp: '36.3', o2: '99' }
     },
     {
       id: 4,
-      name: 'Paciente Exemplo (Usuário)',
-      age: 30,
-      sex: 'Masc',
-      blood: 'O+',
-      cns: '05395045210',
-      cpf: '053.950.452-10',
-      photo: 'https://ui-avatars.com/api/?name=Enzo+User&background=0D8ABC&color=fff',
-      badges: [
-        { text: 'Cadastro Novo', type: 'info' }
-      ],
-      allergies: [],
-      vitals: { bp: '120/80', weight: '75', heartRate: '70' },
-      history: [
-        { date: '19/12/2025', title: 'Primeiro Acesso', desc: 'Cadastro realizado no sistema.' }
-      ],
       vaccines: []
     }
   ],
@@ -1789,7 +1776,16 @@ const PatientModule = {
         const buttonText = button.textContent.trim();
 
         if (buttonText === 'Nova Consulta') {
-          alert('Funcionalidade de Nova Consulta será implementada em breve.\n\nEsta ação abrirá um formulário para registrar uma nova consulta médica para o paciente.');
+          // Close patient profile and return to list
+          const profileView = document.getElementById('patient-profile-view');
+          const searchBar = document.querySelector('.patient-search-bar');
+          const recents = document.getElementById('patient-recents');
+          const results = document.getElementById('patient-results');
+
+          if (profileView) profileView.style.display = 'none';
+          if (searchBar) searchBar.style.display = 'block';
+          if (recents) recents.style.display = 'block';
+          if (results) results.style.display = 'none';
         } else if (buttonText === 'Editar Prontuário') {
           alert('Funcionalidade de Editar Prontuário será implementada em breve.\n\nEsta ação permitirá editar as informações do prontuário do paciente.');
         } else if (buttonText === 'Notificar') {
@@ -1803,14 +1799,30 @@ const PatientModule = {
 
   handleSearch(term) {
     if (!term) return;
-    term = term.toLowerCase().replace(/[.\-]/g, ''); // Clean CPF/CNS chars
+
+    // Clean the search term - remove common formatting characters
+    const cleanTerm = term.toLowerCase().replace(/[.\-\s/]/g, '');
 
     const results = this.mockDB.filter(p => {
-      const cleanCpf = p.cpf.replace(/[.\-]/g, '');
-      const name = p.name.toLowerCase();
-      const cns = p.cns;
+      // Clean patient data for comparison
+      const cleanCpf = p.cpf ? p.cpf.replace(/[.\-]/g, '') : '';
+      const cleanCns = p.cns ? p.cns.replace(/\s/g, '') : '';
+      const cleanBirthDate = p.birthDate ? p.birthDate.replace(/\//g, '') : '';
+      const name = p.name ? p.name.toLowerCase() : '';
 
-      return name.includes(term) || cleanCpf.includes(term) || cns.includes(term);
+      // Search by name (partial match)
+      if (name.includes(term.toLowerCase())) return true;
+
+      // Search by CPF (with or without formatting)
+      if (cleanCpf.includes(cleanTerm)) return true;
+
+      // Search by CNS (with or without formatting)
+      if (cleanCns.includes(cleanTerm)) return true;
+
+      // Search by birth date (with or without formatting)
+      if (cleanBirthDate.includes(cleanTerm)) return true;
+
+      return false;
     });
 
     this.renderResults(results);
