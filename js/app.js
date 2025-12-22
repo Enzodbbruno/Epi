@@ -2267,77 +2267,95 @@ const App = {
     desktopNavItems.forEach(item => {
       item.addEventListener('click', (e) => {
         e.preventDefault();
-        const screen = item.dataset.screen;
-        if (screen) {
-          this.showScreen(screen);
-        }
       });
     });
 
-    // Navegação pelo menu inferior
-    const navItems = document.querySelectorAll('.bottom-nav .nav-item');
-    navItems.forEach(item => {
-      item.addEventListener('click', (e) => {
-        e.preventDefault();
-        const screen = item.dataset.screen;
-        if (screen) {
-          this.showScreen(screen);
-        }
-      });
-    });
-
-    // Navegação pelos cards da tela inicial
-    const actionCards = document.querySelectorAll('.action-card');
-    actionCards.forEach(card => {
+    // Quick Action Cards
+    const quickCards = document.querySelectorAll('.quick-card');
+    quickCards.forEach(card => {
       card.addEventListener('click', () => {
-        const screen = card.id.replace('-card', '');
-        this.showScreen(screen);
+        const screen = card.dataset.screen;
+        if (screen) {
+          this.showScreen(screen);
+        }
       });
     });
 
-    // Botão de voltar
+    // Back Buttons
     const backButtons = document.querySelectorAll('.back-button');
     backButtons.forEach(button => {
       button.addEventListener('click', (e) => {
         e.preventDefault();
-        this.showPreviousScreen();
+        const targetScreen = button.dataset.screen;
+        if (targetScreen) {
+          this.showScreen(targetScreen);
+        } else {
+          this.showScreen('dashboard');
+        }
       });
     });
+
+    // See More Button
+    const seeMoreBtn = document.querySelector('.see-more-btn');
+    if (seeMoreBtn) {
+      seeMoreBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const screen = seeMoreBtn.dataset.screen;
+        if (screen) {
+          this.showScreen(screen);
+        }
+      });
+    }
   },
 
   showScreen(screenId) {
-    // Esconde todas as telas
+    // Hide all screens
     const screens = document.querySelectorAll('.screen');
     screens.forEach(screen => {
+      screen.classList.remove('active');
       screen.style.display = 'none';
     });
 
-    // Mostra a tela solicitada
+    // Show target screen
     const targetScreen = document.getElementById(`${screenId}-screen`);
     if (targetScreen) {
+      targetScreen.classList.add('active');
       targetScreen.style.display = 'block';
       this.currentScreen = screenId;
 
-      // Atualiza o menu ativo
+      // Update active nav items
       this.updateActiveNavItem(screenId);
 
-      // Rola para o topo
-      window.scrollTo(0, 0);
+      // Scroll to top
+      const mainContent = document.querySelector('.main-content');
+      if (mainContent) {
+        mainContent.scrollTop = 0;
+      }
 
-      // Executa ações específicas ao mostrar determinadas telas
+      // Execute screen-specific actions
       this.onScreenShow(screenId);
     }
   },
 
   showPreviousScreen() {
-    // Lógica para voltar à tela anterior
-    // Por enquanto, sempre volta para o dashboard
+    // Always return to dashboard
     this.showScreen('dashboard');
   },
 
   updateActiveNavItem(screenId) {
-    const navItems = document.querySelectorAll('.nav-item, .desktop-nav-item');
-    navItems.forEach(item => {
+    // Update desktop nav
+    const desktopNavItems = document.querySelectorAll('.desktop-nav .nav-item');
+    desktopNavItems.forEach(item => {
+      if (item.dataset.screen === screenId) {
+        item.classList.add('active');
+      } else {
+        item.classList.remove('active');
+      }
+    });
+
+    // Update bottom nav
+    const bottomNavItems = document.querySelectorAll('.bottom-nav .nav-item');
+    bottomNavItems.forEach(item => {
       if (item.dataset.screen === screenId) {
         item.classList.add('active');
       } else {

@@ -5,995 +5,513 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="EpiConecta - Sistema de Vigilância Epidemiológica e Comunicação em Saúde">
-    <meta name="keywords"
-        content="saúde, vigilância epidemiológica, epidemiologia, saúde pública, notificações, chat profissional, biblioteca digital">
-    <meta name="author" content="EpiConecta">
-    <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#1a73e8">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="EpiConecta">
-    <meta name="application-name" content="EpiConecta">
-    <meta name="msapplication-TileColor" content="#1a73e8">
-    <meta name="msapplication-TileImage" content="/icons/ms-icon-144x144.png">
-    <meta name="msapplication-config" content="browserconfig.xml">
-
+    <meta name="theme-color" content="#0D8ABC">
     <title>EpiConecta - Vigilância Epidemiológica</title>
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <!-- Favicons -->
     <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="icons/favicon-96x96.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-icon-180x180.png">
-
-    <!-- CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-        integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-
-    <!-- Leaflet (Map) -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
-    <!-- PWA -->
+    <link rel="apple-touch-icon" href="icons/apple-icon-180x180.png">
     <link rel="manifest" href="manifest.json">
 
-    <!-- iOS -->
-    <link rel="apple-touch-startup-image" href="icons/apple-splash-2048-2732.jpg"
-        media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
-    <link rel="apple-touch-startup-image" href="icons/apple-splash-2732-2048.jpg"
-        media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <!-- Fontes e Ícones -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
 
 <body>
     <div class="app-container">
-        <!-- Desktop Sidebar (Visible only on Desktop via CSS) -->
+
+        <!-- Sidebar Desktop -->
         <aside class="desktop-sidebar">
-            <div class="logo" style="padding: 24px; color: var(--primary-color);">
+            <div class="sidebar-logo">
                 <i class="fas fa-shield-virus"></i>
                 <h1>EpiConecta</h1>
             </div>
             <nav class="desktop-nav">
-                <a href="#" class="desktop-nav-item active" data-screen="dashboard">
-                    <i class="fas fa-home"></i> <span>Início</span>
-                </a>
-                <a href="#" class="desktop-nav-item" data-screen="notifications">
-                    <i class="fas fa-bell"></i> <span>Notificações</span>
-                </a>
-                <a href="#" class="desktop-nav-item" data-screen="analytics">
-                    <i class="fas fa-chart-line"></i> <span>Estatísticas</span>
-                </a>
-                <a href="#" class="desktop-nav-item" data-screen="symptoms">
-                    <i class="fas fa-notes-medical"></i> <span>Triagem</span>
-                </a>
-                <a href="#" class="desktop-nav-item" data-screen="chat">
-                    <i class="fas fa-comments"></i> <span>Chat Profissional</span>
-                </a>
-                <a href="#" class="desktop-nav-item" data-screen="library">
-                    <i class="fas fa-book-medical"></i> <span>Biblioteca</span>
-                </a>
-                <a href="#" class="desktop-nav-item" data-screen="patients">
-                    <i class="fas fa-user-injured"></i> <span>Pacientes</span>
-                </a>
-                <a href="#" class="desktop-nav-item" data-screen="settings">
-                    <i class="fas fa-cog"></i> <span>Configurações</span>
-                </a>
+                <a href="#" class="nav-item active" data-screen="dashboard"><i class="fas fa-home"></i>
+                    <span>Início</span></a>
+                <a href="#" class="nav-item" data-screen="notifications"><i class="fas fa-bell"></i>
+                    <span>Notificações</span></a>
+                <a href="#" class="nav-item" data-screen="analytics"><i class="fas fa-chart-line"></i>
+                    <span>Estatísticas</span></a>
+                <a href="#" class="nav-item" data-screen="symptoms"><i class="fas fa-notes-medical"></i>
+                    <span>Triagem</span></a>
+                <a href="#" class="nav-item" data-screen="chat"><i class="fas fa-comments"></i> <span>Chat</span></a>
+                <a href="#" class="nav-item" data-screen="library"><i class="fas fa-book-medical"></i>
+                    <span>Biblioteca</span></a>
+                <a href="#" class="nav-item" data-screen="patients"><i class="fas fa-user-injured"></i>
+                    <span>Pacientes</span></a>
+                <a href="#" class="nav-item" data-screen="settings"><i class="fas fa-cog"></i>
+                    <span>Configurações</span></a>
             </nav>
         </aside>
 
-        <!-- Main Content Wrapper -->
-        <div class="content-wrapper">
-            <!-- Header Mobile Only -->
+        <!-- Main Content -->
+        <div class="main-wrapper">
+            <!-- Header Mobile -->
             <header class="app-header">
-                <div class="header-content">
-                    <div class="logo" id="logo">
-                        <i class="fas fa-shield-virus"></i>
-                        <h1>EpiConecta</h1>
-                    </div>
-                    <div class="header-actions">
-                        <button class="icon-button" id="notifications-button">
-                            <i class="fas fa-bell"></i>
-                            <span class="badge" id="notification-badge">2</span>
-                        </button>
-                        <div class="user-avatar" id="user-menu-button">
-                            <span>JS</span>
-                        </div>
+                <div class="header-logo">
+                    <i class="fas fa-shield-virus"></i>
+                    <h1>EpiConecta</h1>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-button" id="notifications-button">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge">3</span>
+                    </button>
+                    <div class="user-avatar">
+                        <img src="https://ui-avatars.com/api/?name=Dr+Silva&background=1a73e8&color=fff" alt="Usuário">
                     </div>
                 </div>
             </header>
 
-            <main class="main-content" id="main-content">
-                <!-- Tela Inicial (Dashboard) -->
-                <section class="screen" id="dashboard-screen">
-                    <section class="welcome-section">
-                        <h2>Bem-vindo(a), <span id="user-name">Profissional</span></h2>
-                        <p id="current-date">Carregando...</p>
-                    </section>
+            <main class="main-content">
 
-                    <!-- News Carousel Section -->
-                    <section class="news-carousel-section">
-                        <div class="carousel-container" id="news-carousel">
-                            <!-- News Cards injected via JS -->
-                        </div>
-                        <div class="carousel-indicators" id="carousel-indicators"></div>
-                    </section>
+                <!-- 1. Dashboard -->
+                <section class="screen active" id="dashboard-screen">
+                    <div class="welcome-section">
+                        <h1>Bem-vindo(a), <span id="user-name">Dr. Silva</span></h1>
+                        <p class="current-date" id="current-date">22 de dezembro de 2025</p>
+                    </div>
 
-                    <section class="quick-actions">
-                        <div class="action-card" id="notifications-card">
-                            <div class="icon-container">
-                                <i class="fas fa-bell"></i>
-                            </div>
-                            <h3>Notificações</h3>
-                            <p>Alertas e boletins</p>
+                    <div class="quick-actions-grid">
+                        <div class="quick-card" data-screen="notifications">
+                            <i class="fas fa-bell"></i>
+                            <span>Notificações</span>
                         </div>
-                        <div class="action-card" id="analytics-card">
-                            <div class="icon-container">
-                                <i class="fas fa-chart-line"></i>
-                            </div>
-                            <h3>Estatísticas</h3>
-                            <p>Dados epidemiológicos</p>
+                        <div class="quick-card" data-screen="analytics">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Estatísticas</span>
                         </div>
-                        <div class="action-card" id="chat-card">
-                            <div class="icon-container">
-                                <i class="fas fa-comments"></i>
-                            </div>
-                            <h3>Chat Profissional</h3>
-                            <p>Converse com a equipe</p>
+                        <div class="quick-card" data-screen="chat">
+                            <i class="fas fa-comments"></i>
+                            <span>Chat</span>
                         </div>
-                        <div class="action-card" id="library-card">
-                            <div class="icon-container">
-                                <i class="fas fa-book-medical"></i>
-                            </div>
-                            <h3>Biblioteca</h3>
-                            <p>Materiais de referência</p>
+                        <div class="quick-card" data-screen="library">
+                            <i class="fas fa-book-medical"></i>
+                            <span>Biblioteca</span>
                         </div>
-                        <div class="action-card" id="symptoms-card">
-                            <div class="icon-container">
-                                <i class="fas fa-notes-medical"></i>
-                            </div>
-                            <h3>Nova Triagem</h3>
-                            <p>Avaliação rápida</p>
+                        <div class="quick-card" data-screen="symptoms">
+                            <i class="fas fa-notes-medical"></i>
+                            <span>Triagem</span>
                         </div>
-                    </section>
-
-
-                    <section class="recent-alerts">
-                        <div class="section-header">
-                            <h3>Alertas Recentes</h3>
-                            <a href="#" id="view-all-alerts">Ver todos</a>
-                        </div>
-                        <div id="recent-alerts">
-                            <!-- Alertas serão inseridos aqui via JS -->
-                            <div class="loading-spinner"></div>
-                        </div>
-                    </section>
-
-                </section> <!-- End of dashboard-screen -->
-
-                <!-- Tela de Estatísticas (Analytics) -->
-                <section class="screen" id="analytics-screen" style="display: none;">
-                    <div class="screen-header">
-                        <button class="back-button">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <h2>Dados Epidemiológicos</h2>
-                        <div class="header-actions">
-                            <button class="icon-button" id="refresh-analytics">
-                                <i class="fas fa-sync-alt"></i>
-                            </button>
+                        <div class="quick-card" data-screen="patients">
+                            <i class="fas fa-user-injured"></i>
+                            <span>Pacientes</span>
                         </div>
                     </div>
-                    <div class="content-container">
-                        <!-- Key Metrics Grid -->
-                        <div class="analytics-metrics-grid">
-                            <div class="metric-card alert">
-                                <div class="metric-icon"><i class="fas fa-virus"></i></div>
+
+                    <div class="alerts-section">
+                        <h2>Alertas Recentes</h2>
+                        <div class="alerts-grid" id="recent-alerts">
+                            <!-- Populated by JS -->
+                        </div>
+                        <button class="see-more-btn" data-screen="notifications">Ver todos os alertas</button>
+                    </div>
+                </section>
+
+                <!-- 2. Analytics (Estatísticas) -->
+                <section class="screen" id="analytics-screen" style="display:none;">
+                    <div class="screen-header">
+                        <button class="back-button" data-screen="dashboard"><i class="fas fa-arrow-left"></i></button>
+                        <h1>Dados Epidemiológicos</h1>
+                        <button class="icon-button"><i class="fas fa-sync"></i></button>
+                    </div>
+
+                    <div class="metrics-grid">
+                        <div class="metric-card alert">
+                            <i class="fas fa-virus"></i>
+                            <div>
                                 <h3>Casos Ativos</h3>
-                                <p class="metric-value" id="metric-active">Carregando...</p>
-                                <span class="metric-trend up"><i class="fas fa-arrow-up"></i> +12% esta semana</span>
+                                <p class="value" id="metric-active">1.234</p>
+                                <span class="trend up">+18% esta semana</span>
                             </div>
-                            <div class="metric-card warning">
-                                <div class="metric-icon"><i class="fas fa-procedures"></i></div>
+                        </div>
+                        <div class="metric-card warning">
+                            <i class="fas fa-procedures"></i>
+                            <div>
                                 <h3>Internações</h3>
-                                <p class="metric-value" id="metric-admitted">Carregando...</p>
-                                <span class="metric-trend stable"><i class="fas fa-minus"></i> Estável</span>
+                                <p class="value" id="metric-admitted">87</p>
+                                <span class="trend stable">Estável</span>
                             </div>
-                            <div class="metric-card success">
-                                <div class="metric-icon"><i class="fas fa-heartbeat"></i></div>
+                        </div>
+                        <div class="metric-card success">
+                            <i class="fas fa-heartbeat"></i>
+                            <div>
                                 <h3>Recuperados</h3>
-                                <p class="metric-value" id="metric-recovered">Carregando...</p>
-                                <span class="metric-trend up"><i class="fas fa-arrow-up"></i> +5% hoje</span>
+                                <p class="value" id="metric-recovered">9.876</p>
+                                <span class="trend up">+7% hoje</span>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Map Section -->
-                        <div class="map-section" style="margin-bottom: 24px;">
-                            <div class="map-controls"
-                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
-                                <h3>Mapa de Calor Epidemiológico <span class="badge"
-                                        style="background:var(--secondary-color); font-size: 0.7rem; vertical-align: middle;">AO
-                                        VIVO</span></h3>
-                                <div class="location-selector" style="display: flex; gap: 8px;">
-                                    <select id="disease-select" class="form-select"
-                                        style="padding: 8px; border-radius: 8px; border: 1px solid var(--border-color); background: #fff; font-weight: 500;">
-                                        <option value="dengue">🦟 Dengue</option>
-                                        <option value="covid">🦠 COVID-19</option>
-                                        <option value="influenza">🤒 Influenza</option>
-                                        <option value="zika">🔬 Zika Vírus</option>
-                                    </select>
-                                    <select id="municipality-select" class="form-select"
-                                        style="padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);">
-                                        <option value="gps">📍 Minha Localização (GPS)</option>
-                                        <option value="saopaulo">São Paulo - SP</option>
-                                        <option value="rio">Rio de Janeiro - RJ</option>
-                                        <option value="brasilia">Brasília - DF</option>
-                                        <option value="salvador">Salvador - BA</option>
-                                        <option value="manaus">Manaus - AM</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="map-wrapper"
-                                style="position: relative; height: 400px; border-radius: var(--border-radius); overflow: hidden; box-shadow: var(--shadow-md); border: 1px solid var(--border-color);">
-                                <div id="epidemiological-map" style="height: 100%; width: 100%; z-index: 1;"></div>
-                                <div id="map-permission-overlay"
-                                    style="position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px;">
-                                    <i class="fas fa-map-marker-alt"
-                                        style="font-size: 3rem; color: var(--primary-color); margin-bottom: 16px;"></i>
-                                    <h4>Precisamos da sua localização</h4>
-                                    <p style="color: var(--text-secondary); margin-bottom: 20px; max-width: 300px;">Para
-                                        mostrar os dados da sua região, por favor permita o acesso ao GPS.</p>
-                                    <button class="btn btn-primary" id="enable-location-btn"
-                                        onclick="if(window.MapModule) window.MapModule.requestLocation()">Ativar
-                                        Localização</button>
-                                </div>
-                            </div>
+                    <div class="map-section">
+                        <h2>Mapa de Calor Epidemiológico</h2>
+                        <div class="map-controls">
+                            <select id="disease-select" class="control-select">
+                                <option>🦟 Dengue</option>
+                                <option>🦠 COVID-19</option>
+                                <option>🤒 Influenza</option>
+                            </select>
+                            <select id="municipality-select" class="control-select">
+                                <option value="gps">📍 Minha Localização</option>
+                                <option value="saopaulo">São Paulo - SP</option>
+                                <option value="rio">Rio de Janeiro - RJ</option>
+                            </select>
                         </div>
-
-                        <!-- Charts Section -->
-                        <div class="analytics-charts-section">
-                            <div class="chart-card large">
-                                <h3>Curva de Contágio (Semanal)</h3>
-                                <div class="chart-box" id="chart-contagion">
-                                    <!-- Simple CSS Chart Placeholder -->
-                                    <div class="simple-bar-chart">
-                                        <div class="bar" style="height: 40%;" title="Seg"></div>
-                                        <div class="bar" style="height: 65%;" title="Ter"></div>
-                                        <div class="bar" style="height: 55%;" title="Qua"></div>
-                                        <div class="bar" style="height: 80%;" title="Qui"></div>
-                                        <div class="bar" style="height: 70%;" title="Sex"></div>
-                                        <div class="bar" style="height: 90%;" title="Sáb"></div>
-                                        <div class="bar" style="height: 30%;" title="Dom"></div>
-                                    </div>
-                                    <div class="chart-labels">
-                                        <span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span><span>Dom</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="chart-card">
-                                <h3>Distribuição por Zona</h3>
-                                <div class="chart-box" id="chart-zones">
-                                    <div class="zone-list">
-                                        <div class="zone-item"><span class="zone-name">Zona Norte</span>
-                                            <div class="progress-bar">
-                                                <div class="fill" style="width: 70%; background: #e57373;"></div>
-                                            </div>
-                                        </div>
-                                        <div class="zone-item"><span class="zone-name">Zona Sul</span>
-                                            <div class="progress-bar">
-                                                <div class="fill" style="width: 30%; background: #81c784;"></div>
-                                            </div>
-                                        </div>
-                                        <div class="zone-item"><span class="zone-name">Zona Leste</span>
-                                            <div class="progress-bar">
-                                                <div class="fill" style="width: 55%; background: #ffb74d;"></div>
-                                            </div>
-                                        </div>
-                                        <div class="zone-item"><span class="zone-name">Zona Oeste</span>
-                                            <div class="progress-bar">
-                                                <div class="fill" style="width: 45%; background: #64b5f6;"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div id="epidemiological-map" style="height: 420px; border-radius: 12px; overflow: hidden;">
                         </div>
                     </div>
                 </section>
 
-                <!-- Tela de Triagem (Symptoms) -->
-                <section class="screen" id="symptoms-screen" style="display: none;">
+                <!-- 3. Triagem de Sintomas -->
+                <section class="screen" id="symptoms-screen" style="display:none;">
                     <div class="screen-header">
-                        <button class="back-button">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <h2>Triagem de Sintomas</h2>
-                        <div class="header-actions">
-                            <button class="icon-button" id="clear-symptoms-btn" title="Limpar">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
+                        <button class="back-button" data-screen="dashboard"><i class="fas fa-arrow-left"></i></button>
+                        <h1>Triagem de Sintomas</h1>
+                        <button class="icon-button" id="clear-symptoms-btn"><i class="fas fa-trash"></i></button>
                     </div>
-                    <div class="content-container">
-                        <div class="symptoms-container">
-                            <p class="instruction-text">Selecione os sintomas que você está sentindo para uma análise
-                                preliminar.</p>
-                            <div id="symptoms-grid" class="symptoms-grid">
-                                <!-- Preenchido via JS -->
-                            </div>
-                            <div class="action-bar centered" style="margin-top: 20px; text-align: center;">
-                                <button class="btn btn-primary" id="analyze-symptoms-btn"
-                                    style="width: 100%; max-width: 300px; padding: 12px;">Analisar Sintomas</button>
-                            </div>
-                            <div id="diagnosis-results" class="results-container hidden" style="margin-top: 30px;">
-                                <h3>Resultados da Análise</h3>
-                                <div class="disclaimer-box"
-                                    style="background: #FFF3E0; padding: 12px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #FF9800;">
-                                    <i class="fas fa-exclamation-triangle" style="color: #F57C00;"></i>
-                                    <span style="font-size: 0.9rem; color: #5D4037;"><strong>Atenção:</strong> Este é um
-                                        resultado preliminar. Não substitui um diagnóstico médico.</span>
-                                </div>
-                                <div id="results-list"></div>
-                            </div>
+
+                    <p class="instruction-text">Marque os sintomas apresentados para uma análise preliminar.</p>
+
+                    <div class="symptoms-grid" id="symptoms-grid">
+                        <!-- Generated by JS -->
+                    </div>
+
+                    <div class="action-bar">
+                        <button class="btn btn-primary" id="analyze-symptoms-btn">Analisar Sintomas</button>
+                    </div>
+
+                    <div id="diagnosis-results" class="diagnosis-results hidden">
+                        <h2>Resultado Preliminar</h2>
+                        <div class="disclaimer-box">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>Este é um resultado preliminar. Consulte um médico.</p>
                         </div>
+                        <div id="results-list"></div>
                     </div>
                 </section>
 
-                <!-- Tela de Notificações -->
-                <section class="screen" id="notifications-screen" style="display: none;">
+                <!-- 4. Notificações -->
+                <section class="screen" id="notifications-screen" style="display:none;">
                     <div class="screen-header">
-                        <button class="back-button">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <h2>Notificações</h2>
-                        <div class="header-actions">
-                            <button class="icon-button" id="filter-notifications">
-                                <i class="fas fa-filter"></i>
-                            </button>
-                        </div>
+                        <button class="back-button" data-screen="dashboard"><i class="fas fa-arrow-left"></i></button>
+                        <h1>Notificações</h1>
+                        <button class="icon-button" id="filter-notifications-btn"><i class="fas fa-filter"></i></button>
                     </div>
-                    <div class="content-container">
-                        <div class="filter-options" id="notification-filters" style="display: none;">
-                            <h3>Filtrar por:</h3>
-                            <div class="filter-tags">
-                                <button class="filter-tag active" data-filter="all">Todas</button>
-                                <button class="filter-tag" data-filter="alert">Alertas</button>
-                                <button class="filter-tag" data-filter="news">Notícias</button>
-                                <button class="filter-tag" data-filter="update">Atualizações</button>
-                            </div>
-                        </div>
-                        <div class="notifications-list" id="notifications-list">
-                            <!-- Notificações serão carregadas dinamicamente -->
-                        </div>
+
+                    <div class="notifications-list" id="notifications-list">
+                        <!-- Populated by JS -->
                     </div>
                 </section>
 
-                <!-- Tela de Chat -->
-                <section class="screen" id="chat-screen" style="display: none;">
+                <!-- 5. Chat Profissional -->
+                <section class="screen" id="chat-screen" style="display:none;">
                     <div class="screen-header">
-                        <button class="back-button">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <h2>Chat Profissional</h2>
-                        <div class="header-actions">
-                            <button class="icon-button" id="new-chat">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
+                        <button class="back-button" data-screen="dashboard"><i class="fas fa-arrow-left"></i></button>
+                        <h1>Chat Profissional</h1>
+                        <button class="icon-button" id="new-chat-btn"><i class="fas fa-plus"></i></button>
                     </div>
+
                     <div class="chat-container">
                         <div class="chat-rooms" id="chat-rooms">
-                            <!-- Salas de chat serão carregadas dinamicamente -->
+                            <!-- Populated by JS -->
                         </div>
-                        <div class="chat-messages" id="chat-messages" style="display: none;">
+
+                        <div class="chat-messages hidden" id="chat-messages">
                             <div class="chat-header">
-                                <button class="back-to-rooms">
-                                    <i class="fas fa-arrow-left"></i>
-                                </button>
-                                <h3 id="current-chat-name">Sala de Chat</h3>
-                                <div class="chat-actions">
-                                    <button class="icon-button" id="chat-info">
-                                        <i class="fas fa-info-circle"></i>
-                                    </button>
-                                </div>
+                                <button class="back-to-rooms"><i class="fas fa-arrow-left"></i></button>
+                                <h3 id="current-chat-name">Equipe de Vigilância</h3>
                             </div>
-                            <div class="messages-container" id="messages-container">
-                                <!-- Mensagens serão carregadas dinamicamente -->
-                            </div>
-                            <div class="message-input-container">
-                                <button class="attachment-button">
-                                    <i class="fas fa-paperclip"></i>
-                                </button>
+                            <div class="messages-container" id="messages-container"></div>
+                            <div class="message-input-bar">
                                 <input type="text" id="message-input" placeholder="Digite sua mensagem...">
-                                <button class="send-button" id="send-message">
-                                    <i class="fas fa-paper-plane"></i>
-                                </button>
+                                <button class="send-btn"><i class="fas fa-paper-plane"></i></button>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                <!-- Tela de Biblioteca -->
-                <section class="screen" id="library-screen" style="display: none;">
+                <!-- 6. Biblioteca Digital -->
+                <section class="screen" id="library-screen" style="display:none;">
                     <div class="screen-header">
-                        <button class="back-button">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <h2>Biblioteca Digital</h2>
-                        <div class="header-actions">
-                            <button class="icon-button" id="search-library">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
+                        <button class="back-button" data-screen="dashboard"><i class="fas fa-arrow-left"></i></button>
+                        <h1>Biblioteca Digital</h1>
+                        <button class="icon-button" id="search-library-btn"><i class="fas fa-search"></i></button>
                     </div>
-                    <div class="content-container">
-                        <div class="search-container" id="library-search-container" style="display: none;">
-                            <div class="search-box">
-                                <i class="fas fa-search"></i>
-                                <input type="text" id="library-search" placeholder="Buscar na biblioteca...">
-                                <button class="clear-search" id="clear-search">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            <div class="filter-options">
-                                <select id="document-type-filter">
-                                    <option value="all">Todos os tipos</option>
-                                    <option value="protocol">Protocolos</option>
-                                    <option value="manual">Manuais</option>
-                                    <option value="technical-note">Notas Técnicas</option>
-                                    <option value="report">Relatórios</option>
-                                </select>
-                                <select id="disease-filter">
-                                    <option value="all">Todas as doenças</option>
-                                    <option value="dengue">Dengue</option>
-                                    <option value="zika">Zika</option>
-                                    <option value="chikungunya">Chikungunya</option>
-                                    <option value="covid">COVID-19</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="documents-list" id="documents-list">
-                            <!-- Documentos serão carregados dinamicamente -->
-                        </div>
+
+                    <div class="search-bar-container">
+                        <input type="text" id="library-search" class="search-input"
+                            placeholder="Buscar protocolos, manuais...">
+                    </div>
+
+                    <div class="documents-list" id="documents-list">
+                        <!-- Populated by JS -->
                     </div>
                 </section>
 
-                <!-- Tela de Configurações -->
-                <section class="screen" id="settings-screen" style="display: none;">
+                <!-- 7. Configurações -->
+                <section class="screen" id="settings-screen" style="display:none;">
                     <div class="screen-header">
-                        <button class="back-button">
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                        <h2>Configurações</h2>
+                        <button class="back-button" data-screen="dashboard"><i class="fas fa-arrow-left"></i></button>
+                        <h1>Configurações</h1>
                     </div>
-                    <div class="content-container">
-                        <div class="settings-section">
+
+                    <div class="settings-list">
+                        <div class="setting-group">
                             <h3>Conta</h3>
                             <div class="setting-item">
-                                <div class="setting-info">
-                                    <i class="fas fa-user"></i>
-                                    <div>
-                                        <h4>Perfil</h4>
-                                        <p>Gerencie suas informações pessoais</p>
-                                    </div>
-                                </div>
+                                <i class="fas fa-user"></i>
+                                <div>Perfil</div>
                                 <i class="fas fa-chevron-right"></i>
                             </div>
                             <div class="setting-item">
-                                <div class="setting-info">
-                                    <i class="fas fa-shield-alt"></i>
-                                    <div>
-                                        <h4>Privacidade</h4>
-                                        <p>Controle suas configurações de privacidade</p>
-                                    </div>
-                                </div>
+                                <i class="fas fa-shield-alt"></i>
+                                <div>Privacidade</div>
                                 <i class="fas fa-chevron-right"></i>
                             </div>
                         </div>
 
-                        <div class="settings-section">
+                        <div class="setting-group">
                             <h3>Notificações</h3>
-                            <div class="setting-item toggle">
-                                <div class="setting-info">
-                                    <i class="fas fa-bell"></i>
-                                    <div>
-                                        <h4>Notificações por push</h4>
-                                        <p>Receba alertas importantes</p>
-                                    </div>
-                                </div>
-                                <label class="switch">
-                                    <input type="checkbox" checked>
-                                    <span class="slider round"></span>
-                                </label>
-                            </div>
-                            <div class="setting-item toggle">
-                                <div class="setting-info">
-                                    <i class="fas fa-envelope"></i>
-                                    <div>
-                                        <h4>Notificações por e-mail</h4>
-                                        <p>Receba atualizações por e-mail</p>
-                                    </div>
-                                </div>
-                                <label class="switch">
-                                    <input type="checkbox" checked>
-                                    <span class="slider round"></span>
+                            <div class="setting-item toggle-item">
+                                <i class="fas fa-bell"></i>
+                                <div>Push Notifications</div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked id="push-notifications-toggle">
+                                    <span class="toggle-slider"></span>
                                 </label>
                             </div>
                         </div>
 
-                        <div class="settings-section">
-                            <h3>Geral</h3>
-                            <div class="setting-item">
-                                <div class="setting-info">
-                                    <i class="fas fa-moon"></i>
-                                    <div>
-                                        <h4>Tema</h4>
-                                        <p>Altere para o modo escuro ou claro</p>
-                                    </div>
-                                </div>
-                                <i class="fas fa-chevron-right"></i>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-info">
-                                    <i class="fas fa-language"></i>
-                                    <div>
-                                        <h4>Idioma</h4>
-                                        <p>Português (Brasil)</p>
-                                    </div>
-                                </div>
-                                <i class="fas fa-chevron-right"></i>
-                            </div>
-                        </div>
-
-                        <div class="settings-section">
-                            <h3>Sobre</h3>
-                            <div class="setting-item">
-                                <div class="setting-info">
-                                    <i class="fas fa-info-circle"></i>
-                                    <div>
-                                        <h4>Sobre o EpiConecta</h4>
-                                        <p>Versão 1.0.0</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-info">
-                                    <i class="fas fa-file-alt"></i>
-                                    <div>
-                                        <h4>Termos de Uso</h4>
-                                    </div>
-                                </div>
-                                <i class="fas fa-external-link-alt"></i>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-info">
-                                    <i class="fas fa-lock"></i>
-                                    <div>
-                                        <h4>Política de Privacidade</h4>
-                                    </div>
-                                </div>
-                                <i class="fas fa-external-link-alt"></i>
-                            </div>
-                        </div>
-
-                        <button class="logout-button" id="logout-button">
-                            <i class="fas fa-sign-out-alt"></i>
-                            Sair da Conta
+                        <button class="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i> Sair
                         </button>
+                    </div>
+                </section>
+
+                <!-- 8. Pacientes (Preserved from previous implementation) -->
+                <section id="patients-screen" class="screen" style="display: none;">
+                    <div class="patient-app-header">
+                        <div class="header-left">
+                            <button class="back-button" data-screen="dashboard">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <h1>Prontuário Eletrônico</h1>
+                        </div>
+                        <div class="header-right">
+                            <div class="user-profile">
+                                <img src="https://ui-avatars.com/api/?name=Dr+Silva&background=1a73e8&color=fff"
+                                    alt="Perfil">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="patient-content">
+                        <!-- Área de Busca -->
+                        <div class="patient-search-bar">
+                            <div class="search-input-wrapper">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" id="patient-search-input"
+                                    placeholder="Buscar por nome, CPF, CNS ou data de nascimento..." autocomplete="off">
+                                <button id="patient-search-btn" class="search-btn">
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                            <div class="search-suggestions">
+                                <span class="suggestion-tag">Ex: 123.456.789-00</span>
+                                <span class="suggestion-tag">Ex: Maria da Silva</span>
+                                <span class="suggestion-tag">Ex: 15/05/1990</span>
+                            </div>
+                        </div>
+
+                        <!-- Área de Resultados e Recentes -->
+                        <div class="patient-list-container">
+                            <!-- Acessados Recentemente -->
+                            <div class="patient-recent-section" id="patient-recents">
+                                <h2 class="section-title"><i class="fas fa-history"></i> Últimos Acessados</h2>
+                                <div class="patient-recent-grid" id="recent-patients-list">
+                                    <!-- Populated by JS -->
+                                </div>
+                            </div>
+
+                            <!-- Resultados da Busca -->
+                            <div class="patient-results-section" id="patient-results" style="display: none;">
+                                <h2 class="section-title">Resultados da Busca</h2>
+                                <div class="patient-results-grid" id="results-list">
+                                    <!-- Populated by JS -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Visualização Detalhada do Paciente (Overlay) -->
+                        <div class="patient-detail-overlay" id="patient-profile-view" style="display: none;">
+                            <div class="patient-detail-card">
+                                <div class="detail-header">
+                                    <button class="close-detail-btn" id="back-to-search-btn">
+                                        <i class="fas fa-arrow-left"></i>
+                                    </button>
+                                    <h2 id="p-name">Nome do Paciente</h2>
+                                </div>
+
+                                <div class="patient-profile-header">
+                                    <div class="profile-photo-container">
+                                        <img id="p-photo" src="" alt="Foto do Paciente">
+                                        <div class="photo-overlay">
+                                            <i class="fas fa-camera"></i>
+                                        </div>
+                                    </div>
+                                    <div class="profile-info">
+                                        <div class="patient-badges" id="p-badges">
+                                            <!-- Badges dinâmicos -->
+                                        </div>
+                                        <div class="patient-meta-grid">
+                                            <div class="meta-item">
+                                                <span class="label">Idade</span>
+                                                <span class="value" id="p-age">42 anos</span>
+                                            </div>
+                                            <div class="meta-item">
+                                                <span class="label">Sexo</span>
+                                                <span class="value" id="p-sex">Feminino</span>
+                                            </div>
+                                            <div class="meta-item">
+                                                <span class="label">Tipo Sanguíneo</span>
+                                                <span class="value" id="p-blood">O+</span>
+                                            </div>
+                                            <div class="meta-item">
+                                                <span class="label">CNS</span>
+                                                <span class="value" id="p-cns">123 4567 8901 2345</span>
+                                            </div>
+                                            <div class="meta-item">
+                                                <span class="label">CPF</span>
+                                                <span class="value" id="p-cpf">123.456.789-00</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Abas -->
+                                <div class="patient-tabs">
+                                    <button class="p-tab active" data-tab="p-summary">Resumo</button>
+                                    <button class="p-tab" data-tab="p-history">Histórico</button>
+                                    <button class="p-tab" data-tab="p-vaccines">Vacinas</button>
+                                    <button class="p-tab" data-tab="p-exams">Exames</button>
+                                </div>
+
+                                <!-- Conteúdo das Abas -->
+                                <div class="p-tab-content active" id="p-summary">
+                                    <!-- Alergias -->
+                                    <div class="p-alert-box critical" id="p-allergies-box">
+                                        <h4><i class="fas fa-exclamation-triangle"></i> Alergias Conhecidas</h4>
+                                        <ul id="p-allergies-list"></ul>
+                                    </div>
+
+                                    <!-- Condições Crônicas -->
+                                    <div class="p-section-title">Condições Crônicas</div>
+                                    <div class="p-conditions-grid" id="p-conditions-list">
+                                        <!-- Cards dinâmicos -->
+                                    </div>
+
+                                    <!-- Sinais Vitais Recentes -->
+                                    <div class="p-section-title">Sinais Vitais (Última Consulta)</div>
+                                    <div class="vitals-grid">
+                                        <div class="vital-card">
+                                            <div class="icon"><i class="fas fa-heartbeat"></i></div>
+                                            <div class="data">
+                                                <span id="v-bp" class="val">118/76</span>
+                                                <span class="unit">mmHg</span>
+                                            </div>
+                                            <div class="lbl">Pressão Arterial</div>
+                                        </div>
+                                        <div class="vital-card">
+                                            <div class="icon"><i class="fas fa-weight"></i></div>
+                                            <div class="data">
+                                                <span id="v-weight" class="val">68</span>
+                                                <span class="unit">kg</span>
+                                            </div>
+                                            <div class="lbl">Peso</div>
+                                        </div>
+                                        <div class="vital-card">
+                                            <div class="icon"><i class="fas fa-thermometer-half"></i></div>
+                                            <div class="data">
+                                                <span id="v-temp" class="val">36.4</span>
+                                                <span class="unit">°C</span>
+                                            </div>
+                                            <div class="lbl">Temperatura</div>
+                                        </div>
+                                        <div class="vital-card">
+                                            <div class="icon"><i class="fas fa-lungs"></i></div>
+                                            <div class="data">
+                                                <span id="v-o2" class="val">98</span>
+                                                <span class="unit">%</span>
+                                            </div>
+                                            <div class="lbl">Saturação O₂</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="p-tab-content" id="p-history" style="display: none;">
+                                    <div class="timeline" id="p-timeline">
+                                        <!-- Timeline items populated by JS -->
+                                    </div>
+                                </div>
+
+                                <div class="p-tab-content" id="p-vaccines" style="display: none;">
+                                    <div class="vaccine-list" id="p-vaccines-list">
+                                        <!-- Vaccines populated by JS -->
+                                    </div>
+                                </div>
+
+                                <div class="p-tab-content" id="p-exams" style="display: none;">
+                                    <div class="exams-list" id="p-exams-list">
+                                        <!-- Exams populated by JS -->
+                                    </div>
+                                </div>
+
+                                <!-- Botões de Ação -->
+                                <div class="patient-actions">
+                                    <button class="btn btn-primary">Nova Consulta</button>
+                                    <button class="btn btn-outline">Editar Prontuário</button>
+                                    <button class="btn btn-outline danger">Notificar</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
             </main>
-        </div> <!-- End of content-wrapper -->
+        </div>
 
-        <!-- Bottom Navigation -->
+        <!-- Bottom Nav (Mobile) -->
         <nav class="bottom-nav">
-            <a href="#" class="nav-item active" data-screen="dashboard">
-                <i class="fas fa-home"></i>
-                <span>Início</span>
-            </a>
-            <a href="#" class="nav-item" data-screen="chat">
-                <i class="fas fa-comment-medical"></i>
-                <span>Chat</span>
-            </a>
-            <a href="#" class="nav-item" data-screen="library">
-                <i class="fas fa-book-medical"></i>
-                <span>Biblioteca</span>
-            </a>
-            <button class="nav-item" data-target="patients-screen">
-                <i class="fas fa-user-injured"></i>
-                <span>Pacientes</span>
-            </button>
-            <button class="nav-item" data-target="profile-screen">
-                <i class="fas fa-user"></i>
-                <span>Perfil</span>
-            </button>
+            <button class="nav-item active" data-screen="dashboard"><i
+                    class="fas fa-home"></i><span>Início</span></button>
+            <button class="nav-item" data-screen="chat"><i class="fas fa-comment-medical"></i><span>Chat</span></button>
+            <button class="nav-item" data-screen="library"><i
+                    class="fas fa-book-medical"></i><span>Biblioteca</span></button>
+            <button class="nav-item" data-screen="patients"><i
+                    class="fas fa-user-injured"></i><span>Pacientes</span></button>
+            <button class="nav-item" data-screen="settings"><i
+                    class="fas fa-cog"></i><span>Configurações</span></button>
         </nav>
 
-        <!-- Modal de Notificação -->
-        <div class="modal" id="notification-modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 id="notification-modal-title">Título da Notificação</h3>
-                    <button class="close-button" id="close-notification-modal">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="modal-body" id="notification-modal-body">
-                    <!-- Conteúdo da notificação será inserido aqui -->
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" id="close-notification-btn">Fechar</button>
-                    <button class="btn btn-primary" id="notification-action-btn">Abrir</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal de Confirmação -->
-        <div class="modal" id="confirmation-modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 id="confirmation-modal-title">Confirmação</h3>
-                    <button class="close-button" id="close-confirmation-modal">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="modal-body" id="confirmation-modal-body">
-                    <!-- Mensagem de confirmação será inserida aqui -->
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" id="cancel-confirmation-btn">Cancelar</button>
-                    <button class="btn btn-danger" id="confirm-action-btn">Confirmar</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- TELA DE PACIENTES (VERSÃO REFEITA) -->
-        <section id="patients-screen" class="screen" style="display: none;">
-            <div class="patient-app-header">
-                <div class="header-left">
-                    <button class="back-button" id="back-to-main-btn">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
-                    <h1>Prontuário Eletrônico</h1>
-                </div>
-                <div class="header-right">
-                    <div class="user-profile">
-                        <img src="https://ui-avatars.com/api/?name=Dr+Silva&background=1a73e8&color=fff" alt="Perfil">
-                    </div>
-                </div>
-            </div>
-
-            <div class="patient-content">
-                <!-- Área de Busca -->
-                <div class="patient-search-bar">
-                    <div class="search-input-wrapper">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" id="patient-search-input"
-                            placeholder="Buscar por nome, CPF, CNS ou data de nascimento..." autocomplete="off">
-                        <button id="patient-search-btn" class="search-btn">
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                    </div>
-                    <div class="search-suggestions">
-                        <span class="suggestion-tag">Ex: 123.456.789-00</span>
-                        <span class="suggestion-tag">Ex: Maria da Silva</span>
-                        <span class="suggestion-tag">Ex: 15/05/1990</span>
-                    </div>
-                </div>
-
-                <!-- Área de Resultados e Recentes -->
-                <div class="patient-list-container">
-                    <!-- Acessados Recentemente -->
-                    <div class="patient-recent-section" id="patient-recents">
-                        <h2 class="section-title"><i class="fas fa-history"></i> Últimos Acessados</h2>
-                        <div class="patient-recent-grid" id="recent-patients-list">
-                            <!-- Preenchido via JS -->
-                        </div>
-                    </div>
-
-                    <!-- Resultados da Busca -->
-                    <div class="patient-results-section" id="patient-results" style="display: none;">
-                        <h2 class="section-title">Resultados da Busca</h2>
-                        <div class="patient-results-grid" id="results-list">
-                            <!-- Preenchido via JS -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Visualização Detalhada do Paciente (Overlay) -->
-                <div class="patient-detail-overlay" id="patient-profile-view" style="display: none;">
-                    <div class="patient-detail-card">
-                        <div class="detail-header">
-                            <button class="close-detail-btn" id="back-to-search-btn">
-                                <i class="fas fa-arrow-left"></i>
-                            </button>
-                            <h2 id="p-name">Nome do Paciente</h2>
-                        </div>
-
-                        <div class="patient-profile-header">
-                            <div class="profile-photo-container">
-                                <img id="p-photo" src="" alt="Foto do Paciente">
-                                <div class="photo-overlay">
-                                    <i class="fas fa-camera"></i>
-                                </div>
-                            </div>
-                            <div class="profile-info">
-                                <div class="patient-badges" id="p-badges">
-                                    <!-- Badges dinâmicos -->
-                                </div>
-                                <div class="patient-meta-grid">
-                                    <div class="meta-item">
-                                        <span class="label">Idade</span>
-                                        <span class="value" id="p-age">42 anos</span>
-                                    </div>
-                                    <div class="meta-item">
-                                        <span class="label">Sexo</span>
-                                        <span class="value" id="p-sex">Feminino</span>
-                                    </div>
-                                    <div class="meta-item">
-                                        <span class="label">Tipo Sanguíneo</span>
-                                        <span class="value" id="p-blood">O+</span>
-                                    </div>
-                                    <div class="meta-item">
-                                        <span class="label">CNS</span>
-                                        <span class="value" id="p-cns">123 4567 8901 2345</span>
-                                    </div>
-                                    <div class="meta-item">
-                                        <span class="label">CPF</span>
-                                        <span class="value" id="p-cpf">123.456.789-00</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Abas -->
-                        <div class="patient-tabs">
-                            <button class="p-tab active" data-tab="p-summary">Resumo</button>
-                            <button class="p-tab" data-tab="p-history">Histórico</button>
-                            <button class="p-tab" data-tab="p-vaccines">Vacinas</button>
-                            <button class="p-tab" data-tab="p-exams">Exames</button>
-                        </div>
-
-                        <!-- Conteúdo das Abas -->
-                        <div class="p-tab-content active" id="p-summary">
-                            <!-- Alergias -->
-                            <div class="p-alert-box critical" id="p-allergies-box">
-                                <h4><i class="fas fa-exclamation-triangle"></i> Alergias Conhecidas</h4>
-                                <ul id="p-allergies-list"></ul>
-                            </div>
-
-                            <!-- Condições Crônicas -->
-                            <div class="p-section-title">Condições Crônicas</div>
-                            <div class="p-conditions-grid" id="p-conditions-list">
-                                <!-- Cards dinâmicos -->
-                            </div>
-
-                            <!-- Sinais Vitais Recentes -->
-                            <div class="p-section-title">Sinais Vitais (Última Consulta)</div>
-                            <div class="vitals-grid">
-                                <div class="vital-card">
-                                    <div class="icon"><i class="fas fa-heartbeat"></i></div>
-                                    <div class="data">
-                                        <span id="v-bp" class="val">118/76</span>
-                                        <span class="unit">mmHg</span>
-                                    </div>
-                                    <div class="lbl">Pressão Arterial</div>
-                                </div>
-                                <div class="vital-card">
-                                    <div class="icon"><i class="fas fa-weight"></i></div>
-                                    <div class="data">
-                                        <span id="v-weight" class="val">68</span>
-                                        <span class="unit">kg</span>
-                                    </div>
-                                    <div class="lbl">Peso</div>
-                                </div>
-                                <div class="vital-card">
-                                    <div class="icon"><i class="fas fa-thermometer-half"></i></div>
-                                    <div class="data">
-                                        <span id="v-temp" class="val">36.4</span>
-                                        <span class="unit">°C</span>
-                                    </div>
-                                    <div class="lbl">Temperatura</div>
-                                </div>
-                                <div class="vital-card">
-                                    <div class="icon"><i class="fas fa-lungs"></i></div>
-                                    <div class="data">
-                                        <span id="v-o2" class="val">98</span>
-                                        <span class="unit">%</span>
-                                    </div>
-                                    <div class="lbl">Saturação O₂</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="p-tab-content" id="p-history" style="display: none;">
-                            <div class="timeline" id="p-timeline">
-                                <!-- Itens de timeline dinâmicos -->
-                            </div>
-                        </div>
-
-                        <div class="p-tab-content" id="p-vaccines" style="display: none;">
-                            <div class="vaccine-list" id="p-vaccines-list">
-                                <!-- Vacinas dinâmicas -->
-                            </div>
-                        </div>
-
-                        <div class="p-tab-content" id="p-exams" style="display: none;">
-                            <div class="exams-list" id="p-exams-list">
-                                <!-- Exames dinâmicos -->
-                            </div>
-                        </div>
-
-                        <!-- Botões de Ação -->
-                        <div class="patient-actions">
-                            <button class="btn btn-primary">Nova Consulta</button>
-                            <button class="btn btn-outline">Editar Prontuário</button>
-                            <button class="btn btn-outline danger">Notificar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Modals (Overlay) -->
+        <!-- Loading Overlay -->
         <div class="loading-overlay" id="loading-overlay">
             <div class="loading-spinner"></div>
-            <p id="loading-message">Carregando...</p>
+            <p>Carregando...</p>
         </div>
-        <!-- FAILSAFE: Force remove loading overlay after 4 seconds if app.js fails -->
-        <script>
-            setTimeout(function () {
-                var overlay = document.getElementById('loading-overlay');
-                if (overlay) {
-                    // Log for debugging
-                    console.warn('Loading overlay forced closed by safety timer.');
-                    overlay.style.display = 'none';
-                }
-            }, 4000);
-        </script>
+
     </div>
 
-    <!-- Scripts -->
-    <!-- Scripts -->
-    <!-- app-modules.js logic merged into app.js -->
-    <!-- FAILSAFE: Global Error Handler -->
-    <script>
-        window.onerror = function (msg, url, lineNo, columnNo, error) {
-            alert('Erro Crítico JS: ' + msg + '\nLinha: ' + lineNo);
-            return false;
-        };
-    </script>
-    <script>
-        // Inicializa o Service Worker se suportado
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registration successful');
-                    })
-                    .catch(error => {
-                        console.log('ServiceWorker registration failed: ', error);
-                    });
-            });
-        }
-    </script>
-
-    <template id="alert-card-template">
-        <div class="alert-card" data-id="">
-            <div class="alert-icon">
-                <i class="fas fa-exclamation-triangle"></i>
-            </div>
-            <div class="alert-content">
-                <h3 class="alert-title">Título do Alerta</h3>
-                <p class="alert-description">Descrição do alerta</p>
-                <span class="alert-time">Há alguns instantes</span>
-            </div>
-        </div>
-    </template>
-
-    <template id="notification-item-template">
-        <div class="notification-item" data-id="">
-            <div class="notification-icon">
-                <i class="fas fa-bell"></i>
-            </div>
-            <div class="notification-content">
-                <h4 class="notification-title">Título da Notificação</h4>
-                <p class="notification-preview">Prévia da mensagem da notificação...</p>
-                <span class="notification-time">Há alguns instantes</span>
-            </div>
-            <div class="notification-actions">
-                <button class="mark-as-read">
-                    <i class="far fa-circle"></i>
-                </button>
-            </div>
-        </div>
-    </template>
-
-    <template id="chat-room-template">
-        <div class="chat-room" data-id="">
-            <div class="chat-avatar">
-                <i class="fas fa-users"></i>
-            </div>
-            <div class="chat-info">
-                <h4 class="chat-name">Nome da Sala</h4>
-                <p class="last-message">Última mensagem enviada...</p>
-            </div>
-            <div class="chat-meta">
-                <span class="message-time">12:30</span>
-                <span class="unread-count">2</span>
-            </div>
-        </div>
-    </template>
-
-    <template id="message-template">
-        <div class="message" data-id="">
-            <div class="message-sender">
-                <div class="sender-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <span class="sender-name">Usuário</span>
-                <span class="message-time">12:30</span>
-            </div>
-            <div class="message-content">
-                <p>Conteúdo da mensagem</p>
-            </div>
-        </div>
-    </template>
-
-    <template id="document-item-template">
-        <div class="document-item" data-id="">
-            <div class="document-icon">
-                <i class="far fa-file-pdf"></i>
-            </div>
-            <div class="document-info">
-                <h4 class="document-title">Título do Documento</h4>
-                <div class="document-meta">
-                    <span class="document-type">PDF</span>
-                    <span class="document-size">2.4 MB</span>
-                    <span class="document-date">18/12/2025</span>
-                </div>
-                <div class="document-tags">
-                    <span class="tag">Dengue</span>
-                    <span class="tag">Protocolo</span>
-                </div>
-            </div>
-            <div class="document-actions">
-                <button class="download-button">
-                    <i class="fas fa-download"></i>
-                </button>
-            </div>
-        </div>
-    </template>
-
-    <script src="js/app.js?v=3" type="module"></script>
-
-    <script>
-        // FORÇAR ATUALIZAÇÃO DO CACHE (Dev Fix)
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function (registrations) {
-                for (let registration of registrations) {
-                    registration.update();
-                    console.log("Service Worker Updated triggered");
-                }
-            });
-        }
-
-        // Leaflet Check
-        window.addEventListener('load', () => {
-            // Delay check slightly
-            setTimeout(() => {
-                if (typeof L === 'undefined') {
-                    console.error("Leaflet.js not loaded!");
-                    // Fallback logic could go here
-                }
-            }, 1000);
-        });
-    </script>
+    <script src="js/app.js"></script>
+</body>
 
 </html>
