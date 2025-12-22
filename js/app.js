@@ -2262,11 +2262,27 @@ const App = {
   },
 
   setupNavigation() {
-    // Desktop Navigation (Sidebar)
-    const desktopNavItems = document.querySelectorAll('.desktop-nav-item');
+    // Desktop Sidebar Navigation
+    const desktopNavItems = document.querySelectorAll('.desktop-nav .nav-item');
     desktopNavItems.forEach(item => {
       item.addEventListener('click', (e) => {
         e.preventDefault();
+        const screen = item.dataset.screen;
+        if (screen) {
+          this.showScreen(screen);
+        }
+      });
+    });
+
+    // Bottom Navigation (Mobile)
+    const bottomNavItems = document.querySelectorAll('.bottom-nav .nav-item');
+    bottomNavItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        const screen = item.dataset.screen;
+        if (screen) {
+          this.showScreen(screen);
+        }
       });
     });
 

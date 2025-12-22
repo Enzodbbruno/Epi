@@ -1,5 +1,5 @@
 // Nome do cache
-const CACHE_NAME = 'epiconecta-v30-newlayout';
+const CACHE_NAME = 'epiconecta-v31-navfix';
 // Arquivos para armazenar em cache
 const urlsToCache = [
   './',
