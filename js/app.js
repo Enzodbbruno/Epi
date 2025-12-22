@@ -1744,10 +1744,15 @@ const PatientModule = {
 
     // Back Action
     backBtn.addEventListener('click', () => {
-      document.getElementById('patient-profile-view').style.display = 'none';
-      document.querySelector('.patient-search-container').style.display = 'block';
-      document.getElementById('patient-recents').style.display = 'block';
-      document.getElementById('patient-results').style.display = 'none'; // reset results or check logic
+      const profileView = document.getElementById('patient-profile-view');
+      const searchBar = document.querySelector('.patient-search-bar');
+      const recents = document.getElementById('patient-recents');
+      const results = document.getElementById('patient-results');
+
+      if (profileView) profileView.style.display = 'none';
+      if (searchBar) searchBar.style.display = 'block';
+      if (recents) recents.style.display = 'block';
+      if (results) results.style.display = 'none';
 
       // logic check: if we had searches, maybe show results again? for now, clean reset
       document.getElementById('patient-results').style.display = 'none';
@@ -1849,10 +1854,15 @@ const PatientModule = {
 
   openProfile(patient) {
     // Toggle Views
-    document.querySelector('.patient-search-container').style.display = 'none';
-    document.getElementById('patient-recents').style.display = 'none';
-    document.getElementById('patient-results').style.display = 'none';
-    document.getElementById('patient-profile-view').style.display = 'block';
+    const searchBar = document.querySelector('.patient-search-bar');
+    const recents = document.getElementById('patient-recents');
+    const results = document.getElementById('patient-results');
+    const profileView = document.getElementById('patient-profile-view');
+
+    if (searchBar) searchBar.style.display = 'none';
+    if (recents) recents.style.display = 'none';
+    if (results) results.style.display = 'none';
+    if (profileView) profileView.style.display = 'flex';
 
     // Populate Header
     document.getElementById('p-photo').src = patient.photo;
