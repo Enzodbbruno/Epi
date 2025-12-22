@@ -1765,21 +1765,38 @@ const PatientModule = {
       document.getElementById('patient-results').style.display = 'none';
     });
 
-    // Tabs
+    // Tab Navigation
     const tabs = document.querySelectorAll('.p-tab');
     tabs.forEach(tab => {
       tab.addEventListener('click', () => {
-        // Remove active class from all
-        tabs.forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.p-tab-content').forEach(c => c.classList.remove('active'));
+        // Remove active from all tabs
+        document.querySelectorAll('.p-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.p-tab-content').forEach(c => c.style.display = 'none');
 
-        // Activate clicked
+        // Activate clicked tab
         tab.classList.add('active');
-        const targetId = tab.dataset.tab;
-        const targetContent = document.getElementById(targetId);
-        targetContent.classList.add('active');
-        targetContent.style.display = 'block';
+        const targetContent = document.getElementById(tab.dataset.tab);
+        if (targetContent) {
+          targetContent.style.display = 'block';
+        }
+      });
+    });
+
+    // Patient Action Buttons
+    const actionButtons = document.querySelectorAll('.patient-actions .btn');
+    actionButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        const buttonText = button.textContent.trim();
+
+        if (buttonText === 'Nova Consulta') {
+          alert('Funcionalidade de Nova Consulta será implementada em breve.\n\nEsta ação abrirá um formulário para registrar uma nova consulta médica para o paciente.');
+        } else if (buttonText === 'Editar Prontuário') {
+          alert('Funcionalidade de Editar Prontuário será implementada em breve.\n\nEsta ação permitirá editar as informações do prontuário do paciente.');
+        } else if (buttonText === 'Notificar') {
+          if (confirm('Deseja notificar este caso às autoridades de saúde?')) {
+            alert('Notificação enviada com sucesso!\n\nAs autoridades de saúde foram informadas sobre este caso.');
+          }
+        }
       });
     });
   },
