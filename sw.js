@@ -1,5 +1,5 @@
 // Nome do cache
-const CACHE_NAME = 'epiconecta-v25-overlay';
+const CACHE_NAME = 'epiconecta-v27-csssyntax';
 // Arquivos para armazenar em cache
 const urlsToCache = [
   './',

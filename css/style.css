@@ -1227,9 +1227,6 @@ body {
     .legend-item:last-child {
         margin-bottom: 0;
     }
-
-    background-color: rgba(76, 175, 80, 0.8);
-    color: white;
 }
 
 /* =========================================
