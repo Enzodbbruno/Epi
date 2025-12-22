@@ -2589,6 +2589,46 @@ const App = {
     return categories[category] || category;
   },
 
+  init() {
+    console.log('EpiConecta: Initializing...');
+
+    // Show loading overlay
+    const loadingOverlay = document.getElementById('loading-overlay');
+    if (loadingOverlay) {
+      loadingOverlay.style.display = 'flex';
+    }
+
+    try {
+      // Initialize all modules
+      this.setupNavigation();
+      this.setupUI();
+      this.updateCurrentDate();
+
+      NotificationsModule.init();
+      ChatModule.init();
+      LibraryModule.init();
+      SymptomsModule.init();
+      SettingsModule.init();
+      PatientModule.init();
+      MapModule.init();
+
+      // Hide loading overlay after everything is loaded
+      setTimeout(() => {
+        if (loadingOverlay) {
+          loadingOverlay.style.display = 'none';
+        }
+        console.log('EpiConecta: Initialization complete');
+      }, 500);
+    } catch (error) {
+      console.error('EpiConecta: Initialization error:', error);
+      // Hide loading overlay even if there's an error
+      if (loadingOverlay) {
+        loadingOverlay.style.display = 'none';
+      }
+      alert('Erro ao inicializar o aplicativo. Por favor, recarregue a página.');
+    }
+  },
+
   showLoading(message = 'Carregando...') {
     const loadingOverlay = document.getElementById('loading-overlay');
     const loadingMessage = document.getElementById('loading-message');
@@ -2694,12 +2734,9 @@ const App = {
       }, 300);
     }, 3000);
   }
-};
+}
 
-// Inicializa o aplicativo quando o DOM estiver totalmente carregado
+// Initialize app when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
   App.init();
 });
-
-// Suporte para módulos ES6
-export { App, NotificationsModule, ChatModule, LibraryModule, SettingsModule };
