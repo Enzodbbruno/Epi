@@ -2098,36 +2098,139 @@ body {
 }
 
 /* =========================================
-   CRITICAL FIXES - CENTERING & SCROLLING
+   SIDEBAR LAYOUT - FIXED RIGHT SEARCH PANEL
    ========================================= */
 
-/* Force profile view to center properly */
+/* Main container with sidebar layout */
+#patients-screen .content-wrapper {
+    display: flex !important;
+    gap: 0 !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: calc(100vh - 80px) !important;
+    overflow: hidden !important;
+}
+
+/* Fixed Right Sidebar for Search */
+.patient-search-container {
+    position: fixed !important;
+    right: 0 !important;
+    top: 80px !important;
+    width: 380px !important;
+    height: calc(100vh - 80px) !important;
+    background: white !important;
+    border-left: 1px solid #e5e7eb !important;
+    padding: 32px 24px !important;
+    overflow-y: auto !important;
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.06) !important;
+    z-index: 50 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+}
+
+.patient-search-container h2 {
+    font-size: 1.5rem !important;
+    margin-bottom: 20px !important;
+    color: #1f2937 !important;
+}
+
+/* Search box in sidebar */
+.search-box-large {
+    max-width: none !important;
+    margin: 0 0 24px 0 !important;
+    padding: 10px 16px !important;
+}
+
+.search-box-large button {
+    padding: 10px 20px !important;
+}
+
+/* Main Content Area (Left side) */
+#patient-recents,
+#patient-results,
+#patient-profile-view {
+    margin-right: 380px !important;
+    padding: 32px !important;
+    width: calc(100% - 380px) !important;
+    max-width: none !important;
+    overflow-y: auto !important;
+    height: calc(100vh - 80px) !important;
+}
+
+/* Patient sections in main area */
+.patient-section {
+    max-width: 1200px !important;
+    margin: 0 auto 40px auto !important;
+}
+
+/* Patient grid in main area */
+.patient-list {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+}
+
+/* Profile view in main area */
 .patient-profile-view {
-    margin-left: auto !important;
-    margin-right: auto !important;
+    margin: 0 auto !important;
     max-width: 1200px !important;
     overflow: visible !important;
+    width: 100% !important;
+    height: auto !important;
+}
+
+/* Ensure profile content is scrollable */
+.patient-profile-view {
     position: relative !important;
 }
 
-/* Ensure header rounds top corners */
-.patient-header-card {
-    border-radius: 24px 24px 0 0 !important;
+/* Recent patients in sidebar */
+#patient-recents.in-sidebar {
+    margin-right: 0 !important;
+    width: 100% !important;
+    padding: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
 }
 
-/* Allow content to scroll */
-.p-tab-content {
-    overflow-y: visible !important;
-    max-height: none !important;
+#patient-recents.in-sidebar .patient-list {
+    grid-template-columns: 1fr !important;
 }
 
-/* Ensure patient screen doesn't restrict width */
-#patients-screen {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
+#patient-recents.in-sidebar .patient-card-item {
+    padding: 16px !important;
+    margin-bottom: 12px !important;
 }
 
-/* Fix wrapper alignment */
-#patients-screen .content-wrapper {
-    text-align: left !important;
+#patient-recents.in-sidebar .p-item-photo img {
+    width: 48px !important;
+    height: 48px !important;
+}
+
+#patient-recents.in-sidebar .section-header h3 {
+    font-size: 1rem !important;
+}
+
+/* Mobile adjustments */
+@media (max-width: 1024px) {
+    #patients-screen .content-wrapper {
+        flex-direction: column !important;
+        height: auto !important;
+    }
+
+    .patient-search-container {
+        position: relative !important;
+        width: 100% !important;
+        height: auto !important;
+        top: 0 !important;
+        border-left: none !important;
+        border-bottom: 1px solid #e5e7eb !important;
+    }
+
+    #patient-recents,
+    #patient-results,
+    #patient-profile-view {
+        margin-right: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+    }
 }
