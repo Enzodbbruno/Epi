@@ -1637,51 +1637,26 @@ const PatientModule = {
   mockDB: [
     {
       id: 1,
-      name: 'Maria de Lourdes Souza',
-      age: 68,
-      sex: 'Fem',
-      blood: 'A+',
-      cns: '700501249875',
+      name: 'Maria da Silva Santos',
+      age: 42,
+      sex: 'Feminino',
       cpf: '123.456.789-00',
-      photo: 'https://ui-avatars.com/api/?name=Maria+Lourdes&background=random&size=128',
-      badges: [
-        { text: 'Hipertensa', type: 'warning' },
-        { text: 'Diabética', type: 'warning' },
-        { text: 'Alergia: Penicilina', type: 'danger' }
-      ],
+      cns: '123 4567 8901 2345',
+      blood: 'O+',
+      photo: 'https://ui-avatars.com/api/?name=Maria+Silva&background=e91e63&color=fff',
+      birthDate: '15/05/1982',
+      badges: [{ text: 'Hipertensão', type: 'warning' }],
       allergies: ['Penicilina', 'Dipirona'],
-      vitals: { bp: '135/85', weight: '72', heartRate: '78' },
+      conditions: ['Hipertensão', 'Diabetes Tipo 2'],
+      vitals: { bp: '118/76', weight: '68', temp: '36.4', o2: '98', heartRate: '75' },
       history: [
-        { date: '15/12/2025', title: 'Consulta Cardiologia', desc: 'Retorno de rotina. Pressão controlada.' },
-        { date: '02/10/2025', title: 'Exames Laboratoriais', desc: 'Glicemia em jejum: 110 mg/dL.' },
-        { date: '12/05/2025', title: 'Vacina Gripe', desc: 'Campanha Anual 2025.' }
+        { date: '20/12/2025', title: 'Consulta Geral', desc: 'Controle de pressão arterial. Medicação ajustada.' },
+        { date: '15/11/2025', title: 'Exames de Rotina', desc: 'Glicemia e hemograma completo.' }
       ],
       vaccines: [
-        { name: 'Influenza (Gripe)', date: '12/05/2025' },
-        { name: 'COVID-19 Reforço', date: '20/02/2025' },
-        { name: 'Hepatite B', date: '10/01/2020' }
+        { name: 'Influenza', date: '15/04/2025' },
+        { name: 'COVID-19 (Reforço)', date: '10/01/2025' }
       ]
-    },
-    {
-      id: 2,
-      name: 'João Pedro Alves',
-      age: 5,
-      sex: 'Masc',
-      blood: 'O+',
-      cns: '890012356789',
-      cpf: '555.444.333-22',
-      photo: 'https://ui-avatars.com/api/?name=Joao+Pedro&background=random&size=128',
-      badges: [
-        { text: 'Asma', type: 'info' }
-      ],
-      allergies: ['Poeria', 'Ácaro'],
-      vitals: { bp: '100/60', weight: '22', heartRate: '90' },
-      history: [
-        { date: '10/12/2025', title: 'Pediatra', desc: 'Crise de asma leve. Prescrito nebulização.' },
-        { date: '15/08/2025', title: 'Vacinação', desc: 'Tetra Viral.' }
-      ],
-      conditions: ['Hipertensão', 'Diabetes Tipo 2'],
-      vitals: { bp: '118/76', weight: '68', temp: '36.4', o2: '98' }
     },
     {
       id: 2,
@@ -1690,12 +1665,21 @@ const PatientModule = {
       sex: 'Masculino',
       cpf: '987.654.321-00',
       cns: '987 6543 2109 8765',
-      bloodType: 'A+',
+      blood: 'A+',
       photo: 'https://ui-avatars.com/api/?name=Joao+Pedro&background=2196f3&color=fff',
       birthDate: '22/08/1989',
+      badges: [{ text: 'Asma', type: 'info' }],
       allergies: [],
       conditions: ['Asma'],
-      vitals: { bp: '120/80', weight: '75', temp: '36.5', o2: '97' }
+      vitals: { bp: '120/80', weight: '75', temp: '36.5', o2: '97', heartRate: '72' },
+      history: [
+        { date: '18/12/2025', title: 'Pneumologista', desc: 'Ajuste de medicação para controle da asma.' },
+        { date: '10/09/2025', title: 'Espirometria', desc: 'Função pulmonar dentro da normalidade.' }
+      ],
+      vaccines: [
+        { name: 'Influenza', date: '20/03/2025' },
+        { name: 'Pneumocócica', date: '15/01/2024' }
+      ]
     },
     {
       id: 3,
@@ -1704,16 +1688,91 @@ const PatientModule = {
       sex: 'Feminino',
       cpf: '456.789.123-45',
       cns: '456 7891 2345 6789',
-      bloodType: 'B+',
+      blood: 'B+',
       photo: 'https://ui-avatars.com/api/?name=Ana+Carolina&background=9c27b0&color=fff',
       birthDate: '10/12/1996',
+      badges: [],
       allergies: ['Lactose'],
       conditions: [],
-      vitals: { bp: '115/75', weight: '62', temp: '36.3', o2: '99' }
+      vitals: { bp: '115/75', weight: '62', temp: '36.3', o2: '99', heartRate: '68' },
+      history: [
+        { date: '15/12/2025', title: 'Check-up Anual', desc: 'Exames de rotina todos normais.' },
+        { date: '20/06/2025', title: 'Ginecologista', desc: 'Consulta preventiva.' }
+      ],
+      vaccines: [
+        { name: 'HPV', date: '10/08/2025' },
+        { name: 'Hepatite B', date: '15/03/2024' }
+      ]
     },
     {
       id: 4,
-      vaccines: []
+      name: 'Carlos Eduardo Souza',
+      age: 58,
+      sex: 'Masculino',
+      cpf: '321.654.987-12',
+      cns: '321 6549 8712 3456',
+      blood: 'AB+',
+      photo: 'https://ui-avatars.com/api/?name=Carlos+Eduardo&background=ff9800&color=fff',
+      birthDate: '03/03/1966',
+      badges: [{ text: 'Hipertensão', type: 'warning' }, { text: 'Colesterol Alto', type: 'warning' }],
+      allergies: ['Iodo'],
+      conditions: ['Hipertensão', 'Colesterol Alto'],
+      vitals: { bp: '135/85', weight: '82', temp: '36.6', o2: '96', heartRate: '78' },
+      history: [
+        { date: '22/12/2025', title: 'Cardiologista', desc: 'Controle de hipertensão. ECG normal.' },
+        { date: '10/10/2025', title: 'Exames Laboratoriais', desc: 'Colesterol ainda elevado.' }
+      ],
+      vaccines: [
+        { name: 'Influenza', date: '25/04/2025' },
+        { name: 'Pneumocócica', date: '10/02/2024' }
+      ]
+    },
+    {
+      id: 5,
+      name: 'Juliana Alves Costa',
+      age: 31,
+      sex: 'Feminino',
+      cpf: '159.753.486-20',
+      cns: '159 7534 8620 1597',
+      blood: 'O-',
+      photo: 'https://ui-avatars.com/api/?name=Juliana+Alves&background=4caf50&color=fff',
+      birthDate: '18/07/1993',
+      badges: [{ text: 'Enxaqueca', type: 'info' }],
+      allergies: ['Ácido Acetilsalicílico (AAS)'],
+      conditions: ['Enxaqueca Crônica'],
+      vitals: { bp: '110/70', weight: '58', temp: '36.2', o2: '98', heartRate: '70' },
+      history: [
+        { date: '19/12/2025', title: 'Neurologista', desc: 'Ajuste de medicação preventiva.' },
+        { date: '05/11/2025', title: 'Consulta de Rotina', desc: 'Frequência de crises reduzida.' }
+      ],
+      vaccines: [
+        { name: 'Influenza', date: '18/04/2025' },
+        { name: 'COVID-19', date: '20/01/2025' }
+      ]
+    },
+    {
+      id: 6,
+      name: 'Roberto Lima Mendes',
+      age: 67,
+      sex: 'Masculino',
+      cpf: '753.951.852-33',
+      cns: '753 9518 5233 7539',
+      blood: 'A-',
+      photo: 'https://ui-avatars.com/api/?name=Roberto+Lima&background=795548&color=fff',
+      birthDate: '25/01/1957',
+      badges: [{ text: 'Diabetes', type: 'alert' }, { text: 'Insuf. Renal', type: 'warning' }],
+      allergies: ['Sulfa'],
+      conditions: ['Diabetes Tipo 2', 'Insuficiência Renal Leve'],
+      vitals: { bp: '140/90', weight: '78', temp: '36.7', o2: '95', heartRate: '80' },
+      history: [
+        { date: '21/12/2025', title: 'Nefrologista', desc: 'Função renal estável. Manter acompanhamento.' },
+        { date: '15/12/2025', title: 'Endocrinologista', desc: 'Glicemia controlada com medicação.' }
+      ],
+      vaccines: [
+        { name: 'Influenza', date: '30/03/2025' },
+        { name: 'Pneumocócica 23', date: '15/01/2024' },
+        { name: 'Herpes Zóster', date: '10/11/2023' }
+      ]
     }
   ],
 
