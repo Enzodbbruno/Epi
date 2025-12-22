@@ -1228,24 +1228,269 @@ body {
         margin-bottom: 0;
     }
 
-    background-color: rgba(76, 175, 80, 0.8) !important;
-    color: white !important;
+    background-color: rgba(76, 175, 80, 0.8);
+    color: white;
 }
 
-.marker-cluster-medium {
-    background-color: rgba(255, 183, 77, 0.6) !important;
+/* =========================================
+   PATIENT MODULE UI 2.0 (REMODELED)
+   ========================================= */
+
+/* Main Wrapper Centering */
+#patients-screen .content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 20px;
 }
 
-.marker-cluster-medium div {
-    background-color: rgba(255, 152, 0, 0.8) !important;
-    color: white !important;
+/* Hero Search Container */
+.patient-search-container {
+    width: 100%;
+    max-width: 700px;
+    margin-bottom: 50px;
+    text-align: center;
+    position: relative;
+    z-index: 10;
 }
 
-.marker-cluster-large {
-    background-color: rgba(229, 115, 115, 0.6) !important;
+.patient-search-container h2 {
+    font-size: 1.8rem;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    font-weight: 700;
 }
 
-.marker-cluster-large div {
-    background-color: rgba(244, 67, 54, 0.8) !important;
-    color: white !important;
+/* Modern Search Bar */
+.search-box-large {
+    background: white;
+    border-radius: 50px;
+    /* Pill shape */
+    padding: 8px 8px 8px 25px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08), 0 2px 10px rgba(0, 0, 0, 0.02);
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s;
+    border: 1px solid rgba(0, 0, 0, 0.02);
+}
+
+.search-box-large:focus-within {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 50px rgba(13, 138, 188, 0.15), 0 5px 15px rgba(0, 0, 0, 0.05);
+    border-color: rgba(13, 138, 188, 0.1);
+}
+
+.search-box-large input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 1.1rem;
+    color: #333;
+    background: transparent;
+}
+
+.search-box-large button {
+    background: var(--primary-color);
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.2s;
+    box-shadow: 0 4px 10px rgba(13, 138, 188, 0.3);
+}
+
+.search-box-large button:hover {
+    background: var(--primary-dark);
+    transform: scale(1.05);
+}
+
+/* Tags/Hints */
+.search-tags {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.search-tag {
+    font-size: 0.85rem;
+    background: #f1f3f5;
+    color: #666;
+    padding: 6px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.search-tag:hover {
+    background: #e9ecef;
+    color: #333;
+}
+
+/* Results Grid */
+#patient-results,
+#patient-recents {
+    width: 100%;
+}
+
+.patient-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    width: 100%;
+}
+
+/* Professional Patient Card */
+.patient-card-item {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.patient-card-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    border-color: rgba(13, 138, 188, 0.2);
+}
+
+.patient-card-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    background: var(--primary-color);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.patient-card-item:hover::before {
+    opacity: 1;
+}
+
+.p-item-photo img {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #f8f9fa;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.p-item-info {
+    flex: 1;
+}
+
+.p-item-info h4 {
+    margin: 0 0 6px 0;
+    font-size: 1.1rem;
+    color: #2c3e50;
+    font-weight: 700;
+}
+
+.p-item-detail {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 4px;
+}
+
+.p-item-detail i {
+    color: var(--primary-color);
+    width: 16px;
+    text-align: center;
+}
+
+/* Profile View (EHR) Improvements */
+.patient-profile-view {
+    width: 100%;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    margin-top: -20px;
+    /* Overlap effect */
+}
+
+.patient-header-card {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    padding: 40px 20px;
+    border-radius: 0;
+    margin-bottom: 0;
+}
+
+.patient-photo-large img {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.patient-info-main h2 {
+    color: white;
+    font-size: 1.8rem;
+}
+
+.p-meta-grid {
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    margin-top: 20px;
+    padding-top: 20px;
+}
+
+.p-meta-item .label {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.p-meta-item .value {
+    color: white;
+    font-size: 1.1rem;
+}
+
+.patient-tabs {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    padding: 0 40px;
+    gap: 30px;
+}
+
+.p-tab {
+    padding: 20px 0;
+    font-size: 1rem;
+    color: #6c757d;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.p-tab:hover {
+    color: var(--primary-color);
+}
+
+.p-tab.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    font-weight: 700;
 }
