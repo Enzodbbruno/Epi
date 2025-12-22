@@ -1,5 +1,5 @@
 // Nome do cache
-const CACHE_NAME = 'epiconecta-v21-redesign';
+const CACHE_NAME = 'epiconecta-v23-scrollfix';
 // Arquivos para armazenar em cache
 const urlsToCache = [
   './',

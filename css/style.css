@@ -2096,3 +2096,38 @@ body {
         grid-template-columns: 1fr !important;
     }
 }
+
+/* =========================================
+   CRITICAL FIXES - CENTERING & SCROLLING
+   ========================================= */
+
+/* Force profile view to center properly */
+.patient-profile-view {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    max-width: 1200px !important;
+    overflow: visible !important;
+    position: relative !important;
+}
+
+/* Ensure header rounds top corners */
+.patient-header-card {
+    border-radius: 24px 24px 0 0 !important;
+}
+
+/* Allow content to scroll */
+.p-tab-content {
+    overflow-y: visible !important;
+    max-height: none !important;
+}
+
+/* Ensure patient screen doesn't restrict width */
+#patients-screen {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+/* Fix wrapper alignment */
+#patients-screen .content-wrapper {
+    text-align: left !important;
+}
