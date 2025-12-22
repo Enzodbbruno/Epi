@@ -1,5 +1,5 @@
 // Nome do cache
-const CACHE_NAME = 'epiconecta-v34-mapintegration';
+const CACHE_NAME = 'epiconecta-v35-syntaxfix';
 // Arquivos para armazenar em cache
 const urlsToCache = [
   './',

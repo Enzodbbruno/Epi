@@ -1469,54 +1469,55 @@ const SymptomsModule = {
 
   clearSymptoms() {
     this.selectedSymptoms = new Set();
-    const symptomCards = document.querySelectorAll('.symptom-chip'); // Changed from .symptom-card to .symptom-chip
+    const symptomCards = document.querySelectorAll('.symptom-card');
     symptomCards.forEach(card => card.classList.remove('selected'));
 
     const resultsContainer = document.getElementById('diagnosis-results');
     if (resultsContainer) {
       resultsContainer.classList.add('hidden');
     }
+  }
+};
+
+// Módulo de Notícias (Carousel)
+const NewsModule = {
+  news: [
+    {
+      id: 1,
+      title: 'Vacinação contra Dengue Ampliada',
+      summary: 'Confira os novos grupos prioritários e locais de vacinação.',
+      image: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+      badge: 'Campanha'
+    },
+    {
+      id: 2,
+      title: 'Boletim Epidemiológico: Semana 50',
+      summary: 'Queda de 15% nos casos de Arboviroses na região.',
+      image: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+      badge: 'Relatório'
+    },
+    {
+      id: 3,
+      title: 'Curso de Capacitação em Vigilância',
+      summary: 'Inscrições abertas para profissionais da rede municipal.',
+      image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+      badge: 'Educação'
+    }
+  ],
+  currentIndex: 0,
+  interval: null,
+
+  init() {
+    this.renderNews();
+    this.startAutoPlay();
   },
 
-  // Módulo de Notícias (Carousel)
-  const NewsModule = {
-    news: [
-      {
-        id: 1,
-        title: 'Vacinação contra Dengue Ampliada',
-        summary: 'Confira os novos grupos prioritários e locais de vacinação.',
-        image: 'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-        badge: 'Campanha'
-      },
-      {
-        id: 2,
-        title: 'Boletim Epidemiológico: Semana 50',
-        summary: 'Queda de 15% nos casos de Arboviroses na região.',
-        image: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-        badge: 'Relatório'
-      },
-      {
-        id: 3,
-        title: 'Curso de Capacitação em Vigilância',
-        summary: 'Inscrições abertas para profissionais da rede municipal.',
-        image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-        badge: 'Educação'
-      }
-    ],
-    currentIndex: 0,
-    interval: null,
+  renderNews() {
+    const container = document.getElementById('news-carousel');
+    const indicators = document.getElementById('carousel-indicators');
+    if (!container || !indicators) return;
 
-    init() {
-      this.renderNews();
-      this.startAutoPlay();
-    },
-
-    renderNews() {
-      const container = document.getElementById('news-carousel');
-      const indicators = document.getElementById('carousel-indicators');
-      if (!container || !indicators) return;
-
-      container.innerHTML = this.news.map((item, index) => `
+    container.innerHTML = this.news.map((item, index) => `
       <div class="news-card ${index === 0 ? 'active' : ''}" data-index="${index}" style="background-image: url('${item.image}')">
         <div class="news-content">
           <span class="news-badge">${item.badge}</span>
@@ -1526,301 +1527,301 @@ const SymptomsModule = {
       </div>
     `).join('');
 
-      indicators.innerHTML = this.news.map((_, index) => `
+    indicators.innerHTML = this.news.map((_, index) => `
       <div class="indicator ${index === 0 ? 'active' : ''}" data-index="${index}"></div>
     `).join('');
 
-      // Click events for indicators
-      indicators.querySelectorAll('.indicator').forEach(ind => {
-        ind.addEventListener('click', (e) => {
-          this.goToSlide(parseInt(e.target.dataset.index));
-          this.resetAutoPlay();
-        });
+    // Click events for indicators
+    indicators.querySelectorAll('.indicator').forEach(ind => {
+      ind.addEventListener('click', (e) => {
+        this.goToSlide(parseInt(e.target.dataset.index));
+        this.resetAutoPlay();
       });
-    },
+    });
+  },
 
-    goToSlide(index) {
-      this.currentIndex = index;
-      const cards = document.querySelectorAll('.news-card');
-      const indicators = document.querySelectorAll('.indicator');
+  goToSlide(index) {
+    this.currentIndex = index;
+    const cards = document.querySelectorAll('.news-card');
+    const indicators = document.querySelectorAll('.indicator');
 
-      cards.forEach(c => c.classList.remove('active'));
-      indicators.forEach(i => i.classList.remove('active'));
+    cards.forEach(c => c.classList.remove('active'));
+    indicators.forEach(i => i.classList.remove('active'));
 
-      if (cards[index]) cards[index].classList.add('active');
-      if (indicators[index]) indicators[index].classList.add('active');
-    },
+    if (cards[index]) cards[index].classList.add('active');
+    if (indicators[index]) indicators[index].classList.add('active');
+  },
 
-    nextSlide() {
-      let next = this.currentIndex + 1;
-      if (next >= this.news.length) next = 0;
-      this.goToSlide(next);
-    },
+  nextSlide() {
+    let next = this.currentIndex + 1;
+    if (next >= this.news.length) next = 0;
+    this.goToSlide(next);
+  },
 
-    startAutoPlay() {
-      this.interval = setInterval(() => this.nextSlide(), 5000); // 5 seconds
-    },
+  startAutoPlay() {
+    this.interval = setInterval(() => this.nextSlide(), 5000); // 5 seconds
+  },
 
-    resetAutoPlay() {
-      clearInterval(this.interval);
-      this.startAutoPlay();
-    }
-  };
+  resetAutoPlay() {
+    clearInterval(this.interval);
+    this.startAutoPlay();
+  }
+};
 
-  // Módulo de Estatísticas (Analytics)
-  const AnalyticsModule = {
-    metrics: {
-      active: 1240,
-      admitted: 45,
-      recovered: 8900
-    },
+// Módulo de Estatísticas (Analytics)
+const AnalyticsModule = {
+  metrics: {
+    active: 1240,
+    admitted: 45,
+    recovered: 8900
+  },
 
-    init() {
-      this.renderDashboard();
-      this.setupRefresh();
-    },
+  init() {
+    this.renderDashboard();
+    this.setupRefresh();
+  },
 
-    renderDashboard() {
-      // Populate simple metrics
-      const activeEl = document.getElementById('metric-active');
-      const admittedEl = document.getElementById('metric-admitted');
-      const recoveredEl = document.getElementById('metric-recovered');
+  renderDashboard() {
+    // Populate simple metrics
+    const activeEl = document.getElementById('metric-active');
+    const admittedEl = document.getElementById('metric-admitted');
+    const recoveredEl = document.getElementById('metric-recovered');
 
-      if (activeEl) this.animateValue(activeEl, 0, this.metrics.active, 1500);
-      if (admittedEl) this.animateValue(admittedEl, 0, this.metrics.admitted, 1000);
-      if (recoveredEl) this.animateValue(recoveredEl, 0, this.metrics.recovered, 2000);
+    if (activeEl) this.animateValue(activeEl, 0, this.metrics.active, 1500);
+    if (admittedEl) this.animateValue(admittedEl, 0, this.metrics.admitted, 1000);
+    if (recoveredEl) this.animateValue(recoveredEl, 0, this.metrics.recovered, 2000);
 
-      // Animate CSS Charts (Simple trick: set height after load)
-      const bars = document.querySelectorAll('.simple-bar-chart .bar');
-      // Using setTimeout to trigger CSS transition
-      setTimeout(() => {
-        // Force relayout if needed, or just let CSS height transition kick in naturally if heights are inline.
-        // Since heights are inline in HTML, we might need to "reset" them to 0 and then back to value to animate.
-        // For simplicity in this demo, we assume they animate on view or we just leave them static.
-      }, 500);
-    },
+    // Animate CSS Charts (Simple trick: set height after load)
+    const bars = document.querySelectorAll('.simple-bar-chart .bar');
+    // Using setTimeout to trigger CSS transition
+    setTimeout(() => {
+      // Force relayout if needed, or just let CSS height transition kick in naturally if heights are inline.
+      // Since heights are inline in HTML, we might need to "reset" them to 0 and then back to value to animate.
+      // For simplicity in this demo, we assume they animate on view or we just leave them static.
+    }, 500);
+  },
 
-    animateValue(obj, start, end, duration) {
-      let startTimestamp = null;
-      const step = (timestamp) => {
-        if (!startTimestamp) startTimestamp = timestamp;
-        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-        obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString('pt-BR');
-        if (progress < 1) {
-          window.requestAnimationFrame(step);
-        }
-      };
-      window.requestAnimationFrame(step);
-    },
-
-    setupRefresh() {
-      const btn = document.getElementById('refresh-analytics');
-      if (btn) {
-        btn.addEventListener('click', () => {
-          btn.querySelector('i').classList.add('fa-spin');
-          setTimeout(() => {
-            this.renderDashboard(); // Re-run animation
-            btn.querySelector('i').classList.remove('fa-spin');
-          }, 1000);
-        });
+  animateValue(obj, start, end, duration) {
+    let startTimestamp = null;
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString('pt-BR');
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
       }
+    };
+    window.requestAnimationFrame(step);
+  },
+
+  setupRefresh() {
+    const btn = document.getElementById('refresh-analytics');
+    if (btn) {
+      btn.addEventListener('click', () => {
+        btn.querySelector('i').classList.add('fa-spin');
+        setTimeout(() => {
+          this.renderDashboard(); // Re-run animation
+          btn.querySelector('i').classList.remove('fa-spin');
+        }, 1000);
+      });
     }
-  };
+  }
+};
 
-  // Módulo do Mapa Epidemiológico (Leaflet + Geolocation)
-  // Módulo do Mapa Epidemiológico (True Heatmap + Disease Filter)
-  // Módulo do Mapa Epidemiológico (Cluster Map + Disease Icons)
-  // Módulo de Pacientes (Prontuário Eletrônico)
-  const PatientModule = {
-    // Banco de Dados Simulado
-    mockDB: [
-      {
-        id: 1,
-        name: 'Maria de Lourdes Souza',
-        age: 68,
-        sex: 'Fem',
-        blood: 'A+',
-        cns: '700501249875',
-        cpf: '123.456.789-00',
-        photo: 'https://ui-avatars.com/api/?name=Maria+Lourdes&background=random&size=128',
-        badges: [
-          { text: 'Hipertensa', type: 'warning' },
-          { text: 'Diabética', type: 'warning' },
-          { text: 'Alergia: Penicilina', type: 'danger' }
-        ],
-        allergies: ['Penicilina', 'Dipirona'],
-        vitals: { bp: '135/85', weight: '72', heartRate: '78' },
-        history: [
-          { date: '15/12/2025', title: 'Consulta Cardiologia', desc: 'Retorno de rotina. Pressão controlada.' },
-          { date: '02/10/2025', title: 'Exames Laboratoriais', desc: 'Glicemia em jejum: 110 mg/dL.' },
-          { date: '12/05/2025', title: 'Vacina Gripe', desc: 'Campanha Anual 2025.' }
-        ],
-        vaccines: [
-          { name: 'Influenza (Gripe)', date: '12/05/2025' },
-          { name: 'COVID-19 Reforço', date: '20/02/2025' },
-          { name: 'Hepatite B', date: '10/01/2020' }
-        ]
-      },
-      {
-        id: 2,
-        name: 'João Pedro Alves',
-        age: 5,
-        sex: 'Masc',
-        blood: 'O+',
-        cns: '890012356789',
-        cpf: '555.444.333-22',
-        photo: 'https://ui-avatars.com/api/?name=Joao+Pedro&background=random&size=128',
-        badges: [
-          { text: 'Asma', type: 'info' }
-        ],
-        allergies: ['Poeria', 'Ácaro'],
-        vitals: { bp: '100/60', weight: '22', heartRate: '90' },
-        history: [
-          { date: '10/12/2025', title: 'Pediatra', desc: 'Crise de asma leve. Prescrito nebulização.' },
-          { date: '15/08/2025', title: 'Vacinação', desc: 'Tetra Viral.' }
-        ],
-        vaccines: [
-          { name: 'Tetra Viral', date: '15/08/2025' },
-          { name: 'Poliomielite', date: '10/02/2023' },
-          { name: 'BCG', date: '20/05/2020' }
-        ]
-      },
-      {
-        id: 3,
-        name: 'Ana Clara Silva',
-        age: 34,
-        sex: 'Fem',
-        blood: 'AB-',
-        cns: '201098765432',
-        cpf: '987.654.321-11',
-        photo: 'https://ui-avatars.com/api/?name=Ana+Clara&background=random&size=128',
-        badges: [
-          { text: 'Gestante (20 sem)', type: 'info' }
-        ],
-        allergies: [],
-        vitals: { bp: '110/70', weight: '68', heartRate: '82' },
-        history: [
-          { date: '18/12/2025', title: 'Pré-Natal', desc: 'Consulta mensal. Batimentos fetais normais.' },
-          { date: '20/11/2025', title: 'Ultrassom Morfológico', desc: 'Desenvolvimento adequado.' }
-        ],
-        vaccines: [
-          { name: 'dTpa', date: '20/11/2025' },
-          { name: 'Influenza', date: '10/04/2025' }
-        ]
-      },
-      {
-        id: 4,
-        name: 'Paciente Exemplo (Usuário)',
-        age: 30,
-        sex: 'Masc',
-        blood: 'O+',
-        cns: '05395045210',
-        cpf: '053.950.452-10',
-        photo: 'https://ui-avatars.com/api/?name=Enzo+User&background=0D8ABC&color=fff',
-        badges: [
-          { text: 'Cadastro Novo', type: 'info' }
-        ],
-        allergies: [],
-        vitals: { bp: '120/80', weight: '75', heartRate: '70' },
-        history: [
-          { date: '19/12/2025', title: 'Primeiro Acesso', desc: 'Cadastro realizado no sistema.' }
-        ],
-        vaccines: []
-      }
-    ],
-
-    init() {
-      this.setupEventListeners();
-      this.renderRecents();
+// Módulo do Mapa Epidemiológico (Leaflet + Geolocation)
+// Módulo do Mapa Epidemiológico (True Heatmap + Disease Filter)
+// Módulo do Mapa Epidemiológico (Cluster Map + Disease Icons)
+// Módulo de Pacientes (Prontuário Eletrônico)
+const PatientModule = {
+  // Banco de Dados Simulado
+  mockDB: [
+    {
+      id: 1,
+      name: 'Maria de Lourdes Souza',
+      age: 68,
+      sex: 'Fem',
+      blood: 'A+',
+      cns: '700501249875',
+      cpf: '123.456.789-00',
+      photo: 'https://ui-avatars.com/api/?name=Maria+Lourdes&background=random&size=128',
+      badges: [
+        { text: 'Hipertensa', type: 'warning' },
+        { text: 'Diabética', type: 'warning' },
+        { text: 'Alergia: Penicilina', type: 'danger' }
+      ],
+      allergies: ['Penicilina', 'Dipirona'],
+      vitals: { bp: '135/85', weight: '72', heartRate: '78' },
+      history: [
+        { date: '15/12/2025', title: 'Consulta Cardiologia', desc: 'Retorno de rotina. Pressão controlada.' },
+        { date: '02/10/2025', title: 'Exames Laboratoriais', desc: 'Glicemia em jejum: 110 mg/dL.' },
+        { date: '12/05/2025', title: 'Vacina Gripe', desc: 'Campanha Anual 2025.' }
+      ],
+      vaccines: [
+        { name: 'Influenza (Gripe)', date: '12/05/2025' },
+        { name: 'COVID-19 Reforço', date: '20/02/2025' },
+        { name: 'Hepatite B', date: '10/01/2020' }
+      ]
     },
-
-    setupEventListeners() {
-      const searchBtn = document.getElementById('patient-search-btn');
-      const searchInput = document.getElementById('patient-search-input');
-      const backBtn = document.getElementById('back-to-search-btn');
-
-      // Search Action
-      searchBtn.addEventListener('click', () => {
-        this.handleSearch(searchInput.value);
-      });
-
-      searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') this.handleSearch(searchInput.value);
-      });
-
-      // Back Action
-      backBtn.addEventListener('click', () => {
-        const profileView = document.getElementById('patient-profile-view');
-        const searchBar = document.querySelector('.patient-search-bar');
-        const recents = document.getElementById('patient-recents');
-        const results = document.getElementById('patient-results');
-
-        if (profileView) profileView.style.display = 'none';
-        if (searchBar) searchBar.style.display = 'block';
-        if (recents) recents.style.display = 'block';
-        if (results) results.style.display = 'none';
-
-        // logic check: if we had searches, maybe show results again? for now, clean reset
-        document.getElementById('patient-results').style.display = 'none';
-      });
-
-      // Tabs
-      const tabs = document.querySelectorAll('.p-tab');
-      tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-          // Remove active class from all
-          tabs.forEach(t => t.classList.remove('active'));
-          document.querySelectorAll('.p-tab-content').forEach(c => c.classList.remove('active'));
-          document.querySelectorAll('.p-tab-content').forEach(c => c.style.display = 'none');
-
-          // Activate clicked
-          tab.classList.add('active');
-          const targetId = tab.dataset.tab;
-          const targetContent = document.getElementById(targetId);
-          targetContent.classList.add('active');
-          targetContent.style.display = 'block';
-        });
-      });
+    {
+      id: 2,
+      name: 'João Pedro Alves',
+      age: 5,
+      sex: 'Masc',
+      blood: 'O+',
+      cns: '890012356789',
+      cpf: '555.444.333-22',
+      photo: 'https://ui-avatars.com/api/?name=Joao+Pedro&background=random&size=128',
+      badges: [
+        { text: 'Asma', type: 'info' }
+      ],
+      allergies: ['Poeria', 'Ácaro'],
+      vitals: { bp: '100/60', weight: '22', heartRate: '90' },
+      history: [
+        { date: '10/12/2025', title: 'Pediatra', desc: 'Crise de asma leve. Prescrito nebulização.' },
+        { date: '15/08/2025', title: 'Vacinação', desc: 'Tetra Viral.' }
+      ],
+      vaccines: [
+        { name: 'Tetra Viral', date: '15/08/2025' },
+        { name: 'Poliomielite', date: '10/02/2023' },
+        { name: 'BCG', date: '20/05/2020' }
+      ]
     },
-
-    handleSearch(term) {
-      if (!term) return;
-      term = term.toLowerCase().replace(/[.\-]/g, ''); // Clean CPF/CNS chars
-
-      const results = this.mockDB.filter(p => {
-        const cleanCpf = p.cpf.replace(/[.\-]/g, '');
-        const name = p.name.toLowerCase();
-        const cns = p.cns;
-
-        return name.includes(term) || cleanCpf.includes(term) || cns.includes(term);
-      });
-
-      this.renderResults(results);
+    {
+      id: 3,
+      name: 'Ana Clara Silva',
+      age: 34,
+      sex: 'Fem',
+      blood: 'AB-',
+      cns: '201098765432',
+      cpf: '987.654.321-11',
+      photo: 'https://ui-avatars.com/api/?name=Ana+Clara&background=random&size=128',
+      badges: [
+        { text: 'Gestante (20 sem)', type: 'info' }
+      ],
+      allergies: [],
+      vitals: { bp: '110/70', weight: '68', heartRate: '82' },
+      history: [
+        { date: '18/12/2025', title: 'Pré-Natal', desc: 'Consulta mensal. Batimentos fetais normais.' },
+        { date: '20/11/2025', title: 'Ultrassom Morfológico', desc: 'Desenvolvimento adequado.' }
+      ],
+      vaccines: [
+        { name: 'dTpa', date: '20/11/2025' },
+        { name: 'Influenza', date: '10/04/2025' }
+      ]
     },
+    {
+      id: 4,
+      name: 'Paciente Exemplo (Usuário)',
+      age: 30,
+      sex: 'Masc',
+      blood: 'O+',
+      cns: '05395045210',
+      cpf: '053.950.452-10',
+      photo: 'https://ui-avatars.com/api/?name=Enzo+User&background=0D8ABC&color=fff',
+      badges: [
+        { text: 'Cadastro Novo', type: 'info' }
+      ],
+      allergies: [],
+      vitals: { bp: '120/80', weight: '75', heartRate: '70' },
+      history: [
+        { date: '19/12/2025', title: 'Primeiro Acesso', desc: 'Cadastro realizado no sistema.' }
+      ],
+      vaccines: []
+    }
+  ],
 
-    renderResults(results) {
-      const container = document.getElementById('results-list');
-      const section = document.getElementById('patient-results');
-      const recentsIndex = document.getElementById('patient-recents');
+  init() {
+    this.setupEventListeners();
+    this.renderRecents();
+  },
 
-      container.innerHTML = '';
-      recentsIndex.style.display = 'none';
-      section.style.display = 'block';
+  setupEventListeners() {
+    const searchBtn = document.getElementById('patient-search-btn');
+    const searchInput = document.getElementById('patient-search-input');
+    const backBtn = document.getElementById('back-to-search-btn');
 
-      if (results.length === 0) {
-        container.innerHTML = `
+    // Search Action
+    searchBtn.addEventListener('click', () => {
+      this.handleSearch(searchInput.value);
+    });
+
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') this.handleSearch(searchInput.value);
+    });
+
+    // Back Action
+    backBtn.addEventListener('click', () => {
+      const profileView = document.getElementById('patient-profile-view');
+      const searchBar = document.querySelector('.patient-search-bar');
+      const recents = document.getElementById('patient-recents');
+      const results = document.getElementById('patient-results');
+
+      if (profileView) profileView.style.display = 'none';
+      if (searchBar) searchBar.style.display = 'block';
+      if (recents) recents.style.display = 'block';
+      if (results) results.style.display = 'none';
+
+      // logic check: if we had searches, maybe show results again? for now, clean reset
+      document.getElementById('patient-results').style.display = 'none';
+    });
+
+    // Tabs
+    const tabs = document.querySelectorAll('.p-tab');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Remove active class from all
+        tabs.forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.p-tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.p-tab-content').forEach(c => c.style.display = 'none');
+
+        // Activate clicked
+        tab.classList.add('active');
+        const targetId = tab.dataset.tab;
+        const targetContent = document.getElementById(targetId);
+        targetContent.classList.add('active');
+        targetContent.style.display = 'block';
+      });
+    });
+  },
+
+  handleSearch(term) {
+    if (!term) return;
+    term = term.toLowerCase().replace(/[.\-]/g, ''); // Clean CPF/CNS chars
+
+    const results = this.mockDB.filter(p => {
+      const cleanCpf = p.cpf.replace(/[.\-]/g, '');
+      const name = p.name.toLowerCase();
+      const cns = p.cns;
+
+      return name.includes(term) || cleanCpf.includes(term) || cns.includes(term);
+    });
+
+    this.renderResults(results);
+  },
+
+  renderResults(results) {
+    const container = document.getElementById('results-list');
+    const section = document.getElementById('patient-results');
+    const recentsIndex = document.getElementById('patient-recents');
+
+    container.innerHTML = '';
+    recentsIndex.style.display = 'none';
+    section.style.display = 'block';
+
+    if (results.length === 0) {
+      container.innerHTML = `
                 <div style="text-align:center; color:#888; padding:30px;">
                     <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 10px; opacity: 0.5;"></i><br>
                     Nenhum paciente encontrado.<br>
                     <small>Tente buscar por <b>"Maria"</b>, <b>"João"</b> ou <b>"05395045210"</b></small>
                 </div>`;
-        return;
-      }
+      return;
+    }
 
-      results.forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'patient-card-item';
-        card.innerHTML = `
+    results.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'patient-card-item';
+      card.innerHTML = `
                 <div class="p-item-photo">
                     <img src="${p.photo}" alt="${p.name}">
                 </div>
@@ -1830,21 +1831,21 @@ const SymptomsModule = {
                     <p>${p.age} anos • ${p.sex}</p>
                 </div>
             `;
-        card.onclick = () => this.openProfile(p);
-        container.appendChild(card);
-      });
-    },
+      card.onclick = () => this.openProfile(p);
+      container.appendChild(card);
+    });
+  },
 
-    renderRecents() {
-      const container = document.getElementById('recent-patients-list');
-      // Mock Recents (Just showing Maria for now)
-      const recent = [this.mockDB[0]];
+  renderRecents() {
+    const container = document.getElementById('recent-patients-list');
+    // Mock Recents (Just showing Maria for now)
+    const recent = [this.mockDB[0]];
 
-      container.innerHTML = '';
-      recent.forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'patient-card-item';
-        card.innerHTML = `
+    container.innerHTML = '';
+    recent.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'patient-card-item';
+      card.innerHTML = `
                 <div class="p-item-photo">
                     <img src="${p.photo}" alt="${p.name}">
                 </div>
@@ -1853,315 +1854,315 @@ const SymptomsModule = {
                     <p>Acessado há 2 horas</p>
                 </div>
             `;
-        card.onclick = () => this.openProfile(p);
-        container.appendChild(card);
+      card.onclick = () => this.openProfile(p);
+      container.appendChild(card);
+    });
+  },
+
+  openProfile(patient) {
+    // Toggle Views
+    const searchBar = document.querySelector('.patient-search-bar');
+    const recents = document.getElementById('patient-recents');
+    const results = document.getElementById('patient-results');
+    const profileView = document.getElementById('patient-profile-view');
+
+    if (searchBar) searchBar.style.display = 'none';
+    if (recents) recents.style.display = 'none';
+    if (results) results.style.display = 'none';
+    if (profileView) profileView.style.display = 'flex';
+
+    // Populate Header
+    document.getElementById('p-photo').src = patient.photo;
+    document.getElementById('p-name').innerText = patient.name;
+    document.getElementById('p-age').innerText = `${patient.age} anos`;
+    document.getElementById('p-sex').innerText = patient.sex;
+    document.getElementById('p-blood').innerText = patient.blood;
+    document.getElementById('p-cns').innerText = patient.cns;
+
+    // Populate Badges
+    const badgesContainer = document.getElementById('p-badges');
+    badgesContainer.innerHTML = '';
+    patient.badges.forEach(b => {
+      const span = document.createElement('span');
+      span.className = `p-badge ${b.type}`;
+      span.innerText = b.text;
+      badgesContainer.appendChild(span);
+    });
+
+    // Summary Tab
+    const allergiesList = document.getElementById('p-allergies-list');
+    allergiesList.innerHTML = '';
+    if (patient.allergies.length > 0) {
+      patient.allergies.forEach(a => {
+        const li = document.createElement('li');
+        li.innerText = a;
+        allergiesList.appendChild(li);
       });
-    },
+      document.getElementById('p-allergies-box').style.display = 'block';
+    } else {
+      document.getElementById('p-allergies-box').style.display = 'none';
+    }
 
-    openProfile(patient) {
-      // Toggle Views
-      const searchBar = document.querySelector('.patient-search-bar');
-      const recents = document.getElementById('patient-recents');
-      const results = document.getElementById('patient-results');
-      const profileView = document.getElementById('patient-profile-view');
+    // Vitals
+    document.getElementById('v-bp').innerText = patient.vitals.bp;
+    document.getElementById('v-weight').innerText = patient.vitals.weight;
 
-      if (searchBar) searchBar.style.display = 'none';
-      if (recents) recents.style.display = 'none';
-      if (results) results.style.display = 'none';
-      if (profileView) profileView.style.display = 'flex';
-
-      // Populate Header
-      document.getElementById('p-photo').src = patient.photo;
-      document.getElementById('p-name').innerText = patient.name;
-      document.getElementById('p-age').innerText = `${patient.age} anos`;
-      document.getElementById('p-sex').innerText = patient.sex;
-      document.getElementById('p-blood').innerText = patient.blood;
-      document.getElementById('p-cns').innerText = patient.cns;
-
-      // Populate Badges
-      const badgesContainer = document.getElementById('p-badges');
-      badgesContainer.innerHTML = '';
-      patient.badges.forEach(b => {
-        const span = document.createElement('span');
-        span.className = `p-badge ${b.type}`;
-        span.innerText = b.text;
-        badgesContainer.appendChild(span);
-      });
-
-      // Summary Tab
-      const allergiesList = document.getElementById('p-allergies-list');
-      allergiesList.innerHTML = '';
-      if (patient.allergies.length > 0) {
-        patient.allergies.forEach(a => {
-          const li = document.createElement('li');
-          li.innerText = a;
-          allergiesList.appendChild(li);
-        });
-        document.getElementById('p-allergies-box').style.display = 'block';
-      } else {
-        document.getElementById('p-allergies-box').style.display = 'none';
-      }
-
-      // Vitals
-      document.getElementById('v-bp').innerText = patient.vitals.bp;
-      document.getElementById('v-weight').innerText = patient.vitals.weight;
-
-      // History Tab
-      const timeline = document.getElementById('p-timeline');
-      timeline.innerHTML = '';
-      patient.history.forEach(h => {
-        const item = document.createElement('div');
-        item.className = 'timeline-item';
-        item.innerHTML = `
+    // History Tab
+    const timeline = document.getElementById('p-timeline');
+    timeline.innerHTML = '';
+    patient.history.forEach(h => {
+      const item = document.createElement('div');
+      item.className = 'timeline-item';
+      item.innerHTML = `
                 <div class="timeline-date">${h.date}</div>
                 <div class="timeline-content">
                     <h4>${h.title}</h4>
                     <p>${h.desc}</p>
                 </div>
              `;
-        timeline.appendChild(item);
-      });
+      timeline.appendChild(item);
+    });
 
-      // Vaccines Tab
-      const vList = document.getElementById('p-vaccines-list');
-      vList.innerHTML = '';
-      patient.vaccines.forEach(v => {
-        const item = document.createElement('div');
-        item.className = 'patient-card-item'; // reuse style
-        item.style.marginBottom = '10px';
-        item.innerHTML = `
+    // Vaccines Tab
+    const vList = document.getElementById('p-vaccines-list');
+    vList.innerHTML = '';
+    patient.vaccines.forEach(v => {
+      const item = document.createElement('div');
+      item.className = 'patient-card-item'; // reuse style
+      item.style.marginBottom = '10px';
+      item.innerHTML = `
                 <div class="p-item-info">
                     <h4>${v.name}</h4>
                     <p>Aplicado em: ${v.date}</p>
                 </div>
             `;
-        vList.appendChild(item);
+      vList.appendChild(item);
+    });
+  }
+};
+
+// Módulo do Mapa Epidemiológico (Proportional Bubble Map - Real Neighborhoods)
+const MapModule = {
+  map: null,
+  userLocation: null,
+  currentDisease: 'dengue',
+  layerGroup: null,
+
+  // Configurações de Cores (Severity Gradient)
+  colors: {
+    low: '#FFD54F',    // Amarelo (Baixo)
+    medium: '#FF9800', // Laranja (Médio)
+    high: '#F44336',   // Vermelho (Alto)
+    critical: '#B71C1C' // Vermelho Escuro (Crítico)
+  },
+
+  // Cidades Predefinidas
+  cities: {
+    'saopaulo': { coords: [-23.5505, -46.6333], label: 'São Paulo' },
+    'rio': { coords: [-22.9068, -43.1729], label: 'Rio de Janeiro' },
+    'brasilia': { coords: [-15.7975, -47.8919], label: 'Brasília' },
+    'salvador': { coords: [-12.9774, -38.5016], label: 'Salvador' },
+    'manaus': { coords: [-3.1190, -60.0217], label: 'Manaus' }
+  },
+
+  // Dados Reais de Bairros (Latitude, Longitude)
+  neighborhoodsData: {
+    'saopaulo': [
+      { name: 'Vila Mariana', lat: -23.5837, lng: -46.6339 },
+      { name: 'Mooca', lat: -23.5592, lng: -46.5981 },
+      { name: 'Pinheiros', lat: -23.5653, lng: -46.6914 },
+      { name: 'Itaquera', lat: -23.5344, lng: -46.4515 },
+      { name: 'Santana', lat: -23.4994, lng: -46.6316 },
+      { name: 'Santo Amaro', lat: -23.6559, lng: -46.7027 }
+    ],
+    'rio': [
+      { name: 'Copacabana', lat: -22.9707, lng: -43.1824 },
+      { name: 'Tijuca', lat: -22.9255, lng: -43.2521 },
+      { name: 'Barra da Tijuca', lat: -23.0004, lng: -43.3659 },
+      { name: 'Madureira', lat: -22.8810, lng: -43.3400 },
+      { name: 'Centro', lat: -22.9068, lng: -43.1729 }
+    ],
+    'brasilia': [
+      { name: 'Asa Sul', lat: -15.8131, lng: -47.8961 },
+      { name: 'Asa Norte', lat: -15.7631, lng: -47.8836 },
+      { name: 'Águas Claras', lat: -15.8400, lng: -48.0300 },
+      { name: 'Taguatinga', lat: -15.8333, lng: -48.0564 },
+      { name: 'Plano Piloto', lat: -15.7975, lng: -47.8919 }
+    ],
+    'salvador': [
+      { name: 'Pelourinho', lat: -12.9711, lng: -38.5108 },
+      { name: 'Barra', lat: -13.0084, lng: -38.5283 },
+      { name: 'Rio Vermelho', lat: -13.0125, lng: -38.4906 }
+    ],
+    'manaus': [
+      { name: 'Centro', lat: -3.1190, lng: -60.0217 },
+      { name: 'Adrianópolis', lat: -3.1096, lng: -60.0135 },
+      { name: 'Ponta Negra', lat: -3.0734, lng: -60.0776 }
+    ]
+  },
+
+  init() {
+    this.setupEventListeners();
+  },
+
+  setupEventListeners() {
+    const enableBtn = document.getElementById('enable-location-btn');
+    const selectCity = document.getElementById('municipality-select');
+    const selectDisease = document.getElementById('disease-select');
+
+    if (enableBtn) {
+      enableBtn.onclick = () => this.requestLocation();
+    }
+
+    if (selectCity) {
+      selectCity.addEventListener('change', (e) => {
+        const value = e.target.value;
+        if (value === 'gps') {
+          this.requestLocation();
+        } else if (this.cities[value]) {
+          this.loadMapAt(this.cities[value].coords[0], this.cities[value].coords[1], value);
+          const overlay = document.getElementById('map-permission-overlay');
+          if (overlay) overlay.style.display = 'none';
+        }
       });
     }
-  };
+    if (selectDisease) {
+      selectDisease.addEventListener('change', (e) => {
+        this.currentDisease = e.target.value;
+        // Determine current city context correctly
+        const selectCity = document.getElementById('municipality-select');
+        let currentCity = 'saopaulo';
 
-  // Módulo do Mapa Epidemiológico (Proportional Bubble Map - Real Neighborhoods)
-  const MapModule = {
-    map: null,
-    userLocation: null,
-    currentDisease: 'dengue',
-    layerGroup: null,
-
-    // Configurações de Cores (Severity Gradient)
-    colors: {
-      low: '#FFD54F',    // Amarelo (Baixo)
-      medium: '#FF9800', // Laranja (Médio)
-      high: '#F44336',   // Vermelho (Alto)
-      critical: '#B71C1C' // Vermelho Escuro (Crítico)
-    },
-
-    // Cidades Predefinidas
-    cities: {
-      'saopaulo': { coords: [-23.5505, -46.6333], label: 'São Paulo' },
-      'rio': { coords: [-22.9068, -43.1729], label: 'Rio de Janeiro' },
-      'brasilia': { coords: [-15.7975, -47.8919], label: 'Brasília' },
-      'salvador': { coords: [-12.9774, -38.5016], label: 'Salvador' },
-      'manaus': { coords: [-3.1190, -60.0217], label: 'Manaus' }
-    },
-
-    // Dados Reais de Bairros (Latitude, Longitude)
-    neighborhoodsData: {
-      'saopaulo': [
-        { name: 'Vila Mariana', lat: -23.5837, lng: -46.6339 },
-        { name: 'Mooca', lat: -23.5592, lng: -46.5981 },
-        { name: 'Pinheiros', lat: -23.5653, lng: -46.6914 },
-        { name: 'Itaquera', lat: -23.5344, lng: -46.4515 },
-        { name: 'Santana', lat: -23.4994, lng: -46.6316 },
-        { name: 'Santo Amaro', lat: -23.6559, lng: -46.7027 }
-      ],
-      'rio': [
-        { name: 'Copacabana', lat: -22.9707, lng: -43.1824 },
-        { name: 'Tijuca', lat: -22.9255, lng: -43.2521 },
-        { name: 'Barra da Tijuca', lat: -23.0004, lng: -43.3659 },
-        { name: 'Madureira', lat: -22.8810, lng: -43.3400 },
-        { name: 'Centro', lat: -22.9068, lng: -43.1729 }
-      ],
-      'brasilia': [
-        { name: 'Asa Sul', lat: -15.8131, lng: -47.8961 },
-        { name: 'Asa Norte', lat: -15.7631, lng: -47.8836 },
-        { name: 'Águas Claras', lat: -15.8400, lng: -48.0300 },
-        { name: 'Taguatinga', lat: -15.8333, lng: -48.0564 },
-        { name: 'Plano Piloto', lat: -15.7975, lng: -47.8919 }
-      ],
-      'salvador': [
-        { name: 'Pelourinho', lat: -12.9711, lng: -38.5108 },
-        { name: 'Barra', lat: -13.0084, lng: -38.5283 },
-        { name: 'Rio Vermelho', lat: -13.0125, lng: -38.4906 }
-      ],
-      'manaus': [
-        { name: 'Centro', lat: -3.1190, lng: -60.0217 },
-        { name: 'Adrianópolis', lat: -3.1096, lng: -60.0135 },
-        { name: 'Ponta Negra', lat: -3.0734, lng: -60.0776 }
-      ]
-    },
-
-    init() {
-      this.setupEventListeners();
-    },
-
-    setupEventListeners() {
-      const enableBtn = document.getElementById('enable-location-btn');
-      const selectCity = document.getElementById('municipality-select');
-      const selectDisease = document.getElementById('disease-select');
-
-      if (enableBtn) {
-        enableBtn.onclick = () => this.requestLocation();
-      }
-
-      if (selectCity) {
-        selectCity.addEventListener('change', (e) => {
-          const value = e.target.value;
-          if (value === 'gps') {
-            this.requestLocation();
-          } else if (this.cities[value]) {
-            this.loadMapAt(this.cities[value].coords[0], this.cities[value].coords[1], value);
-            const overlay = document.getElementById('map-permission-overlay');
-            if (overlay) overlay.style.display = 'none';
+        if (selectCity) {
+          if (selectCity.value === 'gps') {
+            currentCity = 'gps';
+          } else {
+            currentCity = selectCity.value;
           }
-        });
-      }
-      if (selectDisease) {
-        selectDisease.addEventListener('change', (e) => {
-          this.currentDisease = e.target.value;
-          // Determine current city context correctly
-          const selectCity = document.getElementById('municipality-select');
-          let currentCity = 'saopaulo';
+        }
 
-          if (selectCity) {
-            if (selectCity.value === 'gps') {
-              currentCity = 'gps';
-            } else {
-              currentCity = selectCity.value;
-            }
-          }
+        const center = this.map ? this.map.getCenter() : { lat: this.defaultCoords[0], lng: this.defaultCoords[1] };
+        if (this.map) {
+          this.generateBubbleData(center.lat, center.lng, currentCity);
+        }
+      });
+    }
+  },
 
-          const center = this.map ? this.map.getCenter() : { lat: this.defaultCoords[0], lng: this.defaultCoords[1] };
-          if (this.map) {
-            this.generateBubbleData(center.lat, center.lng, currentCity);
-          }
-        });
-      }
-    },
+  requestLocation() {
+    const overlay = document.getElementById('map-permission-overlay');
+    const btn = document.getElementById('enable-location-btn');
 
-    requestLocation() {
-      const overlay = document.getElementById('map-permission-overlay');
-      const btn = document.getElementById('enable-location-btn');
+    if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Localizando...';
 
-      if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Localizando...';
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          this.userLocation = [position.coords.latitude, position.coords.longitude];
+          // Pass 'gps' to trigger dynamic generation around user
+          this.loadMapAt(this.userLocation[0], this.userLocation[1], 'gps');
+          if (overlay) overlay.style.display = 'none';
+          if (btn) btn.innerHTML = 'Ativar Localização';
+        },
+        (error) => {
+          console.error("Erro GPS:", error);
+          alert("Não foi possível obter sua localização. Mostrando São Paulo por padrão.");
+          this.loadMapAt(this.cities['saopaulo'].coords[0], this.cities['saopaulo'].coords[1], 'saopaulo');
+          if (overlay) overlay.style.display = 'none';
+          if (btn) btn.innerHTML = 'Ativar Localização';
+        }
+      );
+    } else {
+      alert("Seu navegador não suporta Geolocalização.");
+      this.loadMapAt(this.cities['saopaulo'].coords[0], this.cities['saopaulo'].coords[1], 'saopaulo');
+      if (overlay) overlay.style.display = 'none';
+    }
+  },
 
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            this.userLocation = [position.coords.latitude, position.coords.longitude];
-            // Pass 'gps' to trigger dynamic generation around user
-            this.loadMapAt(this.userLocation[0], this.userLocation[1], 'gps');
-            if (overlay) overlay.style.display = 'none';
-            if (btn) btn.innerHTML = 'Ativar Localização';
-          },
-          (error) => {
-            console.error("Erro GPS:", error);
-            alert("Não foi possível obter sua localização. Mostrando São Paulo por padrão.");
-            this.loadMapAt(this.cities['saopaulo'].coords[0], this.cities['saopaulo'].coords[1], 'saopaulo');
-            if (overlay) overlay.style.display = 'none';
-            if (btn) btn.innerHTML = 'Ativar Localização';
-          }
-        );
-      } else {
-        alert("Seu navegador não suporta Geolocalização.");
-        this.loadMapAt(this.cities['saopaulo'].coords[0], this.cities['saopaulo'].coords[1], 'saopaulo');
-        if (overlay) overlay.style.display = 'none';
-      }
-    },
+  loadMapAt(lat, lng, cityKey = 'saopaulo') {
+    if (this.map) {
+      this.map.flyTo([lat, lng], 12);
+      this.generateBubbleData(lat, lng, cityKey);
+      return;
+    }
 
-    loadMapAt(lat, lng, cityKey = 'saopaulo') {
-      if (this.map) {
-        this.map.flyTo([lat, lng], 12);
-        this.generateBubbleData(lat, lng, cityKey);
-        return;
-      }
+    setTimeout(() => {
+      this.map = L.map('epidemiological-map', {
+        zoomControl: false
+      }).setView([lat, lng], 12);
 
-      setTimeout(() => {
-        this.map = L.map('epidemiological-map', {
-          zoomControl: false
-        }).setView([lat, lng], 12);
+      L.control.zoom({ position: 'topright' }).addTo(this.map);
 
-        L.control.zoom({ position: 'topright' }).addTo(this.map);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap &copy; CARTO',
+        subdomains: 'abcd',
+        maxZoom: 19
+      }).addTo(this.map);
 
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-          attribution: '&copy; OpenStreetMap &copy; CARTO',
-          subdomains: 'abcd',
-          maxZoom: 19
-        }).addTo(this.map);
+      this.layerGroup = L.layerGroup().addTo(this.map);
 
-        this.layerGroup = L.layerGroup().addTo(this.map);
+      this.generateBubbleData(lat, lng, cityKey);
+      this.addLegend();
+    }, 100);
+  },
 
-        this.generateBubbleData(lat, lng, cityKey);
-        this.addLegend();
-      }, 100);
-    },
+  generateBubbleData(lat, lng, cityKey) {
+    if (!this.layerGroup) return;
+    this.layerGroup.clearLayers();
 
-    generateBubbleData(lat, lng, cityKey) {
-      if (!this.layerGroup) return;
-      this.layerGroup.clearLayers();
+    let neighborhoods;
 
-      let neighborhoods;
+    // 1. Get Neighborhoods
+    if (this.neighborhoodsData[cityKey]) {
+      // Use predefined real data
+      neighborhoods = this.neighborhoodsData[cityKey];
+    } else {
+      // Dynamic Generation for GPS/Unknown locations
+      // Generate points relative to the provided lat/lng center
+      neighborhoods = [
+        { name: 'Centro Local', lat: lat, lng: lng },
+        { name: 'Região Norte', lat: lat + 0.02, lng: lng },
+        { name: 'Região Sul', lat: lat - 0.02, lng: lng },
+        { name: 'Região Leste', lat: lat, lng: lng + 0.02 },
+        { name: 'Região Oeste', lat: lat, lng: lng - 0.02 },
+        { name: 'Área Industrial', lat: lat + 0.015, lng: lng + 0.015 },
+        { name: 'Área Residencial', lat: lat - 0.015, lng: lng - 0.015 }
+      ];
+    }
 
-      // 1. Get Neighborhoods
-      if (this.neighborhoodsData[cityKey]) {
-        // Use predefined real data
-        neighborhoods = this.neighborhoodsData[cityKey];
-      } else {
-        // Dynamic Generation for GPS/Unknown locations
-        // Generate points relative to the provided lat/lng center
-        neighborhoods = [
-          { name: 'Centro Local', lat: lat, lng: lng },
-          { name: 'Região Norte', lat: lat + 0.02, lng: lng },
-          { name: 'Região Sul', lat: lat - 0.02, lng: lng },
-          { name: 'Região Leste', lat: lat, lng: lng + 0.02 },
-          { name: 'Região Oeste', lat: lat, lng: lng - 0.02 },
-          { name: 'Área Industrial', lat: lat + 0.015, lng: lng + 0.015 },
-          { name: 'Área Residencial', lat: lat - 0.015, lng: lng - 0.015 }
-        ];
-      }
+    neighborhoods.forEach(hood => {
+      // 2. Generate Random Case Counts
+      let cases = Math.floor(Math.random() * 500) + 20; // 20 to 520 cases
 
-      neighborhoods.forEach(hood => {
-        // 2. Generate Random Case Counts
-        let cases = Math.floor(Math.random() * 500) + 20; // 20 to 520 cases
+      // Disease Multipliers
+      if (this.currentDisease === 'covid') cases *= 1.5;
+      if (this.currentDisease === 'zika') cases *= 0.3;
 
-        // Disease Multipliers
-        if (this.currentDisease === 'covid') cases *= 1.5;
-        if (this.currentDisease === 'zika') cases *= 0.3;
+      cases = Math.floor(cases);
 
-        cases = Math.floor(cases);
+      // 3. Determine Radius and Color
+      // Radius proportional to sqrt of area (cases) for perception accuracy
+      const radius = Math.sqrt(cases) * 1.5;
 
-        // 3. Determine Radius and Color
-        // Radius proportional to sqrt of area (cases) for perception accuracy
-        const radius = Math.sqrt(cases) * 1.5;
+      let color = this.colors.low;
+      if (cases > 100) color = this.colors.medium;
+      if (cases > 300) color = this.colors.high;
+      if (cases > 600) color = this.colors.critical;
 
-        let color = this.colors.low;
-        if (cases > 100) color = this.colors.medium;
-        if (cases > 300) color = this.colors.high;
-        if (cases > 600) color = this.colors.critical;
+      // 4. Create Circle Marker at coordinates
+      const circle = L.circleMarker([hood.lat, hood.lng], {
+        radius: radius,
+        fillColor: color,
+        color: color,
+        weight: 1,
+        opacity: 0.8,
+        fillOpacity: 0.5
+      });
 
-        // 4. Create Circle Marker at coordinates
-        const circle = L.circleMarker([hood.lat, hood.lng], {
-          radius: radius,
-          fillColor: color,
-          color: color,
-          weight: 1,
-          opacity: 0.8,
-          fillOpacity: 0.5
-        });
+      // 5. Tooltip/Popup
+      const disLabel = this.currentDisease.charAt(0).toUpperCase() + this.currentDisease.slice(1);
 
-        // 5. Tooltip/Popup
-        const disLabel = this.currentDisease.charAt(0).toUpperCase() + this.currentDisease.slice(1);
-
-        circle.bindPopup(`
+      circle.bindPopup(`
                 <div style="text-align: center; min-width: 120px;">
                     <strong style="font-size: 1.1em; color: ${color}">${hood.name}</strong>
                     <hr style="margin: 5px 0; border: 0; border-top: 1px solid #eee;">
@@ -2171,36 +2172,36 @@ const SymptomsModule = {
                 </div>
             `);
 
-        // Hover interactions
-        circle.on('mouseover', function (e) {
-          this.openPopup();
-          this.setStyle({ fillOpacity: 0.8, weight: 2 });
-        });
-        circle.on('mouseout', function (e) {
-          this.closePopup();
-          this.setStyle({ fillOpacity: 0.5, weight: 1 });
-        });
-
-        this.layerGroup.addLayer(circle);
+      // Hover interactions
+      circle.on('mouseover', function (e) {
+        this.openPopup();
+        this.setStyle({ fillOpacity: 0.8, weight: 2 });
       });
-    },
+      circle.on('mouseout', function (e) {
+        this.closePopup();
+        this.setStyle({ fillOpacity: 0.5, weight: 1 });
+      });
 
-    addLegend() {
-      if (document.querySelector('.map-legend')) return;
+      this.layerGroup.addLayer(circle);
+    });
+  },
 
-      const legend = L.control({ position: 'bottomleft' });
+  addLegend() {
+    if (document.querySelector('.map-legend')) return;
 
-      legend.onAdd = (map) => {
-        const div = L.DomUtil.create('div', 'map-legend');
-        this.updateLegendContent(div);
-        return div;
-      };
+    const legend = L.control({ position: 'bottomleft' });
 
-      legend.addTo(this.map);
-    },
+    legend.onAdd = (map) => {
+      const div = L.DomUtil.create('div', 'map-legend');
+      this.updateLegendContent(div);
+      return div;
+    };
 
-    updateLegendContent(div) {
-      div.innerHTML = `
+    legend.addTo(this.map);
+  },
+
+  updateLegendContent(div) {
+    div.innerHTML = `
             <strong>Densidade de Casos</strong><br>
             <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
                 <div style="width: 10px; height: 10px; border-radius: 50%; background: ${this.colors.low}; opacity: 0.6;"></div>
@@ -2218,281 +2219,281 @@ const SymptomsModule = {
                 * Tamanho proporcional<br>ao nº de casos
             </div>
         `;
-    }
-  };
+  }
+};
 
-  // Expose to Window for Debugging/Inline access
-  window.MapModule = MapModule;
+// Expose to Window for Debugging/Inline access
+window.MapModule = MapModule;
 
-  // Módulo Principal do Aplicativo
-  const App = {
-    currentScreen: 'dashboard',
+// Módulo Principal do Aplicativo
+const App = {
+  currentScreen: 'dashboard',
 
-    init() {
-      this.startSafetyTimeout(); // Safety failsafe
-      this.setupNavigation();
-      this.setupUI();
-      this.loadInitialData();
-      this.setupServiceWorker();
-      this.checkConnectionStatus();
+  init() {
+    this.startSafetyTimeout(); // Safety failsafe
+    this.setupNavigation();
+    this.setupUI();
+    this.loadInitialData();
+    this.setupServiceWorker();
+    this.checkConnectionStatus();
 
-      // Inicializa os módulos
-      try {
-        NotificationsModule.init();
-        ChatModule.init();
-        LibraryModule.init();
-        SettingsModule.init();
-        SymptomsModule.init(); // Init Symptoms
-        NewsModule.init(); // Init News Carousel
-        AnalyticsModule.init(); // Init Analytics
-        MapModule.init(); // Init Map Listener
-        PatientModule.init(); // Init Patient Module
+    // Inicializa os módulos
+    try {
+      NotificationsModule.init();
+      ChatModule.init();
+      LibraryModule.init();
+      SettingsModule.init();
+      SymptomsModule.init(); // Init Symptoms
+      NewsModule.init(); // Init News Carousel
+      AnalyticsModule.init(); // Init Analytics
+      MapModule.init(); // Init Map Listener
+      PatientModule.init(); // Init Patient Module
 
-        // Mostra a tela inicial
-        this.showScreen('dashboard');
-
-        // ... (existing code)
-
-
-
-        console.log('Aplicativo EpiConecta inicializado com sucesso!');
-      } catch (error) {
-        console.error('Erro na inicialização:', error);
-        this.showToast('Erro ao carregar o aplicativo', 'error');
-      } finally {
-        // Garante que o loading seja removido
-        setTimeout(() => {
-          this.hideLoading();
-        }, 500);
-      }
-    },
-
-    setupNavigation() {
-      // Desktop Sidebar Navigation
-      const desktopNavItems = document.querySelectorAll('.desktop-nav .nav-item');
-      desktopNavItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-          e.preventDefault();
-          const screen = item.dataset.screen;
-          if (screen) {
-            this.showScreen(screen);
-          }
-        });
-      });
-
-      // Bottom Navigation (Mobile)
-      const bottomNavItems = document.querySelectorAll('.bottom-nav .nav-item');
-      bottomNavItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-          e.preventDefault();
-          const screen = item.dataset.screen;
-          if (screen) {
-            this.showScreen(screen);
-          }
-        });
-      });
-
-      // Quick Action Cards
-      const quickCards = document.querySelectorAll('.quick-card');
-      quickCards.forEach(card => {
-        card.addEventListener('click', () => {
-          const screen = card.dataset.screen;
-          if (screen) {
-            this.showScreen(screen);
-          }
-        });
-      });
-
-      // Back Buttons
-      const backButtons = document.querySelectorAll('.back-button');
-      backButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-          e.preventDefault();
-          const targetScreen = button.dataset.screen;
-          if (targetScreen) {
-            this.showScreen(targetScreen);
-          } else {
-            this.showScreen('dashboard');
-          }
-        });
-      });
-
-      // See More Button
-      const seeMoreBtn = document.querySelector('.see-more-btn');
-      if (seeMoreBtn) {
-        seeMoreBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          const screen = seeMoreBtn.dataset.screen;
-          if (screen) {
-            this.showScreen(screen);
-          }
-        });
-      }
-    },
-
-    showScreen(screenId) {
-      // Hide all screens
-      const screens = document.querySelectorAll('.screen');
-      screens.forEach(screen => {
-        screen.classList.remove('active');
-        screen.style.display = 'none';
-      });
-
-      // Show target screen
-      const targetScreen = document.getElementById(`${screenId}-screen`);
-      if (targetScreen) {
-        targetScreen.classList.add('active');
-        targetScreen.style.display = 'block';
-        this.currentScreen = screenId;
-
-        // Update active nav items
-        this.updateActiveNavItem(screenId);
-
-        // Scroll to top
-        const mainContent = document.querySelector('.main-content');
-        if (mainContent) {
-          mainContent.scrollTop = 0;
-        }
-
-        // Execute screen-specific actions
-        this.onScreenShow(screenId);
-      }
-    },
-
-    showPreviousScreen() {
-      // Always return to dashboard
+      // Mostra a tela inicial
       this.showScreen('dashboard');
-    },
 
-    updateActiveNavItem(screenId) {
-      // Update desktop nav
-      const desktopNavItems = document.querySelectorAll('.desktop-nav .nav-item');
-      desktopNavItems.forEach(item => {
-        if (item.dataset.screen === screenId) {
-          item.classList.add('active');
-        } else {
-          item.classList.remove('active');
-        }
-      });
+      // ... (existing code)
 
-      // Update bottom nav
-      const bottomNavItems = document.querySelectorAll('.bottom-nav .nav-item');
-      bottomNavItems.forEach(item => {
-        if (item.dataset.screen === screenId) {
-          item.classList.add('active');
-        } else {
-          item.classList.remove('active');
-        }
-      });
-    },
 
-    onScreenShow(screenId) {
-      switch (screenId) {
-        case 'notifications':
-          // Atualiza a lista de notificações
-          NotificationsModule.renderNotifications();
-          break;
-        case 'chat':
-          // Atualiza a lista de salas de chat
-          ChatModule.renderChatRooms();
-          break;
-        case 'library':
-          // Atualiza a lista de documentos
-          LibraryModule.renderDocuments();
-          break;
-        case 'symptoms':
-          // Sintomas já são renderizados no init e o estado é mantido, 
-          // mas poderíamos resetar se quiséssemos.
-          break;
-        case 'analytics':
-          // Initialize map when analytics screen is shown
-          if (MapModule && MapModule.init) {
-            setTimeout(() => {
-              MapModule.init();
-            }, 100);
-          }
-          break;
-      }
-    },
 
-    setupUI() {
-      // Atualiza a data atual
-      this.updateCurrentDate();
-
-      // Configura o botão de notificações
-      const notificationsButton = document.getElementById('notifications-button');
-      if (notificationsButton) {
-        notificationsButton.addEventListener('click', (e) => {
-          e.preventDefault();
-          this.showScreen('notifications');
-        });
-      }
-
-      // Configura o botão do perfil do usuário
-      const userMenuButton = document.getElementById('user-menu-button');
-      if (userMenuButton) {
-        userMenuButton.addEventListener('click', () => {
-          this.showScreen('settings');
-        });
-      }
-
-      // Configura o botão "Ver todos" dos alertas
-      const viewAllAlerts = document.getElementById('view-all-alerts');
-      if (viewAllAlerts) {
-        viewAllAlerts.addEventListener('click', (e) => {
-          e.preventDefault();
-          this.showScreen('notifications');
-        });
-      }
-    },
-
-    updateCurrentDate() {
-      const dateElement = document.getElementById('current-date');
-      if (dateElement) {
-        const options = {
-          weekday: 'long',
-          day: '2-digit',
-          month: 'long',
-          year: 'numeric',
-          timeZone: 'America/Sao_Paulo'
-        };
-
-        const now = new Date();
-        dateElement.textContent = now.toLocaleDateString('pt-BR', options);
-      }
-    },
-
-    loadInitialData() {
-      // Carrega os alertas recentes
-      this.renderRecentAlerts();
-
-      // Simula um carregamento inicial
-      this.showLoading('Carregando dados...');
+      console.log('Aplicativo EpiConecta inicializado com sucesso!');
+    } catch (error) {
+      console.error('Erro na inicialização:', error);
+      this.showToast('Erro ao carregar o aplicativo', 'error');
+    } finally {
+      // Garante que o loading seja removido
       setTimeout(() => {
         this.hideLoading();
-      }, 1000);
-    },
+      }, 500);
+    }
+  },
 
-    renderRecentAlerts() {
-      const container = document.querySelector('#recent-alerts'); // Use querySelector for flexibility
-      if (!container) {
-        console.warn('Recent Alerts container not found!');
-        return;
+  setupNavigation() {
+    // Desktop Sidebar Navigation
+    const desktopNavItems = document.querySelectorAll('.desktop-nav .nav-item');
+    desktopNavItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        const screen = item.dataset.screen;
+        if (screen) {
+          this.showScreen(screen);
+        }
+      });
+    });
+
+    // Bottom Navigation (Mobile)
+    const bottomNavItems = document.querySelectorAll('.bottom-nav .nav-item');
+    bottomNavItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        const screen = item.dataset.screen;
+        if (screen) {
+          this.showScreen(screen);
+        }
+      });
+    });
+
+    // Quick Action Cards
+    const quickCards = document.querySelectorAll('.quick-card');
+    quickCards.forEach(card => {
+      card.addEventListener('click', () => {
+        const screen = card.dataset.screen;
+        if (screen) {
+          this.showScreen(screen);
+        }
+      });
+    });
+
+    // Back Buttons
+    const backButtons = document.querySelectorAll('.back-button');
+    backButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetScreen = button.dataset.screen;
+        if (targetScreen) {
+          this.showScreen(targetScreen);
+        } else {
+          this.showScreen('dashboard');
+        }
+      });
+    });
+
+    // See More Button
+    const seeMoreBtn = document.querySelector('.see-more-btn');
+    if (seeMoreBtn) {
+      seeMoreBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const screen = seeMoreBtn.dataset.screen;
+        if (screen) {
+          this.showScreen(screen);
+        }
+      });
+    }
+  },
+
+  showScreen(screenId) {
+    // Hide all screens
+    const screens = document.querySelectorAll('.screen');
+    screens.forEach(screen => {
+      screen.classList.remove('active');
+      screen.style.display = 'none';
+    });
+
+    // Show target screen
+    const targetScreen = document.getElementById(`${screenId}-screen`);
+    if (targetScreen) {
+      targetScreen.classList.add('active');
+      targetScreen.style.display = 'block';
+      this.currentScreen = screenId;
+
+      // Update active nav items
+      this.updateActiveNavItem(screenId);
+
+      // Scroll to top
+      const mainContent = document.querySelector('.main-content');
+      if (mainContent) {
+        mainContent.scrollTop = 0;
       }
 
-      const recentAlerts = sampleData.alerts.slice(0, 3); // Mostra apenas os 3 alertas mais recentes
+      // Execute screen-specific actions
+      this.onScreenShow(screenId);
+    }
+  },
 
-      if (recentAlerts.length === 0) {
-        container.innerHTML = `
+  showPreviousScreen() {
+    // Always return to dashboard
+    this.showScreen('dashboard');
+  },
+
+  updateActiveNavItem(screenId) {
+    // Update desktop nav
+    const desktopNavItems = document.querySelectorAll('.desktop-nav .nav-item');
+    desktopNavItems.forEach(item => {
+      if (item.dataset.screen === screenId) {
+        item.classList.add('active');
+      } else {
+        item.classList.remove('active');
+      }
+    });
+
+    // Update bottom nav
+    const bottomNavItems = document.querySelectorAll('.bottom-nav .nav-item');
+    bottomNavItems.forEach(item => {
+      if (item.dataset.screen === screenId) {
+        item.classList.add('active');
+      } else {
+        item.classList.remove('active');
+      }
+    });
+  },
+
+  onScreenShow(screenId) {
+    switch (screenId) {
+      case 'notifications':
+        // Atualiza a lista de notificações
+        NotificationsModule.renderNotifications();
+        break;
+      case 'chat':
+        // Atualiza a lista de salas de chat
+        ChatModule.renderChatRooms();
+        break;
+      case 'library':
+        // Atualiza a lista de documentos
+        LibraryModule.renderDocuments();
+        break;
+      case 'symptoms':
+        // Sintomas já são renderizados no init e o estado é mantido, 
+        // mas poderíamos resetar se quiséssemos.
+        break;
+      case 'analytics':
+        // Initialize map when analytics screen is shown
+        if (MapModule && MapModule.init) {
+          setTimeout(() => {
+            MapModule.init();
+          }, 100);
+        }
+        break;
+    }
+  },
+
+  setupUI() {
+    // Atualiza a data atual
+    this.updateCurrentDate();
+
+    // Configura o botão de notificações
+    const notificationsButton = document.getElementById('notifications-button');
+    if (notificationsButton) {
+      notificationsButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.showScreen('notifications');
+      });
+    }
+
+    // Configura o botão do perfil do usuário
+    const userMenuButton = document.getElementById('user-menu-button');
+    if (userMenuButton) {
+      userMenuButton.addEventListener('click', () => {
+        this.showScreen('settings');
+      });
+    }
+
+    // Configura o botão "Ver todos" dos alertas
+    const viewAllAlerts = document.getElementById('view-all-alerts');
+    if (viewAllAlerts) {
+      viewAllAlerts.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.showScreen('notifications');
+      });
+    }
+  },
+
+  updateCurrentDate() {
+    const dateElement = document.getElementById('current-date');
+    if (dateElement) {
+      const options = {
+        weekday: 'long',
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'America/Sao_Paulo'
+      };
+
+      const now = new Date();
+      dateElement.textContent = now.toLocaleDateString('pt-BR', options);
+    }
+  },
+
+  loadInitialData() {
+    // Carrega os alertas recentes
+    this.renderRecentAlerts();
+
+    // Simula um carregamento inicial
+    this.showLoading('Carregando dados...');
+    setTimeout(() => {
+      this.hideLoading();
+    }, 1000);
+  },
+
+  renderRecentAlerts() {
+    const container = document.querySelector('#recent-alerts'); // Use querySelector for flexibility
+    if (!container) {
+      console.warn('Recent Alerts container not found!');
+      return;
+    }
+
+    const recentAlerts = sampleData.alerts.slice(0, 3); // Mostra apenas os 3 alertas mais recentes
+
+    if (recentAlerts.length === 0) {
+      container.innerHTML = `
         <div class="empty-state">
           <i class="fas fa-check-circle"></i>
           <p>Nenhum alerta recente</p>
         </div>
       `;
-        return;
-      }
+      return;
+    }
 
-      container.innerHTML = recentAlerts.map(alert => `
+    container.innerHTML = recentAlerts.map(alert => `
       <div class="alert-card" data-id="${alert.id}">
         <div class="alert-icon">
           <i class="fas fa-${alert.type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
@@ -2505,45 +2506,45 @@ const SymptomsModule = {
       </div>
     `).join('');
 
-      // Adiciona os event listeners para os cartões de alerta
-      document.querySelectorAll('.alert-card').forEach(card => {
-        card.addEventListener('click', () => {
-          const alertId = card.dataset.id;
-          this.showAlertDetails(alertId);
-        });
+    // Adiciona os event listeners para os cartões de alerta
+    document.querySelectorAll('.alert-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const alertId = card.dataset.id;
+        this.showAlertDetails(alertId);
       });
-    },
+    });
+  },
 
-    formatAlertTime(timestamp) {
-      const date = new Date(timestamp);
-      const now = new Date();
-      const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
+  formatAlertTime(timestamp) {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
 
-      if (diffInHours < 1) {
-        const diffInMinutes = Math.floor((now - date) / (1000 * 60));
-        return `Há ${diffInMinutes} min`;
-      } else if (diffInHours < 24) {
-        return `Há ${diffInHours} h`;
-      } else if (diffInHours < 48) {
-        return 'Ontem';
-      } else {
-        return date.toLocaleDateString('pt-BR');
-      }
-    },
+    if (diffInHours < 1) {
+      const diffInMinutes = Math.floor((now - date) / (1000 * 60));
+      return `Há ${diffInMinutes} min`;
+    } else if (diffInHours < 24) {
+      return `Há ${diffInHours} h`;
+    } else if (diffInHours < 48) {
+      return 'Ontem';
+    } else {
+      return date.toLocaleDateString('pt-BR');
+    }
+  },
 
-    showAlertDetails(alertId) {
-      const alert = sampleData.alerts.find(a => a.id === alertId);
-      if (!alert) return;
+  showAlertDetails(alertId) {
+    const alert = sampleData.alerts.find(a => a.id === alertId);
+    if (!alert) return;
 
-      const modal = document.getElementById('notification-modal');
-      const modalTitle = document.getElementById('notification-modal-title');
-      const modalBody = document.getElementById('notification-modal-body');
-      const actionBtn = document.getElementById('notification-action-btn');
+    const modal = document.getElementById('notification-modal');
+    const modalTitle = document.getElementById('notification-modal-title');
+    const modalBody = document.getElementById('notification-modal-body');
+    const actionBtn = document.getElementById('notification-action-btn');
 
-      if (!modal || !modalTitle || !modalBody || !actionBtn) return;
+    if (!modal || !modalTitle || !modalBody || !actionBtn) return;
 
-      modalTitle.textContent = alert.title;
-      modalBody.innerHTML = `
+    modalTitle.textContent = alert.title;
+    modalBody.innerHTML = `
       <div class="alert-details">
         <p>${alert.description}</p>
         <div class="alert-meta">
@@ -2553,204 +2554,204 @@ const SymptomsModule = {
       </div>
     `;
 
-      // Configura o botão de ação com base no tipo de alerta
-      let actionText = 'Ver Detalhes';
+    // Configura o botão de ação com base no tipo de alerta
+    let actionText = 'Ver Detalhes';
 
+    if (alert.action) {
+      switch (alert.action.type) {
+        case 'openLink':
+          actionText = 'Abrir Link';
+          break;
+        case 'openDocument':
+          actionText = 'Abrir Documento';
+          break;
+        case 'viewDetails':
+          actionText = 'Ver Detalhes';
+          break;
+      }
+    }
+
+    actionBtn.textContent = actionText;
+    actionBtn.onclick = () => {
       if (alert.action) {
         switch (alert.action.type) {
           case 'openLink':
-            actionText = 'Abrir Link';
+            window.open(alert.action.url, '_blank');
             break;
           case 'openDocument':
-            actionText = 'Abrir Documento';
+            LibraryModule.previewDocument(alert.action.documentId);
             break;
           case 'viewDetails':
-            actionText = 'Ver Detalhes';
+            // Navega para a tela de detalhes do alerta
+            console.log(`Visualizando detalhes do alerta: ${alertId}`);
             break;
         }
       }
+      this.closeModal('notification-modal');
+    };
 
-      actionBtn.textContent = actionText;
-      actionBtn.onclick = () => {
-        if (alert.action) {
-          switch (alert.action.type) {
-            case 'openLink':
-              window.open(alert.action.url, '_blank');
-              break;
-            case 'openDocument':
-              LibraryModule.previewDocument(alert.action.documentId);
-              break;
-            case 'viewDetails':
-              // Navega para a tela de detalhes do alerta
-              console.log(`Visualizando detalhes do alerta: ${alertId}`);
-              break;
-          }
-        }
-        this.closeModal('notification-modal');
-      };
+    this.openModal('notification-modal');
+  },
 
-      this.openModal('notification-modal');
-    },
+  formatAlertCategory(category) {
+    const categories = {
+      'dengue': 'Dengue',
+      'covid': 'COVID-19',
+      'vaccination': 'Vacinação',
+      'general': 'Geral'
+    };
 
-    formatAlertCategory(category) {
-      const categories = {
-        'dengue': 'Dengue',
-        'covid': 'COVID-19',
-        'vaccination': 'Vacinação',
-        'general': 'Geral'
-      };
+    return categories[category] || category;
+  },
 
-      return categories[category] || category;
-    },
+  init() {
+    console.log('EpiConecta: Initializing...');
 
-    init() {
-      console.log('EpiConecta: Initializing...');
+    // Show loading overlay
+    const loadingOverlay = document.getElementById('loading-overlay');
+    if (loadingOverlay) {
+      loadingOverlay.style.display = 'flex';
+    }
 
-      // Show loading overlay
-      const loadingOverlay = document.getElementById('loading-overlay');
-      if (loadingOverlay) {
-        loadingOverlay.style.display = 'flex';
-      }
+    try {
+      // Initialize all modules
+      this.setupNavigation();
+      this.setupUI();
+      this.updateCurrentDate();
 
-      try {
-        // Initialize all modules
-        this.setupNavigation();
-        this.setupUI();
-        this.updateCurrentDate();
+      NotificationsModule.init();
+      ChatModule.init();
+      LibraryModule.init();
+      SymptomsModule.init();
+      SettingsModule.init();
+      PatientModule.init();
+      MapModule.init();
 
-        NotificationsModule.init();
-        ChatModule.init();
-        LibraryModule.init();
-        SymptomsModule.init();
-        SettingsModule.init();
-        PatientModule.init();
-        MapModule.init();
-
-        // Hide loading overlay after everything is loaded
-        setTimeout(() => {
-          if (loadingOverlay) {
-            loadingOverlay.style.display = 'none';
-          }
-          console.log('EpiConecta: Initialization complete');
-        }, 500);
-      } catch (error) {
-        console.error('EpiConecta: Initialization error:', error);
-        // Hide loading overlay even if there's an error
+      // Hide loading overlay after everything is loaded
+      setTimeout(() => {
         if (loadingOverlay) {
           loadingOverlay.style.display = 'none';
         }
-        alert('Erro ao inicializar o aplicativo. Por favor, recarregue a página.');
-      }
-    },
-
-    showLoading(message = 'Carregando...') {
-      const loadingOverlay = document.getElementById('loading-overlay');
-      const loadingMessage = document.getElementById('loading-message');
-
+        console.log('EpiConecta: Initialization complete');
+      }, 500);
+    } catch (error) {
+      console.error('EpiConecta: Initialization error:', error);
+      // Hide loading overlay even if there's an error
       if (loadingOverlay) {
-        loadingOverlay.classList.add('active');
+        loadingOverlay.style.display = 'none';
       }
-
-      if (loadingMessage) {
-        loadingMessage.textContent = message;
-      }
-    },
-
-    hideLoading() {
-      const overlay = document.getElementById('loading-overlay');
-      if (overlay) {
-        overlay.classList.remove('active'); // Changed from 'add('hidden')' to 'remove('active')' to match showLoading
-        setTimeout(() => {
-          // Use a slight delay to allow transition to finish before removal/hiding completely if needed
-          overlay.style.display = 'none';
-        }, 500);
-      }
-    },
-
-    // Add a safety timeout to initialization
-    startSafetyTimeout() {
-      setTimeout(() => {
-        this.hideLoading();
-      }, 5000); // Force hide after 5 seconds max
-    },
-
-    openModal(modalId) {
-      const modal = document.getElementById(modalId);
-      if (modal) {
-        modal.classList.add('show');
-        document.body.style.overflow = 'hidden';
-      }
-    },
-
-    closeModal(modalId) {
-      const modal = document.getElementById(modalId);
-      if (modal) {
-        modal.classList.remove('show');
-        document.body.style.overflow = '';
-      }
-    },
-
-    setupServiceWorker() {
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').then(registration => {
-            console.log('ServiceWorker registration successful');
-          }).catch(err => {
-            console.log('ServiceWorker registration failed: ', err);
-          });
-        });
-      }
-    },
-
-    checkConnectionStatus() {
-      const updateConnectionStatus = () => {
-        const isOnline = navigator.onLine;
-        const statusElement = document.getElementById('connection-status');
-
-        if (statusElement) {
-          statusElement.textContent = isOnline ? 'Online' : 'Offline';
-          statusElement.className = isOnline ? 'online' : 'offline';
-        }
-
-        // Mostra uma notificação quando o status da conexão mudar
-        if (isOnline) {
-          this.showToast('Você está online', 'success');
-        } else {
-          this.showToast('Você está offline. Algumas funcionalidades podem estar limitadas.', 'warning');
-        }
-      };
-
-      // Verifica o status da conexão quando a página carrega
-      updateConnectionStatus();
-
-      // Monitora mudanças no status da conexão
-      window.addEventListener('online', updateConnectionStatus);
-      window.addEventListener('offline', updateConnectionStatus);
-    },
-
-    showToast(message, type = 'info') {
-      const toast = document.createElement('div');
-      toast.className = `toast toast-${type}`;
-      toast.textContent = message;
-
-      document.body.appendChild(toast);
-
-      // Mostra o toast
-      setTimeout(() => {
-        toast.classList.add('show');
-      }, 100);
-
-      // Remove o toast após 3 segundos
-      setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => {
-          document.body.removeChild(toast);
-        }, 300);
-      }, 3000);
+      alert('Erro ao inicializar o aplicativo. Por favor, recarregue a página.');
     }
+  },
+
+  showLoading(message = 'Carregando...') {
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const loadingMessage = document.getElementById('loading-message');
+
+    if (loadingOverlay) {
+      loadingOverlay.classList.add('active');
+    }
+
+    if (loadingMessage) {
+      loadingMessage.textContent = message;
+    }
+  },
+
+  hideLoading() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+      overlay.classList.remove('active'); // Changed from 'add('hidden')' to 'remove('active')' to match showLoading
+      setTimeout(() => {
+        // Use a slight delay to allow transition to finish before removal/hiding completely if needed
+        overlay.style.display = 'none';
+      }, 500);
+    }
+  },
+
+  // Add a safety timeout to initialization
+  startSafetyTimeout() {
+    setTimeout(() => {
+      this.hideLoading();
+    }, 5000); // Force hide after 5 seconds max
+  },
+
+  openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+  },
+
+  closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+  },
+
+  setupServiceWorker() {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(registration => {
+          console.log('ServiceWorker registration successful');
+        }).catch(err => {
+          console.log('ServiceWorker registration failed: ', err);
+        });
+      });
+    }
+  },
+
+  checkConnectionStatus() {
+    const updateConnectionStatus = () => {
+      const isOnline = navigator.onLine;
+      const statusElement = document.getElementById('connection-status');
+
+      if (statusElement) {
+        statusElement.textContent = isOnline ? 'Online' : 'Offline';
+        statusElement.className = isOnline ? 'online' : 'offline';
+      }
+
+      // Mostra uma notificação quando o status da conexão mudar
+      if (isOnline) {
+        this.showToast('Você está online', 'success');
+      } else {
+        this.showToast('Você está offline. Algumas funcionalidades podem estar limitadas.', 'warning');
+      }
+    };
+
+    // Verifica o status da conexão quando a página carrega
+    updateConnectionStatus();
+
+    // Monitora mudanças no status da conexão
+    window.addEventListener('online', updateConnectionStatus);
+    window.addEventListener('offline', updateConnectionStatus);
+  },
+
+  showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+
+    document.body.appendChild(toast);
+
+    // Mostra o toast
+    setTimeout(() => {
+      toast.classList.add('show');
+    }, 100);
+
+    // Remove o toast após 3 segundos
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => {
+        document.body.removeChild(toast);
+      }, 300);
+    }, 3000);
   }
+}
 
 // Initialize app when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    App.init();
-  });
+  App.init();
+});
