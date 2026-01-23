@@ -2396,7 +2396,9 @@ const MapModule = {
     { name: 'UBS Jaime Pinto', lat: -5.3590, lng: -49.1010, type: 'ubs', info: 'Nova Marabá.' },
     { name: 'UBS Amadeu Vivacqua', lat: -5.3360, lng: -49.1560, type: 'ubs', info: 'São Félix II.' },
     { name: 'UBS Morada Nova', lat: -5.3750, lng: -49.0500, type: 'ubs', info: 'Morada Nova.' },
-    { name: 'Centro de Controle de Zoonoses', lat: -5.3480, lng: -49.1100, type: 'ubs', info: 'Controle vetorial.' }
+    { name: 'Centro de Controle de Zoonoses', lat: -5.3480, lng: -49.1100, type: 'ubs', info: 'Controle vetorial.' },
+    { name: 'UBS Mariana Moraes', lat: -5.3400, lng: -49.0300, type: 'ubs', info: 'Km 07.' },
+    { name: 'UBS Pedro Cavalcante', lat: -5.3600, lng: -49.0900, type: 'ubs', info: 'Novo Horizonte.' }
   ],
 
   init() {
@@ -2551,7 +2553,8 @@ const MapModule = {
 
       // 3. Determine Radius and Color
       // Radius proportional to sqrt of area (cases) for perception accuracy
-      const radius = Math.sqrt(cases) * 1.5;
+      // Increased multiplier for better visibility
+      const radius = Math.sqrt(cases) * 5;
 
       let color = this.colors.low;
       if (cases > 20) color = this.colors.medium;
@@ -2565,7 +2568,7 @@ const MapModule = {
         color: color,
         weight: 1,
         opacity: 0.8,
-        fillOpacity: 0.5
+        fillOpacity: 0.6
       });
 
       // 5. Tooltip/Popup
@@ -2610,6 +2613,14 @@ const MapModule = {
     };
 
     legend.addTo(this.map);
+  },
+
+  fixSize() {
+    if (this.map) {
+      setTimeout(() => {
+        this.map.invalidateSize();
+      }, 200);
+    }
   },
 
   addHealthCenters() {
@@ -3142,10 +3153,14 @@ const App = {
         break;
       case 'analytics':
         // Initialize map when analytics screen is shown
-        if (MapModule && MapModule.init) {
-          setTimeout(() => {
-            MapModule.init();
-          }, 100);
+        if (MapModule) {
+          if (!MapModule.map) {
+            setTimeout(() => {
+              MapModule.init();
+            }, 100);
+          } else {
+            MapModule.fixSize();
+          }
         }
         break;
       case 'case-notification':
