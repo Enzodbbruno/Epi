@@ -1185,7 +1185,7 @@ const SettingsModule = {
 const SymptomsModule = {
   selectedSymptoms: new Set(),
 
-  // Base de Dados de Sintomas (Categorizada)
+  // Base de Dados de Sintomas (Categorizada) - Expandida
   symptomsData: {
     'Gerais': [
       { id: 'febre', label: 'Febre Alta (>38°C)' },
@@ -1193,7 +1193,9 @@ const SymptomsModule = {
       { id: 'fadiga', label: 'Cansaço/Fadiga Extrema' },
       { id: 'mal_estar', label: 'Mal-estar Geral' },
       { id: 'perda_apetite', label: 'Perda de Apetite' },
-      { id: 'calafrios', label: 'Calafrios' }
+      { id: 'calafrios', label: 'Calafrios' },
+      { id: 'perda_peso', label: 'Perda de Peso' },
+      { id: 'sudorese_noturna', label: 'Sudorese Noturna' }
     ],
     'Dores': [
       { id: 'dor_cabeca', label: 'Dor de Cabeça' },
@@ -1201,7 +1203,9 @@ const SymptomsModule = {
       { id: 'dor_corpo', label: 'Dor no Corpo' },
       { id: 'dor_articulacoes', label: 'Dor nas Articulações' },
       { id: 'dor_muscular', label: 'Dor Muscular (Mialgia)' },
-      { id: 'dor_garganta', label: 'Dor de Garganta' }
+      { id: 'dor_garganta', label: 'Dor de Garganta' },
+      { id: 'dor_abdominal', label: 'Dor Abdominal' },
+      { id: 'dor_peito', label: 'Dor no Peito' }
     ],
     'Respiratório': [
       { id: 'tosse_seca', label: 'Tosse Seca' },
@@ -1209,80 +1213,278 @@ const SymptomsModule = {
       { id: 'falta_ar', label: 'Falta de Ar / Dificuldade para Respirar' },
       { id: 'coriza', label: 'Coriza / Nariz Escorrendo' },
       { id: 'congestao', label: 'Nariz Entupido' },
-      { id: 'espirros', label: 'Espirros Frequentes' }
+      { id: 'espirros', label: 'Espirros Frequentes' },
+      { id: 'dificuldade_respirar', label: 'Dificuldade para Respirar' }
     ],
     'Gastrointestinal': [
       { id: 'nauseas', label: 'Náuseas / Enjoo' },
       { id: 'vomitos', label: 'Vômitos' },
       { id: 'diarreia', label: 'Diarreia' },
-      { id: 'dor_abdominal', label: 'Dor Abdominal' }
+      { id: 'dor_abdominal', label: 'Dor Abdominal' },
+      { id: 'sangue_fezes', label: 'Sangue nas Fezes' },
+      { id: 'hepatomegalia', label: 'Aumento do Fígado' },
+      { id: 'esplenomegalia', label: 'Aumento do Baço' }
     ],
-    'Pele e Outros': [
+    'Pele e Lesões': [
       { id: 'manchas', label: 'Manchas Vermelhas na Pele' },
       { id: 'coceira', label: 'Coceira' },
       { id: 'sangramento', label: 'Sangramento (Gengiva/Nariz)' },
       { id: 'olhos_vermelhos', label: 'Olhos Vermelhos (Conjuntivite)' },
-      { id: 'perda_olfato', label: 'Perda de Olfato/Paladar' }
+      { id: 'lesoes_cutaneas', label: 'Lesões Cutâneas' },
+      { id: 'ulceras', label: 'Úlceras' },
+      { id: 'nodulos', label: 'Nódulos' },
+      { id: 'edema', label: 'Edema (Inchaço)' },
+      { id: 'perda_sensibilidade', label: 'Perda de Sensibilidade' },
+      { id: 'erupcoes', label: 'Erupções Cutâneas' }
+    ],
+    'Neurológicos': [
+      { id: 'perda_olfato', label: 'Perda de Olfato/Paladar' },
+      { id: 'convulsoes', label: 'Convulsões' },
+      { id: 'confusao_mental', label: 'Confusão Mental' },
+      { id: 'sonolencia', label: 'Sonolência Excessiva' },
+      { id: 'agitacao', label: 'Agitação' },
+      { id: 'hidrofobia', label: 'Hidrofobia (Medo de Água)' },
+      { id: 'fotofobia', label: 'Fotofobia (Sensibilidade à Luz)' }
+    ],
+    'Outros': [
+      { id: 'ictericia', label: 'Icterícia (Pele Amarelada)' },
+      { id: 'anemia', label: 'Anemia' },
+      { id: 'linfadenopatia', label: 'Aumento de Gânglios' },
+      { id: 'cegueira', label: 'Problemas de Visão/Cegueira' },
+      { id: 'picada_inseto', label: 'Picada de Inseto Visível' },
+      { id: 'mordida_animal', label: 'Mordida de Animal' }
     ]
   },
 
-  // Base de Dados de Doenças e Regras
+  // Base de Dados de Doenças Tropicais Negligenciadas (OMS)
   diseases: [
+    // Transmitidas por vetores
     {
       id: 'dengue',
       name: 'Dengue',
       description: 'Doença viral transmitida pelo mosquito Aedes aegypti.',
-      symptoms: ['febre', 'dor_atras_olhos', 'dor_muscular', 'dor_articulacoes', 'manchas', 'nauseas', 'mal_estar', 'dor_cabeca'],
-      mandatory: ['febre'], // Sintomas que aumentam muito a chance
-      weight: 1.2 // Peso para desempate
-    },
-    {
-      id: 'covid',
-      name: 'COVID-19',
-      description: 'Infecção respiratória causada pelo coronavírus SARS-CoV-2.',
-      symptoms: ['febre', 'tosse_seca', 'fadiga', 'perda_olfato', 'dor_garganta', 'dor_cabeca', 'falta_ar', 'coriza'],
-      mandatory: ['tosse_seca', 'perda_olfato'],
-      weight: 1.1
-    },
-    {
-      id: 'gripe',
-      name: 'Influenza (Gripe)',
-      description: 'Infecção viral aguda do sistema respiratório.',
-      symptoms: ['febre', 'tosse_seca', 'dor_garganta', 'coriza', 'dor_muscular', 'dor_cabeca', 'calafrios', 'fadiga'],
-      mandatory: ['febre', 'tosse_seca'],
-      weight: 1.0
+      symptoms: ['febre', 'dor_atras_olhos', 'dor_muscular', 'dor_articulacoes', 'manchas', 'nauseas', 'mal_estar', 'dor_cabeca', 'sangramento'],
+      mandatory: ['febre'],
+      weight: 1.2
     },
     {
       id: 'chikungunya',
       name: 'Chikungunya',
       description: 'Doença viral caracterizada por fortes dores nas articulações.',
-      symptoms: ['febre', 'dor_articulacoes', 'dor_muscular', 'dor_cabeca', 'manchas', 'nauseas', 'olhos_vermelhos'],
-      mandatory: ['dor_articulacoes'],
+      symptoms: ['febre', 'dor_articulacoes', 'dor_muscular', 'dor_cabeca', 'manchas', 'nauseas', 'olhos_vermelhos', 'fadiga'],
+      mandatory: ['dor_articulacoes', 'febre'],
       weight: 1.2
     },
     {
       id: 'zika',
-      name: 'Zika Vírus',
+      name: 'Zika',
       description: 'Doença viral que pode causar febre baixa e erupções cutâneas.',
-      symptoms: ['febre_baixa', 'manchas', 'coceira', 'dor_muscular', 'olhos_vermelhos', 'dor_articulações', 'dor_cabeca'],
-      mandatory: ['manchas', 'coceira'],
+      symptoms: ['febre_baixa', 'manchas', 'coceira', 'dor_muscular', 'olhos_vermelhos', 'dor_articulacoes', 'dor_cabeca', 'mal_estar'],
+      mandatory: ['manchas'],
       weight: 1.0
     },
     {
-      id: 'resfriado',
-      name: 'Resfriado Comum',
-      description: 'Infecção viral leve das vias aéreas superiores.',
-      symptoms: ['coriza', 'congestao', 'espirros', 'dor_garganta', 'tosse_produtiva', 'febre_baixa', 'mal_estar'],
-      mandatory: ['coriza', 'espirros'],
-      weight: 0.8
+      id: 'leishmaniose-tegumentar',
+      name: 'Leishmaniose Tegumentar',
+      description: 'Infecção causada por parasitas do gênero Leishmania, transmitida por flebotomíneos.',
+      symptoms: ['lesoes_cutaneas', 'ulceras', 'nodulos', 'febre', 'mal_estar', 'perda_apetite'],
+      mandatory: ['lesoes_cutaneas'],
+      weight: 1.3
     },
     {
-      id: 'gastro',
-      name: 'Gastroenterite Viral',
-      description: 'Inflamação do estômago e intestinos.',
-      symptoms: ['diarreia', 'vomitos', 'nauseas', 'dor_abdominal', 'febre', 'calafrios', 'dor_cabeca'],
-      mandatory: ['diarreia', 'vomitos'],
+      id: 'leishmaniose-visceral',
+      name: 'Leishmaniose Visceral',
+      description: 'Forma grave da leishmaniose que afeta órgãos internos.',
+      symptoms: ['febre', 'hepatomegalia', 'esplenomegalia', 'perda_peso', 'anemia', 'fadiga', 'sudorese_noturna'],
+      mandatory: ['febre', 'hepatomegalia'],
+      weight: 1.4
+    },
+    {
+      id: 'chagas',
+      name: 'Doença de Chagas',
+      description: 'Doença causada pelo protozoário Trypanosoma cruzi, transmitida por triatomíneos.',
+      symptoms: ['febre', 'mal_estar', 'dor_cabeca', 'dor_muscular', 'hepatomegalia', 'esplenomegalia', 'linfadenopatia', 'edema'],
+      mandatory: ['febre'],
+      weight: 1.3
+    },
+    {
+      id: 'tripanossomiase-africana',
+      name: 'Tripanossomíase Africana',
+      description: 'Doença do sono transmitida pela mosca tsé-tsé.',
+      symptoms: ['febre', 'dor_cabeca', 'linfadenopatia', 'sonolencia', 'confusao_mental', 'fadiga', 'perda_peso'],
+      mandatory: ['febre', 'sonolencia'],
+      weight: 1.3
+    },
+    {
+      id: 'oncocercose',
+      name: 'Oncocercose',
+      description: 'Cegueira dos rios causada por vermes transmitidos por moscas simulídeas.',
+      symptoms: ['coceira', 'nodulos', 'erupcoes', 'cegueira', 'lesoes_cutaneas', 'fotofobia'],
+      mandatory: ['coceira', 'nodulos'],
+      weight: 1.2
+    },
+    {
+      id: 'filariose-linfatica',
+      name: 'Filariose Linfática',
+      description: 'Elefantíase causada por vermes transmitidos por mosquitos.',
+      symptoms: ['edema', 'febre', 'dor_muscular', 'linfadenopatia', 'lesoes_cutaneas', 'fadiga'],
+      mandatory: ['edema'],
+      weight: 1.2
+    },
+    // Helmintíases
+    {
+      id: 'esquistossomose',
+      name: 'Esquistossomose',
+      description: 'Infecção causada por vermes do gênero Schistosoma.',
+      symptoms: ['febre', 'dor_abdominal', 'diarreia', 'dor_muscular', 'coceira', 'hepatomegalia', 'esplenomegalia'],
+      mandatory: ['dor_abdominal', 'febre'],
+      weight: 1.2
+    },
+    {
+      id: 'ascaridiase',
+      name: 'Ascaridíase',
+      description: 'Infecção por verme Ascaris lumbricoides.',
+      symptoms: ['dor_abdominal', 'nauseas', 'vomitos', 'diarreia', 'perda_apetite', 'fadiga', 'perda_peso'],
+      mandatory: ['dor_abdominal'],
       weight: 1.0
+    },
+    {
+      id: 'ancilostomiase',
+      name: 'Ancilostomíase',
+      description: 'Infecção por ancilostomídeos (amarelão).',
+      symptoms: ['anemia', 'fadiga', 'dor_abdominal', 'diarreia', 'perda_peso', 'coceira'],
+      mandatory: ['anemia'],
+      weight: 1.1
+    },
+    {
+      id: 'tricuriase',
+      name: 'Tricuríase',
+      description: 'Infecção por Trichuris trichiura.',
+      symptoms: ['dor_abdominal', 'diarreia', 'sangue_fezes', 'anemia', 'perda_peso'],
+      mandatory: ['dor_abdominal'],
+      weight: 1.0
+    },
+    {
+      id: 'estrongiloidiase',
+      name: 'Estrongiloidíase',
+      description: 'Infecção por Strongyloides stercoralis.',
+      symptoms: ['dor_abdominal', 'diarreia', 'coceira', 'erupcoes', 'nauseas', 'vomitos'],
+      mandatory: ['dor_abdominal', 'coceira'],
+      weight: 1.1
+    },
+    {
+      id: 'teniase',
+      name: 'Teníase',
+      description: 'Infecção por tênia (solitária).',
+      symptoms: ['dor_abdominal', 'nauseas', 'perda_peso', 'diarreia', 'fadiga'],
+      mandatory: ['dor_abdominal'],
+      weight: 1.0
+    },
+    {
+      id: 'cisticercose',
+      name: 'Cisticercose',
+      description: 'Infecção por larvas de tênia.',
+      symptoms: ['convulsoes', 'dor_cabeca', 'confusao_mental', 'nodulos', 'dor_muscular'],
+      mandatory: ['convulsoes'],
+      weight: 1.3
+    },
+    {
+      id: 'equinococose',
+      name: 'Equinococose',
+      description: 'Infecção por Echinococcus.',
+      symptoms: ['dor_abdominal', 'hepatomegalia', 'nauseas', 'vomitos', 'fadiga', 'perda_peso'],
+      mandatory: ['hepatomegalia'],
+      weight: 1.2
+    },
+    {
+      id: 'fascioliase',
+      name: 'Fasciolíase',
+      description: 'Infecção por Fasciola hepatica.',
+      symptoms: ['febre', 'dor_abdominal', 'hepatomegalia', 'ictericia', 'nauseas', 'vomitos'],
+      mandatory: ['dor_abdominal', 'hepatomegalia'],
+      weight: 1.2
+    },
+    {
+      id: 'dracunculiase',
+      name: 'Dracunculíase',
+      description: 'Infecção por Dracunculus medinensis.',
+      symptoms: ['ulceras', 'dor_muscular', 'febre', 'nauseas', 'vomitos', 'edema'],
+      mandatory: ['ulceras'],
+      weight: 1.2
+    },
+    // Infecções bacterianas
+    {
+      id: 'hanseniase',
+      name: 'Hanseníase',
+      description: 'Infecção bacteriana crônica causada por Mycobacterium leprae.',
+      symptoms: ['lesoes_cutaneas', 'perda_sensibilidade', 'nodulos', 'manchas', 'dor_muscular'],
+      mandatory: ['lesoes_cutaneas', 'perda_sensibilidade'],
+      weight: 1.4
+    },
+    {
+      id: 'tracoma',
+      name: 'Tracoma',
+      description: 'Infecção ocular bacteriana que pode causar cegueira.',
+      symptoms: ['olhos_vermelhos', 'coceira', 'fotofobia', 'cegueira', 'lesoes_cutaneas'],
+      mandatory: ['olhos_vermelhos'],
+      weight: 1.2
+    },
+    {
+      id: 'bouba',
+      name: 'Bouba',
+      description: 'Infecção bacteriana da pele causada por Treponema pertenue.',
+      symptoms: ['lesoes_cutaneas', 'ulceras', 'nodulos', 'dor_articulacoes', 'dor_muscular'],
+      mandatory: ['lesoes_cutaneas'],
+      weight: 1.2
+    },
+    {
+      id: 'leptospirose',
+      name: 'Leptospirose',
+      description: 'Infecção bacteriana transmitida por animais.',
+      symptoms: ['febre', 'dor_muscular', 'dor_cabeca', 'ictericia', 'nauseas', 'vomitos', 'diarreia', 'erupcoes'],
+      mandatory: ['febre', 'dor_muscular'],
+      weight: 1.2
+    },
+    {
+      id: 'ulcera-buruli',
+      name: 'Úlcera de Buruli',
+      description: 'Infecção bacteriana da pele causada por Mycobacterium ulcerans.',
+      symptoms: ['ulceras', 'nodulos', 'edema', 'dor_muscular', 'febre'],
+      mandatory: ['ulceras'],
+      weight: 1.3
+    },
+    // Outras
+    {
+      id: 'raiva',
+      name: 'Raiva',
+      description: 'Doença viral fatal transmitida por mordidas de animais.',
+      symptoms: ['febre', 'agitacao', 'hidrofobia', 'fotofobia', 'convulsoes', 'confusao_mental', 'dor_muscular'],
+      mandatory: ['hidrofobia', 'agitacao'],
+      weight: 1.5
+    },
+    {
+      id: 'micetoma',
+      name: 'Micetoma',
+      description: 'Infecção crônica da pele e tecidos subcutâneos.',
+      symptoms: ['nodulos', 'ulceras', 'edema', 'dor_muscular', 'lesoes_cutaneas'],
+      mandatory: ['nodulos'],
+      weight: 1.2
+    },
+    {
+      id: 'escabiose',
+      name: 'Escabiose',
+      description: 'Infecção por ácaros (sarna).',
+      symptoms: ['coceira', 'erupcoes', 'lesoes_cutaneas', 'manchas'],
+      mandatory: ['coceira'],
+      weight: 1.1
+    },
+    {
+      id: 'acidente-ofidico',
+      name: 'Acidente Ofídico',
+      description: 'Envenenamento por picada de serpente.',
+      symptoms: ['dor_muscular', 'edema', 'nauseas', 'vomitos', 'dor_abdominal', 'sangramento', 'febre'],
+      mandatory: ['edema', 'dor_muscular'],
+      weight: 1.4
     }
   ],
 
@@ -1329,8 +1531,10 @@ const SymptomsModule = {
       'Gerais': 'thermometer-half',
       'Dores': 'head-side-virus',
       'Respiratório': 'lungs',
-      'Gastrointestinal': 'stomach', // Note: Check fa icon availability
-      'Pele e Outros': 'allergies'
+      'Gastrointestinal': 'stomach',
+      'Pele e Lesões': 'allergies',
+      'Neurológicos': 'brain',
+      'Outros': 'exclamation-circle'
     };
     return map[category] || 'notes-medical';
   },
@@ -2316,10 +2520,104 @@ window.MapModule = MapModule;
 // Módulo de Notificação de Casos
 const CaseNotificationModule = {
   currentDisease: 'dengue',
+  
+  // Lista completa de doenças tropicais negligenciadas (OMS)
+  diseases: {
+    // Transmitidas por vetores
+    'dengue': { name: 'Dengue', icon: 'fa-mosquito', category: 'vetor' },
+    'chikungunya': { name: 'Chikungunya', icon: 'fa-mosquito', category: 'vetor' },
+    'zika': { name: 'Zika', icon: 'fa-mosquito', category: 'vetor' },
+    'leishmaniose-tegumentar': { name: 'Leishmaniose Tegumentar', icon: 'fa-bug', category: 'vetor' },
+    'leishmaniose-visceral': { name: 'Leishmaniose Visceral', icon: 'fa-bug', category: 'vetor' },
+    'chagas': { name: 'Doença de Chagas', icon: 'fa-home', category: 'vetor' },
+    'tripanossomiase-africana': { name: 'Tripanossomíase Africana', icon: 'fa-bug', category: 'vetor' },
+    'oncocercose': { name: 'Oncocercose', icon: 'fa-bug', category: 'vetor' },
+    'filariose-linfatica': { name: 'Filariose Linfática', icon: 'fa-bug', category: 'vetor' },
+    
+    // Helmintíases e parasitoses
+    'esquistossomose': { name: 'Esquistossomose', icon: 'fa-eye', category: 'helmintíase' },
+    'ascaridiase': { name: 'Ascaridíase', icon: 'fa-bug', category: 'helmintíase' },
+    'ancilostomiase': { name: 'Ancilostomíase', icon: 'fa-bug', category: 'helmintíase' },
+    'tricuriase': { name: 'Tricuríase', icon: 'fa-bug', category: 'helmintíase' },
+    'estrongiloidiase': { name: 'Estrongiloidíase', icon: 'fa-bug', category: 'helmintíase' },
+    'teniase': { name: 'Teníase', icon: 'fa-bug', category: 'helmintíase' },
+    'cisticercose': { name: 'Cisticercose', icon: 'fa-bug', category: 'helmintíase' },
+    'equinococose': { name: 'Equinococose', icon: 'fa-bug', category: 'helmintíase' },
+    'fascioliase': { name: 'Fasciolíase', icon: 'fa-bug', category: 'helmintíase' },
+    'dracunculiase': { name: 'Dracunculíase', icon: 'fa-bug', category: 'helmintíase' },
+    
+    // Infecções bacterianas
+    'hanseniase': { name: 'Hanseníase', icon: 'fa-user-injured', category: 'bacteriana' },
+    'tracoma': { name: 'Tracoma', icon: 'fa-eye', category: 'bacteriana' },
+    'bouba': { name: 'Bouba', icon: 'fa-hand-paper', category: 'bacteriana' },
+    'leptospirose': { name: 'Leptospirose', icon: 'fa-virus', category: 'bacteriana' },
+    'ulcera-buruli': { name: 'Úlcera de Buruli', icon: 'fa-hand-paper', category: 'bacteriana' },
+    
+    // Outras
+    'raiva': { name: 'Raiva', icon: 'fa-paw', category: 'outra' },
+    'micetoma': { name: 'Micetoma', icon: 'fa-hand-paper', category: 'outra' },
+    'escabiose': { name: 'Escabiose', icon: 'fa-bug', category: 'outra' },
+    'acidente-ofidico': { name: 'Acidente Ofídico', icon: 'fa-paw', category: 'outra' }
+  },
 
   init() {
+    this.renderDiseaseSelector();
     this.setupDiseaseTabs();
+    this.setupDropdown();
     this.setupForms();
+    this.generateAllForms();
+  },
+
+  renderDiseaseSelector() {
+    // Render tabs for desktop
+    const tabsContainer = document.getElementById('disease-tabs');
+    if (!tabsContainer) return;
+
+    tabsContainer.innerHTML = '';
+    
+    Object.entries(this.diseases).forEach(([id, disease]) => {
+      const tab = document.createElement('button');
+      tab.className = `disease-tab ${id === 'dengue' ? 'active' : ''}`;
+      tab.dataset.disease = id;
+      tab.innerHTML = `<i class="fas ${disease.icon}"></i><span>${disease.name}</span>`;
+      tabsContainer.appendChild(tab);
+    });
+
+    // Render dropdown for mobile
+    const dropdownContainer = document.getElementById('disease-dropdown-container');
+    if (dropdownContainer) {
+      const select = document.createElement('select');
+      select.id = 'disease-dropdown';
+      select.className = 'disease-dropdown';
+      
+      // Group by category
+      const categories = {
+        'vetor': '🦟 Transmitidas por vetores',
+        'helmintíase': '🪱 Helmintíases e parasitoses',
+        'bacteriana': '🦠 Infecções bacterianas',
+        'outra': '🧫 Outras'
+      };
+
+      Object.entries(categories).forEach(([catKey, catName]) => {
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = catName;
+        
+        Object.entries(this.diseases)
+          .filter(([_, disease]) => disease.category === catKey)
+          .forEach(([id, disease]) => {
+            const option = document.createElement('option');
+            option.value = id;
+            option.textContent = disease.name;
+            if (id === 'dengue') option.selected = true;
+            optgroup.appendChild(option);
+          });
+        
+        select.appendChild(optgroup);
+      });
+
+      dropdownContainer.innerHTML = '';
+      dropdownContainer.appendChild(select);
+    }
   },
 
   setupDiseaseTabs() {
@@ -2332,10 +2630,21 @@ const CaseNotificationModule = {
     });
   },
 
+  setupDropdown() {
+    const dropdown = document.getElementById('disease-dropdown');
+    if (dropdown) {
+      dropdown.addEventListener('change', (e) => {
+        this.switchDisease(e.target.value);
+      });
+    }
+  },
+
   switchDisease(disease) {
+    if (!this.diseases[disease]) return;
+    
     this.currentDisease = disease;
 
-    // Update tabs
+    // Update tabs (desktop)
     document.querySelectorAll('.disease-tab').forEach(tab => {
       if (tab.dataset.disease === disease) {
         tab.classList.add('active');
@@ -2343,6 +2652,12 @@ const CaseNotificationModule = {
         tab.classList.remove('active');
       }
     });
+
+    // Update dropdown (mobile)
+    const dropdown = document.getElementById('disease-dropdown');
+    if (dropdown) {
+      dropdown.value = disease;
+    }
 
     // Update forms
     document.querySelectorAll('.disease-form').forEach(form => {
@@ -2354,24 +2669,115 @@ const CaseNotificationModule = {
         form.classList.remove('active');
       }
     });
+
+    // Scroll to form
+    const activeForm = document.getElementById(`form-${disease}`);
+    if (activeForm) {
+      activeForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  },
+
+  generateAllForms() {
+    const formCard = document.querySelector('.notification-form-card');
+    if (!formCard) return;
+
+    // Clear existing forms (keep structure)
+    const existingForms = formCard.querySelectorAll('.disease-form');
+    existingForms.forEach(form => {
+      if (!form.id.startsWith('form-')) return;
+      const diseaseId = form.id.replace('form-', '');
+      if (!this.diseases[diseaseId]) {
+        form.remove();
+      }
+    });
+
+    // Generate forms for all diseases
+    Object.entries(this.diseases).forEach(([id, disease]) => {
+      if (document.getElementById(`form-${id}`)) return; // Already exists
+
+      const formDiv = document.createElement('div');
+      formDiv.className = `disease-form ${id === 'dengue' ? 'active' : ''}`;
+      formDiv.id = `form-${id}`;
+      if (id !== 'dengue') formDiv.style.display = 'none';
+
+      formDiv.innerHTML = `
+        <div class="form-header">
+          <i class="fas ${disease.icon}"></i>
+          <h2>${disease.name}</h2>
+        </div>
+        <form id="notification-form-${id}" class="notification-form">
+          <div class="form-group">
+            <label for="patient-name-${id}">
+              <i class="fas fa-user"></i>
+              Nome do paciente:
+            </label>
+            <input type="text" id="patient-name-${id}" placeholder="Digite o nome" required>
+          </div>
+          <div class="form-group">
+            <label for="patient-age-${id}">
+              <i class="fas fa-birthday-cake"></i>
+              Idade:
+            </label>
+            <input type="number" id="patient-age-${id}" placeholder="Digite a idade" min="0" max="150" required>
+          </div>
+          <div class="form-group">
+            <label for="patient-location-${id}">
+              <i class="fas fa-map-marker-alt"></i>
+              Bairro / Localidade:
+            </label>
+            <input type="text" id="patient-location-${id}" placeholder="Informe o bairro em Marabá" required>
+          </div>
+          <div class="form-group">
+            <label for="symptoms-date-${id}">
+              <i class="fas fa-calendar"></i>
+              Data dos sintomas:
+            </label>
+            <div class="date-input-wrapper">
+              <input type="date" id="symptoms-date-${id}" required>
+              <button type="button" class="date-picker-btn" onclick="document.getElementById('symptoms-date-${id}').showPicker()">
+                <i class="fas fa-calendar-alt"></i>
+              </button>
+            </div>
+          </div>
+          <div class="form-group full-width">
+            <label for="main-symptoms-${id}">
+              <i class="fas fa-notes-medical"></i>
+              Sintomas principais:
+            </label>
+            <textarea id="main-symptoms-${id}" rows="4" placeholder="Descreva os sintomas principais..." required></textarea>
+          </div>
+          <button type="submit" class="btn-notify">
+            <i class="fas fa-paper-plane"></i>
+            Notificar Caso
+          </button>
+        </form>
+      `;
+
+      formCard.appendChild(formDiv);
+    });
+
+    // Setup forms after generation
+    this.setupForms();
   },
 
   setupForms() {
-    const diseases = ['dengue', 'leishmaniose', 'chagas', 'hanseniase', 'esquistossomose', 'raiva'];
-    
-    diseases.forEach(disease => {
+    Object.keys(this.diseases).forEach(disease => {
       const form = document.getElementById(`notification-form-${disease}`);
       if (form) {
-        form.addEventListener('submit', (e) => {
+        // Remove existing listeners
+        const newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+        
+        // Add new listener
+        newForm.addEventListener('submit', (e) => {
           e.preventDefault();
-          this.handleFormSubmit(disease, form);
+          this.handleFormSubmit(disease, newForm);
         });
       }
     });
   },
 
   handleFormSubmit(disease, form) {
-    const formData = new FormData(form);
     const data = {
       disease: disease,
       patientName: document.getElementById(`patient-name-${disease}`).value,
@@ -2395,31 +2801,16 @@ const CaseNotificationModule = {
 
     // Simulate API call
     setTimeout(() => {
-      // Success
-      App.showToast(`Caso de ${this.getDiseaseName(disease)} notificado com sucesso!`, 'success');
-      
-      // Reset form
+      App.showToast(`Caso de ${this.diseases[disease].name} notificado com sucesso!`, 'success');
       form.reset();
-      
-      // Reset button
       submitBtn.innerHTML = originalText;
       submitBtn.disabled = false;
-
-      // Log data (in real app, this would be sent to server)
       console.log('Notificação enviada:', data);
     }, 1500);
   },
 
   getDiseaseName(disease) {
-    const names = {
-      'dengue': 'Dengue',
-      'leishmaniose': 'Leishmaniose',
-      'chagas': 'Doença de Chagas',
-      'hanseniase': 'Hanseníase',
-      'esquistossomose': 'Esquistossomose',
-      'raiva': 'Raiva'
-    };
-    return names[disease] || disease;
+    return this.diseases[disease]?.name || disease;
   }
 };
 
@@ -2614,10 +3005,11 @@ const App = {
         break;
       case 'case-notification':
         // Ensure case notification module is initialized
-        if (CaseNotificationModule && !CaseNotificationModule.initialized) {
-          CaseNotificationModule.init();
-          CaseNotificationModule.initialized = true;
-        }
+        setTimeout(() => {
+          if (CaseNotificationModule) {
+            CaseNotificationModule.init();
+          }
+        }, 100);
         break;
     }
   },

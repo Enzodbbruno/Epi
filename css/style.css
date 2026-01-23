@@ -68,6 +68,45 @@ body {
     flex-direction: column;
     background: var(--bg-body);
     position: relative;
+    overflow-x: hidden;
+}
+
+@media (max-width: 1023px) {
+    body {
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        height: auto !important;
+        min-height: 100vh;
+    }
+    
+    .app-container {
+        height: auto !important;
+        min-height: 100vh;
+        overflow-x: hidden;
+        overflow-y: visible;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .main-wrapper {
+        overflow-y: visible !important;
+        -webkit-overflow-scrolling: touch;
+        height: auto !important;
+        min-height: auto;
+        flex: 1 1 auto;
+    }
+    
+    .main-content {
+        overflow-y: visible !important;
+        height: auto !important;
+        min-height: auto;
+        flex: 1 1 auto;
+    }
+    
+    #case-notification-screen {
+        height: auto !important;
+        min-height: auto !important;
+        overflow: visible !important;
+    }
 }
 
 /* ==========================================================================
@@ -208,8 +247,15 @@ body {
     flex-direction: column;
     /* Fix for mobile layout */
     flex: 1;
-    overflow: hidden;
-    /* Prevent body scroll */
+    overflow-x: hidden;
+    /* Allow vertical scroll on mobile */
+}
+
+@media (max-width: 1023px) {
+    .content-wrapper {
+        overflow-y: visible;
+        height: auto;
+    }
 }
 
 .main-content {
@@ -2649,11 +2695,7 @@ body {
    ========================================= */
 
 /* App Container */
-.app-container {
-    display: flex;
-    height: 100vh;
-    overflow: hidden;
-}
+/* Removed duplicate - using the one at the top */
 
 /* Desktop Sidebar */
 .desktop-sidebar {
@@ -2733,6 +2775,15 @@ body {
     flex-direction: column;
     margin-left: 0;
     width: 100%;
+    overflow-x: hidden;
+}
+
+@media (max-width: 1023px) {
+    .main-wrapper {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        height: auto;
+    }
 }
 
 /* App Header (Mobile) */
@@ -2825,21 +2876,43 @@ body {
 /* Mobile: Extra padding to ensure content is fully visible */
 @media (max-width: 1023px) {
     .main-content {
-        padding-bottom: 150px !important;
+        padding-bottom: 200px !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        height: auto !important;
+        min-height: auto !important;
     }
     
     /* Ensure all screen sections have enough bottom padding */
     .screen {
         padding-bottom: 20px;
+        min-height: auto;
+        height: auto;
+        overflow: visible;
     }
     
     /* Specific padding for case notification screen */
     #case-notification-screen {
-        padding-bottom: 160px !important;
+        padding-bottom: 0 !important;
+        overflow-y: visible !important;
+        -webkit-overflow-scrolling: touch !important;
+        height: auto !important;
+        min-height: auto !important;
     }
     
     #case-notification-screen .notification-form-container {
-        padding-bottom: 160px !important;
+        padding-bottom: 200px !important;
+        overflow: visible;
+    }
+    
+    #case-notification-screen .notification-form-card {
+        margin-bottom: 40px;
+    }
+    
+    /* Ensure disease forms are scrollable */
+    .disease-form {
+        overflow: visible;
+        height: auto;
     }
 }
 
@@ -3791,9 +3864,22 @@ input:checked + .toggle-slider:before {
 .disease-tabs-container {
     background: white;
     border-bottom: 2px solid var(--border-color);
-    padding: 0 20px;
+    padding: 0;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    width: 100%;
+}
+
+/* Desktop: Full width tabs */
+@media (min-width: 1024px) {
+    .disease-tabs-container {
+        padding: 0;
+    }
+    
+    .disease-tabs {
+        padding: 12px 20px;
+        max-width: 100%;
+    }
 }
 
 .disease-tabs {
@@ -3836,10 +3922,84 @@ input:checked + .toggle-slider:before {
     box-shadow: 0 2px 8px rgba(0, 119, 204, 0.3);
 }
 
+/* Mobile Dropdown */
+.disease-dropdown-container {
+    background: white;
+    border-bottom: 2px solid var(--border-color);
+    padding: 16px 20px;
+    display: none;
+}
+
+.disease-dropdown {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    background: white;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230077CC' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+}
+
+.disease-dropdown:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(0, 119, 204, 0.1);
+}
+
+.disease-dropdown optgroup {
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.disease-dropdown option {
+    padding: 8px;
+    font-weight: 500;
+}
+
+/* Responsive visibility */
+.desktop-only {
+    display: block;
+}
+
+.mobile-only {
+    display: none;
+}
+
+@media (max-width: 1023px) {
+    .desktop-only {
+        display: none !important;
+    }
+    
+    .mobile-only {
+        display: block !important;
+    }
+}
+
 .notification-form-container {
     padding: 24px 20px;
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
+    width: 100%;
+}
+
+/* Desktop: Full width form */
+@media (min-width: 1024px) {
+    .notification-form-container {
+        padding: 24px 40px;
+    }
+    
+    .notification-form-card {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
 }
 
 .notification-form-card {
@@ -4045,8 +4205,9 @@ input:checked + .toggle-slider:before {
 
     .notification-form-container {
         padding: 16px;
-        padding-bottom: 140px;
+        padding-bottom: 200px;
         /* Extra space for bottom nav on mobile */
+        overflow: visible;
     }
 
     .notification-form-card {
