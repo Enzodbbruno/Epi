@@ -18,7 +18,7 @@ const sampleData = {
       id: 'notif-001',
       type: 'alert',
       title: 'Alerta: Aumento de casos de Dengue',
-      message: 'Foram registrados 15 novos casos de dengue na região sul da cidade. Fique atento aos sintomas e medidas preventivas.',
+      message: 'Foram registrados 15 novos casos de dengue na região de Marabá. Fique atento aos sintomas e medidas preventivas.',
       date: '2025-12-18T10:30:00',
       read: false,
       priority: 'high',
@@ -60,7 +60,7 @@ const sampleData = {
   chatRooms: [
     {
       id: 'room-001',
-      name: 'Dengue - Região Sul',
+      name: 'Dengue - Região Marabá',
       type: 'group',
       members: 12,
       lastMessage: 'Precisamos agendar uma reunião para discutir as novas estratégias de combate ao mosquito.',
@@ -665,7 +665,7 @@ const ChatModule = {
 
     // Keyword Matching Logic
     if (msg.includes('dengue')) {
-      responseText = 'Sobre a **Dengue**: O boletim atual indica alta na região Sul. Recomenda-se intensificar visitas domiciliares e verificação de focos de água parada. Protocolo: verifique febre alta, dor retroorbital e manchas vermelhas.';
+      responseText = 'Sobre a **Dengue**: O boletim atual indica alta na região de Marabá. Recomenda-se intensificar visitas domiciliares e verificação de focos de água parada. Protocolo: verifique febre alta, dor retroorbital e manchas vermelhas.';
     } else if (msg.includes('vacina') || msg.includes('campanha') || msg.includes('gripe')) {
       responseText = 'A **Campanha de Vacinação** (Influenza) foi antecipada para o dia 20/12. O público-alvo inicial são idosos e profissionais de saúde. Verifique o estoque na sua UBS.';
     } else if (msg.includes('zika') || msg.includes('microcefalia')) {
@@ -1256,7 +1256,7 @@ const SymptomsModule = {
     ]
   },
 
-  // Base de Dados de Doenças Tropicais Negligenciadas (OMS)
+  // Base de Dados de Doenças Tropicais Negligenciadas (OMS) - Filtrada para Marabá
   diseases: [
     // Transmitidas por vetores
     {
@@ -1306,30 +1306,6 @@ const SymptomsModule = {
       symptoms: ['febre', 'mal_estar', 'dor_cabeca', 'dor_muscular', 'hepatomegalia', 'esplenomegalia', 'linfadenopatia', 'edema'],
       mandatory: ['febre'],
       weight: 1.3
-    },
-    {
-      id: 'tripanossomiase-africana',
-      name: 'Tripanossomíase Africana',
-      description: 'Doença do sono transmitida pela mosca tsé-tsé.',
-      symptoms: ['febre', 'dor_cabeca', 'linfadenopatia', 'sonolencia', 'confusao_mental', 'fadiga', 'perda_peso'],
-      mandatory: ['febre', 'sonolencia'],
-      weight: 1.3
-    },
-    {
-      id: 'oncocercose',
-      name: 'Oncocercose',
-      description: 'Cegueira dos rios causada por vermes transmitidos por moscas simulídeas.',
-      symptoms: ['coceira', 'nodulos', 'erupcoes', 'cegueira', 'lesoes_cutaneas', 'fotofobia'],
-      mandatory: ['coceira', 'nodulos'],
-      weight: 1.2
-    },
-    {
-      id: 'filariose-linfatica',
-      name: 'Filariose Linfática',
-      description: 'Elefantíase causada por vermes transmitidos por mosquitos.',
-      symptoms: ['edema', 'febre', 'dor_muscular', 'linfadenopatia', 'lesoes_cutaneas', 'fadiga'],
-      mandatory: ['edema'],
-      weight: 1.2
     },
     // Helmintíases
     {
@@ -1388,30 +1364,6 @@ const SymptomsModule = {
       mandatory: ['convulsoes'],
       weight: 1.3
     },
-    {
-      id: 'equinococose',
-      name: 'Equinococose',
-      description: 'Infecção por Echinococcus.',
-      symptoms: ['dor_abdominal', 'hepatomegalia', 'nauseas', 'vomitos', 'fadiga', 'perda_peso'],
-      mandatory: ['hepatomegalia'],
-      weight: 1.2
-    },
-    {
-      id: 'fascioliase',
-      name: 'Fasciolíase',
-      description: 'Infecção por Fasciola hepatica.',
-      symptoms: ['febre', 'dor_abdominal', 'hepatomegalia', 'ictericia', 'nauseas', 'vomitos'],
-      mandatory: ['dor_abdominal', 'hepatomegalia'],
-      weight: 1.2
-    },
-    {
-      id: 'dracunculiase',
-      name: 'Dracunculíase',
-      description: 'Infecção por Dracunculus medinensis.',
-      symptoms: ['ulceras', 'dor_muscular', 'febre', 'nauseas', 'vomitos', 'edema'],
-      mandatory: ['ulceras'],
-      weight: 1.2
-    },
     // Infecções bacterianas
     {
       id: 'hanseniase',
@@ -1430,28 +1382,12 @@ const SymptomsModule = {
       weight: 1.2
     },
     {
-      id: 'bouba',
-      name: 'Bouba',
-      description: 'Infecção bacteriana da pele causada por Treponema pertenue.',
-      symptoms: ['lesoes_cutaneas', 'ulceras', 'nodulos', 'dor_articulacoes', 'dor_muscular'],
-      mandatory: ['lesoes_cutaneas'],
-      weight: 1.2
-    },
-    {
       id: 'leptospirose',
       name: 'Leptospirose',
       description: 'Infecção bacteriana transmitida por animais.',
       symptoms: ['febre', 'dor_muscular', 'dor_cabeca', 'ictericia', 'nauseas', 'vomitos', 'diarreia', 'erupcoes'],
       mandatory: ['febre', 'dor_muscular'],
       weight: 1.2
-    },
-    {
-      id: 'ulcera-buruli',
-      name: 'Úlcera de Buruli',
-      description: 'Infecção bacteriana da pele causada por Mycobacterium ulcerans.',
-      symptoms: ['ulceras', 'nodulos', 'edema', 'dor_muscular', 'febre'],
-      mandatory: ['ulceras'],
-      weight: 1.3
     },
     // Outras
     {
@@ -1837,6 +1773,7 @@ const AnalyticsModule = {
 // Módulo do Mapa Epidemiológico (Cluster Map + Disease Icons)
 // Módulo de Pacientes (Prontuário Eletrônico)
 const PatientModule = {
+  currentPatient: null,
   // Banco de Dados Simulado
   mockDB: [
     {
@@ -1977,6 +1914,114 @@ const PatientModule = {
         { name: 'Pneumocócica 23', date: '15/01/2024' },
         { name: 'Herpes Zóster', date: '10/11/2023' }
       ]
+    },
+    {
+      id: 7,
+      name: 'Fernanda Rocha Silva',
+      age: 25,
+      sex: 'Feminino',
+      cpf: '258.147.369-11',
+      cns: '258 1473 6911 2581',
+      blood: 'O+',
+      photo: 'https://ui-avatars.com/api/?name=Fernanda+Rocha&background=e91e63&color=fff',
+      birthDate: '12/03/1999',
+      badges: [{ text: 'Gestante', type: 'info' }],
+      allergies: [],
+      conditions: ['Gestação de Risco Habitual'],
+      vitals: { bp: '110/70', weight: '65', temp: '36.5', o2: '99', heartRate: '78' },
+      history: [
+        { date: '25/12/2025', title: 'Pré-natal', desc: 'Consulta de rotina. Batimentos fetais normais.' }
+      ],
+      vaccines: [
+        { name: 'dTpa', date: '01/12/2025' },
+        { name: 'Hepatite B', date: '15/06/2024' }
+      ]
+    },
+    {
+      id: 8,
+      name: 'Ricardo Gomes Pereira',
+      age: 45,
+      sex: 'Masculino',
+      cpf: '369.258.147-22',
+      cns: '369 2581 4722 3692',
+      blood: 'B-',
+      photo: 'https://ui-avatars.com/api/?name=Ricardo+Gomes&background=607d8b&color=fff',
+      birthDate: '05/09/1980',
+      badges: [{ text: 'Tabagista', type: 'warning' }],
+      allergies: ['Frutos do Mar'],
+      conditions: ['Bronquite Crônica'],
+      vitals: { bp: '130/85', weight: '80', temp: '36.6', o2: '94', heartRate: '82' },
+      history: [
+        { date: '20/12/2025', title: 'Pneumologista', desc: 'Avaliação de função pulmonar. Orientado a cessar tabagismo.' }
+      ],
+      vaccines: [
+        { name: 'Influenza', date: '10/04/2025' }
+      ]
+    },
+    {
+      id: 9,
+      name: 'Camila Santos Oliveira',
+      age: 8,
+      sex: 'Feminino',
+      cpf: '741.852.963-33',
+      cns: '741 8529 6333 7418',
+      blood: 'A+',
+      photo: 'https://ui-avatars.com/api/?name=Camila+Santos&background=9c27b0&color=fff',
+      birthDate: '15/07/2017',
+      badges: [],
+      allergies: ['Picada de Inseto'],
+      conditions: [],
+      vitals: { bp: '100/60', weight: '28', temp: '36.8', o2: '99', heartRate: '90' },
+      history: [
+        { date: '15/12/2025', title: 'Pediatra', desc: 'Crescimento e desenvolvimento adequados.' }
+      ],
+      vaccines: [
+        { name: 'ACWY', date: '10/11/2025' },
+        { name: 'HPV', date: '15/07/2025' }
+      ]
+    },
+    {
+      id: 10,
+      name: 'Luiz Fernando Souza',
+      age: 55,
+      sex: 'Masculino',
+      cpf: '852.963.741-44',
+      cns: '852 9637 4144 8529',
+      blood: 'AB-',
+      photo: 'https://ui-avatars.com/api/?name=Luiz+Fernando&background=3f51b5&color=fff',
+      birthDate: '28/02/1970',
+      badges: [{ text: 'Cardiopatia', type: 'alert' }],
+      allergies: [],
+      conditions: ['Insuficiência Cardíaca'],
+      vitals: { bp: '125/80', weight: '85', temp: '36.4', o2: '96', heartRate: '75' },
+      history: [
+        { date: '22/12/2025', title: 'Cardiologista', desc: 'Ajuste de bloqueadores beta. Estável.' }
+      ],
+      vaccines: [
+        { name: 'Influenza', date: '25/03/2025' },
+        { name: 'Pneumocócica', date: '12/02/2024' }
+      ]
+    },
+    {
+      id: 11,
+      name: 'Beatriz Costa Lima',
+      age: 19,
+      sex: 'Feminino',
+      cpf: '963.741.852-55',
+      cns: '963 7418 5255 9637',
+      blood: 'O+',
+      photo: 'https://ui-avatars.com/api/?name=Beatriz+Costa&background=f06292&color=fff',
+      birthDate: '10/10/2006',
+      badges: [],
+      allergies: [],
+      conditions: [],
+      vitals: { bp: '115/75', weight: '55', temp: '36.6', o2: '99', heartRate: '70' },
+      history: [
+        { date: '18/12/2025', title: 'Clínico Geral', desc: 'Solicitação de exames admissionais.' }
+      ],
+      vaccines: [
+        { name: 'Meningocócica', date: '15/08/2024' }
+      ]
     }
   ],
 
@@ -2052,8 +2097,32 @@ const PatientModule = {
         } else if (buttonText === 'Editar Prontuário') {
           alert('Funcionalidade de Editar Prontuário será implementada em breve.\n\nEsta ação permitirá editar as informações do prontuário do paciente.');
         } else if (buttonText === 'Notificar') {
-          if (confirm('Deseja notificar este caso às autoridades de saúde?')) {
-            alert('Notificação enviada com sucesso!\n\nAs autoridades de saúde foram informadas sobre este caso.');
+          if (this.currentPatient) {
+            if (confirm(`Deseja iniciar a notificação para o paciente ${this.currentPatient.name}?`)) {
+
+              // Hide Profile
+              const profileView = document.getElementById('patient-profile-view');
+              if (profileView) profileView.style.display = 'none';
+
+              // Navigate to Case Notification
+              App.showScreen('case-notification');
+
+              // Wait for screen transition
+              setTimeout(() => {
+                // Pre-fill forms for all diseases
+                if (CaseNotificationModule && CaseNotificationModule.diseases) {
+                  const diseaseIds = Object.keys(CaseNotificationModule.diseases);
+                  diseaseIds.forEach(id => {
+                    const nameInput = document.getElementById(`patient-name-${id}`);
+                    const ageInput = document.getElementById(`patient-age-${id}`);
+
+                    if (nameInput) nameInput.value = this.currentPatient.name;
+                    if (ageInput) ageInput.value = this.currentPatient.age;
+                  });
+                  App.showToast('Dados do paciente carregados com sucesso.', 'success');
+                }
+              }, 300);
+            }
           }
         }
       });
@@ -2152,6 +2221,7 @@ const PatientModule = {
   },
 
   openProfile(patient) {
+    this.currentPatient = patient;
     // Toggle Views
     const searchBar = document.querySelector('.patient-search-bar');
     const recents = document.getElementById('patient-recents');
@@ -2520,7 +2590,7 @@ window.MapModule = MapModule;
 // Módulo de Notificação de Casos
 const CaseNotificationModule = {
   currentDisease: 'dengue',
-  
+
   // Lista completa de doenças tropicais negligenciadas (OMS)
   diseases: {
     // Transmitidas por vetores
@@ -2530,10 +2600,7 @@ const CaseNotificationModule = {
     'leishmaniose-tegumentar': { name: 'Leishmaniose Tegumentar', icon: 'fa-bug', category: 'vetor' },
     'leishmaniose-visceral': { name: 'Leishmaniose Visceral', icon: 'fa-bug', category: 'vetor' },
     'chagas': { name: 'Doença de Chagas', icon: 'fa-home', category: 'vetor' },
-    'tripanossomiase-africana': { name: 'Tripanossomíase Africana', icon: 'fa-bug', category: 'vetor' },
-    'oncocercose': { name: 'Oncocercose', icon: 'fa-bug', category: 'vetor' },
-    'filariose-linfatica': { name: 'Filariose Linfática', icon: 'fa-bug', category: 'vetor' },
-    
+
     // Helmintíases e parasitoses
     'esquistossomose': { name: 'Esquistossomose', icon: 'fa-eye', category: 'helmintíase' },
     'ascaridiase': { name: 'Ascaridíase', icon: 'fa-bug', category: 'helmintíase' },
@@ -2542,17 +2609,12 @@ const CaseNotificationModule = {
     'estrongiloidiase': { name: 'Estrongiloidíase', icon: 'fa-bug', category: 'helmintíase' },
     'teniase': { name: 'Teníase', icon: 'fa-bug', category: 'helmintíase' },
     'cisticercose': { name: 'Cisticercose', icon: 'fa-bug', category: 'helmintíase' },
-    'equinococose': { name: 'Equinococose', icon: 'fa-bug', category: 'helmintíase' },
-    'fascioliase': { name: 'Fasciolíase', icon: 'fa-bug', category: 'helmintíase' },
-    'dracunculiase': { name: 'Dracunculíase', icon: 'fa-bug', category: 'helmintíase' },
-    
+
     // Infecções bacterianas
     'hanseniase': { name: 'Hanseníase', icon: 'fa-user-injured', category: 'bacteriana' },
     'tracoma': { name: 'Tracoma', icon: 'fa-eye', category: 'bacteriana' },
-    'bouba': { name: 'Bouba', icon: 'fa-hand-paper', category: 'bacteriana' },
     'leptospirose': { name: 'Leptospirose', icon: 'fa-virus', category: 'bacteriana' },
-    'ulcera-buruli': { name: 'Úlcera de Buruli', icon: 'fa-hand-paper', category: 'bacteriana' },
-    
+
     // Outras
     'raiva': { name: 'Raiva', icon: 'fa-paw', category: 'outra' },
     'micetoma': { name: 'Micetoma', icon: 'fa-hand-paper', category: 'outra' },
@@ -2574,7 +2636,7 @@ const CaseNotificationModule = {
     if (!tabsContainer) return;
 
     tabsContainer.innerHTML = '';
-    
+
     Object.entries(this.diseases).forEach(([id, disease]) => {
       const tab = document.createElement('button');
       tab.className = `disease-tab ${id === 'dengue' ? 'active' : ''}`;
@@ -2589,7 +2651,7 @@ const CaseNotificationModule = {
       const select = document.createElement('select');
       select.id = 'disease-dropdown';
       select.className = 'disease-dropdown';
-      
+
       // Group by category
       const categories = {
         'vetor': '🦟 Transmitidas por vetores',
@@ -2601,7 +2663,7 @@ const CaseNotificationModule = {
       Object.entries(categories).forEach(([catKey, catName]) => {
         const optgroup = document.createElement('optgroup');
         optgroup.label = catName;
-        
+
         Object.entries(this.diseases)
           .filter(([_, disease]) => disease.category === catKey)
           .forEach(([id, disease]) => {
@@ -2611,7 +2673,7 @@ const CaseNotificationModule = {
             if (id === 'dengue') option.selected = true;
             optgroup.appendChild(option);
           });
-        
+
         select.appendChild(optgroup);
       });
 
@@ -2641,7 +2703,7 @@ const CaseNotificationModule = {
 
   switchDisease(disease) {
     if (!this.diseases[disease]) return;
-    
+
     this.currentDisease = disease;
 
     // Update tabs (desktop)
@@ -2767,7 +2829,7 @@ const CaseNotificationModule = {
         // Remove existing listeners
         const newForm = form.cloneNode(true);
         form.parentNode.replaceChild(newForm, form);
-        
+
         // Add new listener
         newForm.addEventListener('submit', (e) => {
           e.preventDefault();
