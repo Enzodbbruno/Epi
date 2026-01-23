@@ -2363,28 +2363,29 @@ const MapModule = {
   },
 
   // Dados Reais de Bairros de Marabá (Centróides dos Núcleos Urbanos)
-  // Ajustado para evitar o Rio Tocantins e Itacaiúnas
+  // Ajustado com "Strict Geofencing" para evitar rios
   neighborhoodsData: {
     'maraba': [
-      // Velha Marabá (Pioneira) - Ponta da península
-      { name: 'Marabá Pioneira', lat: -5.3440, lng: -49.1360, radius: 0.006 },
+      // Velha Marabá (Pioneira) - Mais ao sul da ponta para evitar o rio
+      { name: 'Marabá Pioneira (Centro)', lat: -5.3530, lng: -49.1350, radius: 0.005 },
 
-      // Cidade Nova - Sul do Rio Itacaiúnas
-      { name: 'Cidade Nova (Centro)', lat: -5.3650, lng: -49.0750, radius: 0.008 },
-      { name: 'Novo Horizonte', lat: -5.3720, lng: -49.0820, radius: 0.005 },
+      // Cidade Nova - Bem definido ao sul da Nova Marabá (outro lado da ponte)
+      { name: 'Cidade Nova', lat: -5.3750, lng: -49.0750, radius: 0.007 },
+      { name: 'Novo Horizonte', lat: -5.3780, lng: -49.0820, radius: 0.004 },
 
-      // Nova Marabá - Leste
-      { name: 'Nova Marabá (Folhas)', lat: -5.3530, lng: -49.0950, radius: 0.009 },
-      { name: 'Folha 33', lat: -5.3480, lng: -49.0850, radius: 0.004 },
+      // Nova Marabá - O grande centro planejado (Folhas)
+      // Dividido em zonas para cobrir melhor sem pegar o rio Itacaiúnas
+      { name: 'Nova Marabá (Folhas Norte)', lat: -5.3500, lng: -49.0950, radius: 0.006 },
+      { name: 'Nova Marabá (Folhas Sul)', lat: -5.3600, lng: -49.0900, radius: 0.006 },
 
-      // São Félix - Norte do Rio Tocantins
-      { name: 'São Félix Pioneiro', lat: -5.3250, lng: -49.1550, radius: 0.005 },
-      { name: 'São Félix II', lat: -5.3300, lng: -49.1480, radius: 0.005 },
+      // São Félix - Margem norte do Tocantins
+      { name: 'São Félix Pioneiro', lat: -5.3280, lng: -49.1550, radius: 0.005 },
+      { name: 'São Félix II', lat: -5.3320, lng: -49.1480, radius: 0.005 },
 
-      // Morada Nova - Nordeste Distante
+      // Morada Nova - Longe, nordeste
       { name: 'Morada Nova', lat: -5.2950, lng: -49.0400, radius: 0.006 },
 
-      // Industrial - Sudeste
+      // Industrial
       { name: 'Distrito Industrial', lat: -5.3900, lng: -49.0600, radius: 0.005 }
     ]
   },
@@ -2392,27 +2393,40 @@ const MapModule = {
   // Postos de Saúde e Hospitais de Marabá (Localizações reais aproximadas por núcleo)
   healthCenters: [
     // Velha Marabá (Pioneira) - Próximo à orla/centro histórico
-    { name: 'UBS Demétrio Ribeiro', lat: -5.3440, lng: -49.1360, type: 'ubs', info: 'Pioneira. Atendimento Geral.' },
-    { name: 'Centro de Zoonoses', lat: -5.3420, lng: -49.1320, type: 'ubs', info: 'Controle Vetorial.' },
+    // Velha Marabá (Pioneira) - Centro Histórico real
+    { name: 'UBS Demétrio Ribeiro', lat: -5.3540, lng: -49.1340, type: 'ubs', info: 'Pioneira. Atendimento Geral.' },
+    { name: 'Centro de Zoonoses', lat: -5.3510, lng: -49.1310, type: 'ubs', info: 'Controle Vetorial.' },
 
     // Nova Marabá
-    { name: 'Hospital Municipal (HMM)', lat: -5.3545, lng: -49.0945, type: 'hospital', info: 'Nova Marabá, Folha 17. Emergência 24h.' },
-    { name: 'Hosp. Regional do Sudeste', lat: -5.3610, lng: -49.0890, type: 'hospital', info: 'Alta Complexidade. Folha 17/28.' },
-    { name: 'Hosp. Materno Infantil', lat: -5.3525, lng: -49.0925, type: 'hospital', info: 'Gestantes e Crianças.' },
+    { name: 'Hospital Municipal (HMM)', lat: -5.3545, lng: -49.0945, type: 'hospital', info: 'Folha 17. Emergência 24h.' },
+    { name: 'Hosp. Regional do Sudeste', lat: -5.3610, lng: -49.0890, type: 'hospital', info: 'Alta Complexidade.' },
+    { name: 'Hosp. Materno Infantil', lat: -5.3525, lng: -49.0925, type: 'hospital', info: 'Folha 11.' },
     { name: 'UBS Hiroshi Matsuda', lat: -5.3500, lng: -49.1020, type: 'ubs', info: 'Folha 11.' },
-    { name: 'UBS Jaime Pinto', lat: -5.3585, lng: -49.1000, type: 'ubs', info: 'Folha 27.' },
     { name: 'UBS Enfermeira Zezinha', lat: -5.3515, lng: -49.0970, type: 'ubs', info: 'Folha 23.' },
-    { name: 'UBS Mariana Moraes', lat: -5.3480, lng: -49.0800, type: 'ubs', info: 'Km 07.' },
 
     // Cidade Nova
-    { name: 'UBS Laranjeiras', lat: -5.3660, lng: -49.0790, type: 'ubs', info: 'Cidade Nova.' },
-    { name: 'UBS Pedro Cavalcante', lat: -5.3720, lng: -49.0820, type: 'ubs', info: 'Novo Horizonte.' },
+    { name: 'UBS Laranjeiras', lat: -5.3760, lng: -49.0790, type: 'ubs', info: 'Cidade Nova.' },
+    { name: 'UBS Pedro Cavalcante', lat: -5.3790, lng: -49.0820, type: 'ubs', info: 'Novo Horizonte.' },
 
     // São Félix
-    { name: 'UBS Amadeu Vivacqua', lat: -5.3280, lng: -49.1520, type: 'ubs', info: 'São Félix II.' },
+    { name: 'UBS Amadeu Vivacqua', lat: -5.3290, lng: -49.1530, type: 'ubs', info: 'São Félix II.' },
 
     // Morada Nova
-    { name: 'UBS Morada Nova', lat: -5.2950, lng: -49.0400, type: 'ubs', info: 'Morada Nova.' }
+    { name: 'UBS Morada Nova', lat: -5.2960, lng: -49.0410, type: 'ubs', info: 'Morada Nova.' },
+    // (Fim da lista atualizada)
+
+
+
+
+    // Cidade Nova
+
+
+
+    // São Félix
+
+
+    // Morada Nova
+
   ],
 
   init() {
@@ -2565,11 +2579,12 @@ const MapModule = {
 
         // USE L.circle (METERS) instead of L.circleMarker (PIXELS)
         // This ensures bubbles shrink when zooming out
+        // Radius reduced to 150m for tighter packing
         const circle = L.circle([pLat, pLng], {
           color: 'transparent',
           fillColor: color,
           fillOpacity: 0.6,
-          radius: 350 // Fixed radius ~350m per bubble
+          radius: 150 // Strict small radius to avoid river bleed
         });
 
         // Simplified popup
