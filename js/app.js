@@ -2362,43 +2362,59 @@ const MapModule = {
     'maraba': { coords: [-5.3699, -49.1169], label: 'Marabá' }
   },
 
-  // Dados Reais de Bairros de Marabá (Latitude, Longitude)
+  // Dados Reais de Bairros de Marabá (Centróides dos Núcleos Urbanos)
+  // Ajustado para evitar o Rio Tocantins e Itacaiúnas
   neighborhoodsData: {
     'maraba': [
-      // Nova Marabá
-      { name: 'Folha 31 (Nova Marabá)', lat: -5.3520, lng: -49.0950 },
-      { name: 'Folha 28 (Nova Marabá)', lat: -5.3580, lng: -49.0980 },
-      { name: 'Folha 16 (Nova Marabá)', lat: -5.3610, lng: -49.1020 },
+      // Velha Marabá (Pioneira) - Ponta da península
+      { name: 'Marabá Pioneira', lat: -5.3440, lng: -49.1360, radius: 0.006 },
 
-      // Cidade Nova
-      { name: 'Liberdade (Cidade Nova)', lat: -5.3650, lng: -49.0750 },
-      { name: 'Novo Horizonte (Cidade Nova)', lat: -5.3700, lng: -49.0800 },
+      // Cidade Nova - Sul do Rio Itacaiúnas
+      { name: 'Cidade Nova (Centro)', lat: -5.3650, lng: -49.0750, radius: 0.008 },
+      { name: 'Novo Horizonte', lat: -5.3720, lng: -49.0820, radius: 0.005 },
 
-      // Velha Marabá (Marabá Pioneira)
-      { name: 'Marabá Pioneira', lat: -5.3450, lng: -49.1250 },
-      { name: 'Sta. Rosa (Pioneira)', lat: -5.3400, lng: -49.1220 },
+      // Nova Marabá - Leste
+      { name: 'Nova Marabá (Folhas)', lat: -5.3530, lng: -49.0950, radius: 0.009 },
+      { name: 'Folha 33', lat: -5.3480, lng: -49.0850, radius: 0.004 },
 
-      // São Félix
-      { name: 'São Félix I', lat: -5.3350, lng: -49.1550 },
-      { name: 'São Félix II', lat: -5.3300, lng: -49.1600 }
+      // São Félix - Norte do Rio Tocantins
+      { name: 'São Félix Pioneiro', lat: -5.3250, lng: -49.1550, radius: 0.005 },
+      { name: 'São Félix II', lat: -5.3300, lng: -49.1480, radius: 0.005 },
+
+      // Morada Nova - Nordeste Distante
+      { name: 'Morada Nova', lat: -5.2950, lng: -49.0400, radius: 0.006 },
+
+      // Industrial - Sudeste
+      { name: 'Distrito Industrial', lat: -5.3900, lng: -49.0600, radius: 0.005 }
     ]
   },
 
-  // Postos de Saúde e Hospitais de Marabá
+  // Postos de Saúde e Hospitais de Marabá (Localizações reais aproximadas por núcleo)
   healthCenters: [
-    { name: 'Hospital Municipal de Marabá (HMM)', lat: -5.3550, lng: -49.0900, type: 'hospital', info: 'Atendimento de Urgência e Emergência 24h.' },
-    { name: 'Hospital Regional do Sudeste do Pará', lat: -5.3620, lng: -49.0850, type: 'hospital', info: 'Alta complexidade e especialidades.' },
-    { name: 'Hosp. Materno Infantil', lat: -5.3530, lng: -49.0920, type: 'hospital', info: 'Atendimento especializado gestantes/crianças.' },
-    { name: 'UBS Hiroshi Matsuda', lat: -5.3500, lng: -49.1000, type: 'ubs', info: 'Folha 11. Vacinação: 08h às 17h.' },
-    { name: 'UBS Laranjeiras', lat: -5.3680, lng: -49.0780, type: 'ubs', info: 'Cidade Nova. Clínico Geral.' },
-    { name: 'UBS Demétrio Ribeiro', lat: -5.3460, lng: -49.1240, type: 'ubs', info: 'Marabá Pioneira.' },
-    { name: 'UBS Enfermeira Zezinha', lat: -5.3510, lng: -49.0960, type: 'ubs', info: 'Nova Marabá, Folha 23.' },
-    { name: 'UBS Jaime Pinto', lat: -5.3590, lng: -49.1010, type: 'ubs', info: 'Nova Marabá.' },
-    { name: 'UBS Amadeu Vivacqua', lat: -5.3360, lng: -49.1560, type: 'ubs', info: 'São Félix II.' },
-    { name: 'UBS Morada Nova', lat: -5.3750, lng: -49.0500, type: 'ubs', info: 'Morada Nova.' },
-    { name: 'Centro de Controle de Zoonoses', lat: -5.3480, lng: -49.1100, type: 'ubs', info: 'Controle vetorial.' },
-    { name: 'UBS Mariana Moraes', lat: -5.3400, lng: -49.0300, type: 'ubs', info: 'Km 07.' },
-    { name: 'UBS Pedro Cavalcante', lat: -5.3600, lng: -49.0900, type: 'ubs', info: 'Novo Horizonte.' }
+    // Velha Marabá
+    { name: 'UBS Demétrio Ribeiro', lat: -5.3455, lng: -49.1350, type: 'ubs', info: 'Pioneira. Atendimento Geral.' },
+    { name: 'Centro de Controle de Zoonoses', lat: -5.3420, lng: -49.1300, type: 'ubs', info: 'Controle Vetorial.' },
+
+    // Nova Marabá
+    { name: 'Hospital Municipal (HMM)', lat: -5.3540, lng: -49.0940, type: 'hospital', info: 'Nova Marabá, Folha 17. Emergência 24h.' },
+    { name: 'Hosp. Materno Infantil', lat: -5.3520, lng: -49.0920, type: 'hospital', info: 'Nova Marabá. Gestantes e Crianças.' },
+    { name: 'Hospital Regional', lat: -5.3600, lng: -49.0880, type: 'hospital', info: 'Alta Complexidade.' },
+    { name: 'UBS Hiroshi Matsuda', lat: -5.3520, lng: -49.1000, type: 'ubs', info: 'Folha 11. Vacinação.' },
+    { name: 'UBS Jaime Pinto', lat: -5.3580, lng: -49.0990, type: 'ubs', info: 'Folha 27.' },
+    { name: 'UBS Enfermeira Zezinha', lat: -5.3500, lng: -49.0960, type: 'ubs', info: 'Folha 23.' },
+
+    // Cidade Nova
+    { name: 'UBS Laranjeiras', lat: -5.3680, lng: -49.0780, type: 'ubs', info: 'Cidade Nova.' },
+    { name: 'UBS Pedro Cavalcante', lat: -5.3710, lng: -49.0810, type: 'ubs', info: 'Novo Horizonte.' },
+
+    // São Félix
+    { name: 'UBS Amadeu Vivacqua', lat: -5.3280, lng: -49.1500, type: 'ubs', info: 'São Félix II.' },
+
+    // Morada Nova
+    { name: 'UBS Morada Nova', lat: -5.2950, lng: -49.0400, type: 'ubs', info: 'Morada Nova.' },
+
+    // Outros
+    { name: 'UBS Mariana Moraes', lat: -5.3480, lng: -49.0800, type: 'ubs', info: 'Km 07 (Nova Marabá).' }
   ],
 
   init() {
