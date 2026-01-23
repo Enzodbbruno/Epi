@@ -2391,30 +2391,28 @@ const MapModule = {
 
   // Postos de Saúde e Hospitais de Marabá (Localizações reais aproximadas por núcleo)
   healthCenters: [
-    // Velha Marabá
-    { name: 'UBS Demétrio Ribeiro', lat: -5.3455, lng: -49.1350, type: 'ubs', info: 'Pioneira. Atendimento Geral.' },
-    { name: 'Centro de Controle de Zoonoses', lat: -5.3420, lng: -49.1300, type: 'ubs', info: 'Controle Vetorial.' },
+    // Velha Marabá (Pioneira) - Próximo à orla/centro histórico
+    { name: 'UBS Demétrio Ribeiro', lat: -5.3440, lng: -49.1360, type: 'ubs', info: 'Pioneira. Atendimento Geral.' },
+    { name: 'Centro de Zoonoses', lat: -5.3420, lng: -49.1320, type: 'ubs', info: 'Controle Vetorial.' },
 
     // Nova Marabá
-    { name: 'Hospital Municipal (HMM)', lat: -5.3540, lng: -49.0940, type: 'hospital', info: 'Nova Marabá, Folha 17. Emergência 24h.' },
-    { name: 'Hosp. Materno Infantil', lat: -5.3520, lng: -49.0920, type: 'hospital', info: 'Nova Marabá. Gestantes e Crianças.' },
-    { name: 'Hospital Regional', lat: -5.3600, lng: -49.0880, type: 'hospital', info: 'Alta Complexidade.' },
-    { name: 'UBS Hiroshi Matsuda', lat: -5.3520, lng: -49.1000, type: 'ubs', info: 'Folha 11. Vacinação.' },
-    { name: 'UBS Jaime Pinto', lat: -5.3580, lng: -49.0990, type: 'ubs', info: 'Folha 27.' },
-    { name: 'UBS Enfermeira Zezinha', lat: -5.3500, lng: -49.0960, type: 'ubs', info: 'Folha 23.' },
+    { name: 'Hospital Municipal (HMM)', lat: -5.3545, lng: -49.0945, type: 'hospital', info: 'Nova Marabá, Folha 17. Emergência 24h.' },
+    { name: 'Hosp. Regional do Sudeste', lat: -5.3610, lng: -49.0890, type: 'hospital', info: 'Alta Complexidade. Folha 17/28.' },
+    { name: 'Hosp. Materno Infantil', lat: -5.3525, lng: -49.0925, type: 'hospital', info: 'Gestantes e Crianças.' },
+    { name: 'UBS Hiroshi Matsuda', lat: -5.3500, lng: -49.1020, type: 'ubs', info: 'Folha 11.' },
+    { name: 'UBS Jaime Pinto', lat: -5.3585, lng: -49.1000, type: 'ubs', info: 'Folha 27.' },
+    { name: 'UBS Enfermeira Zezinha', lat: -5.3515, lng: -49.0970, type: 'ubs', info: 'Folha 23.' },
+    { name: 'UBS Mariana Moraes', lat: -5.3480, lng: -49.0800, type: 'ubs', info: 'Km 07.' },
 
     // Cidade Nova
-    { name: 'UBS Laranjeiras', lat: -5.3680, lng: -49.0780, type: 'ubs', info: 'Cidade Nova.' },
-    { name: 'UBS Pedro Cavalcante', lat: -5.3710, lng: -49.0810, type: 'ubs', info: 'Novo Horizonte.' },
+    { name: 'UBS Laranjeiras', lat: -5.3660, lng: -49.0790, type: 'ubs', info: 'Cidade Nova.' },
+    { name: 'UBS Pedro Cavalcante', lat: -5.3720, lng: -49.0820, type: 'ubs', info: 'Novo Horizonte.' },
 
     // São Félix
-    { name: 'UBS Amadeu Vivacqua', lat: -5.3280, lng: -49.1500, type: 'ubs', info: 'São Félix II.' },
+    { name: 'UBS Amadeu Vivacqua', lat: -5.3280, lng: -49.1520, type: 'ubs', info: 'São Félix II.' },
 
     // Morada Nova
-    { name: 'UBS Morada Nova', lat: -5.2950, lng: -49.0400, type: 'ubs', info: 'Morada Nova.' },
-
-    // Outros
-    { name: 'UBS Mariana Moraes', lat: -5.3480, lng: -49.0800, type: 'ubs', info: 'Km 07 (Nova Marabá).' }
+    { name: 'UBS Morada Nova', lat: -5.2950, lng: -49.0400, type: 'ubs', info: 'Morada Nova.' }
   ],
 
   init() {
@@ -2423,7 +2421,6 @@ const MapModule = {
 
   setupEventListeners() {
     const enableBtn = document.getElementById('enable-location-btn');
-    const selectCity = document.getElementById('municipality-select');
     const selectDisease = document.getElementById('disease-select');
 
     // Automatically load Marabá on start
@@ -2436,36 +2433,12 @@ const MapModule = {
       enableBtn.onclick = () => this.requestLocation();
     }
 
-    if (selectCity) {
-      selectCity.addEventListener('change', (e) => {
-        const value = e.target.value;
-        if (value === 'gps') {
-          this.requestLocation();
-        } else if (this.cities[value]) {
-          this.loadMapAt(this.cities[value].coords[0], this.cities[value].coords[1], value);
-          const overlay = document.getElementById('map-permission-overlay');
-          if (overlay) overlay.style.display = 'none';
-        }
-      });
-    }
     if (selectDisease) {
       selectDisease.addEventListener('change', (e) => {
         this.currentDisease = e.target.value;
-        // Determine current city context correctly
-        const selectCity = document.getElementById('municipality-select');
-        let currentCity = 'maraba';
-
-        if (selectCity) {
-          if (selectCity.value === 'gps') {
-            currentCity = 'gps';
-          } else {
-            currentCity = selectCity.value;
-          }
-        }
-
-        const center = this.map ? this.map.getCenter() : { lat: this.defaultCoords[0], lng: this.defaultCoords[1] };
+        const center = this.map ? this.map.getCenter() : { lat: this.cities['maraba'].coords[0], lng: this.cities['maraba'].coords[1] };
         if (this.map) {
-          this.generateBubbleData(center.lat, center.lng, currentCity);
+          this.generateBubbleData(center.lat, center.lng, 'maraba');
         }
       });
     }
@@ -2553,64 +2526,58 @@ const MapModule = {
     }
 
     neighborhoods.forEach(hood => {
-      // 2. Generate Random Case Counts
-      // Realistic numbers for Marabá
-      let cases = Math.floor(Math.random() * 50) + 5;
+      // Number of sub-bubbles to generate per neighborhood to create "heat"
+      const subBubbles = 3;
 
-      // Disease Multipliers & Adjustments
-      if (this.currentDisease === 'dengue') cases = Math.floor(cases * 2.5); // Endemic
-      if (this.currentDisease === 'hanseniase') cases = Math.floor(Math.random() * 10) + 1; // Lower numbers
-      if (this.currentDisease === 'leishmaniose') cases = Math.floor(Math.random() * 15) + 2;
+      for (let i = 0; i < subBubbles; i++) {
+        // Random offset within SAFE radius (avoiding rivers)
+        // Use logic: random angle, random distance < hood.radius
+        const angle = Math.random() * Math.PI * 2;
+        const dist = Math.random() * (hood.radius || 0.005);
+        const pLat = hood.lat + (Math.sin(angle) * dist);
+        const pLng = hood.lng + (Math.cos(angle) * dist);
 
-      // Zero check
-      if (cases < 0) cases = 0;
+        // Generate intensity
+        // Realistic numbers for Marabá context
+        let intensity = Math.floor(Math.random() * 80) + 10;
 
-      cases = Math.floor(cases);
+        // Disease Specific Adjustments (Using only allowed diseases)
+        // Dengue/Chikungunya/Zika -> VETOR (High in urban areas)
+        if (['dengue', 'chikungunya', 'zika'].includes(this.currentDisease)) {
+          intensity *= 1.5;
+        }
+        // Leishmaniose -> Usually more peripheral or near forests, but we simplify
+        if (this.currentDisease.includes('leishmaniose')) {
+          intensity *= 1.2;
+        }
+        // Geohelmintíases (Verminoses)
+        if (['ascaridiase', 'esquistossomose'].includes(this.currentDisease)) {
+          intensity *= 0.8;
+        }
 
-      // 3. Determine Radius and Color
-      // Radius proportional to sqrt of area (cases) for perception accuracy
-      // Increased multiplier for better visibility
-      const radius = Math.sqrt(cases) * 5;
+        intensity = Math.floor(intensity);
+        if (intensity < 10) intensity = 10;
 
-      let color = this.colors.low;
-      if (cases > 20) color = this.colors.medium;
-      if (cases > 50) color = this.colors.high;
-      if (cases > 100) color = this.colors.critical;
+        let color = this.colors.low;
+        if (intensity > 40) color = this.colors.medium;
+        if (intensity > 80) color = this.colors.high;
+        if (intensity > 120) color = this.colors.critical;
 
-      // 4. Create Circle Marker at coordinates
-      const circle = L.circleMarker([hood.lat, hood.lng], {
-        radius: radius,
-        fillColor: color,
-        color: color,
-        weight: 1,
-        opacity: 0.8,
-        fillOpacity: 0.6
-      });
+        // USE L.circle (METERS) instead of L.circleMarker (PIXELS)
+        // This ensures bubbles shrink when zooming out
+        const circle = L.circle([pLat, pLng], {
+          color: 'transparent',
+          fillColor: color,
+          fillOpacity: 0.6,
+          radius: 350 // Fixed radius ~350m per bubble
+        });
 
-      // 5. Tooltip/Popup
-      const disLabel = this.currentDisease.charAt(0).toUpperCase() + this.currentDisease.slice(1);
+        // Simplified popup
+        const disLabel = this.currentDisease.charAt(0).toUpperCase() + this.currentDisease.slice(1);
+        circle.bindPopup(`<b>${hood.name}</b><br>${disLabel}: Foco Detectado<br>Intensidade: ${intensity}`);
 
-      circle.bindPopup(`
-                <div style="text-align: center; min-width: 120px;">
-                    <strong style="font-size: 1.1em; color: ${color}">${hood.name}</strong>
-                    <hr style="margin: 5px 0; border: 0; border-top: 1px solid #eee;">
-                    <div style="font-size: 0.9em; color: #666;">${disLabel}</div>
-                    <div style="font-size: 1.4em; font-weight: bold; color: #333;">${cases}</div>
-                    <div style="font-size: 0.8em; color: #999;">Casos Confirmados</div>
-                </div>
-            `);
-
-      // Hover interactions
-      circle.on('mouseover', function (e) {
-        this.openPopup();
-        this.setStyle({ fillOpacity: 0.8, weight: 2 });
-      });
-      circle.on('mouseout', function (e) {
-        this.closePopup();
-        this.setStyle({ fillOpacity: 0.5, weight: 1 });
-      });
-
-      this.layerGroup.addLayer(circle);
+        this.layerGroup.addLayer(circle);
+      }
     });
 
     // 6. Add Health Centers Markers

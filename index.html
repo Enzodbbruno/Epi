@@ -169,40 +169,47 @@
                                 <div class="vaccine-list">
                                     <div class="vaccine-item">
                                         <div class="v-header"><span>Influenza</span> <span>85%</span></div>
-                                        <div class="progress-bar"><div class="fill" style="width: 85%; background: var(--secondary-color);"></div></div>
+                                        <div class="progress-bar">
+                                            <div class="fill" style="width: 85%; background: var(--secondary-color);">
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="vaccine-item">
                                         <div class="v-header"><span>COVID-19 (Bivalente)</span> <span>72%</span></div>
-                                        <div class="progress-bar"><div class="fill" style="width: 72%; background: #FFC107;"></div></div>
+                                        <div class="progress-bar">
+                                            <div class="fill" style="width: 72%; background: #FFC107;"></div>
+                                        </div>
                                     </div>
                                     <div class="vaccine-item">
                                         <div class="v-header"><span>Dengue (Qdenga)</span> <span>45%</span></div>
-                                        <div class="progress-bar"><div class="fill" style="width: 45%; background: #F44336;"></div></div>
+                                        <div class="progress-bar">
+                                            <div class="fill" style="width: 45%; background: #F44336;"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="stat-card-grid">
-                                 <div class="mini-stat">
+                                <div class="mini-stat">
                                     <i class="fas fa-mosquito" style="color: #F44336;"></i>
                                     <span class="mini-val">1.2k</span>
                                     <span class="mini-lbl">Focos Eliminados</span>
-                                 </div>
-                                 <div class="mini-stat">
+                                </div>
+                                <div class="mini-stat">
                                     <i class="fas fa-user-nurse" style="color: var(--primary-color);"></i>
                                     <span class="mini-val">48</span>
                                     <span class="mini-lbl">Equipes em Campo</span>
-                                 </div>
-                                 <div class="mini-stat">
+                                </div>
+                                <div class="mini-stat">
                                     <i class="fas fa-hospital" style="color: var(--secondary-color);"></i>
                                     <span class="mini-val">65%</span>
                                     <span class="mini-lbl">Ocupação Leitos</span>
-                                 </div>
-                                 <div class="mini-stat">
+                                </div>
+                                <div class="mini-stat">
                                     <i class="fas fa-clipboard-check" style="color: #005299;"></i>
                                     <span class="mini-val">98%</span>
                                     <span class="mini-lbl">Notificações Fechadas</span>
-                                 </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -211,14 +218,15 @@
                         <h2>Mapa de Calor Epidemiológico</h2>
                         <div class="map-controls">
                             <select id="disease-select" class="control-select">
-                                <option>🦟 Dengue</option>
-                                <option>🦠 COVID-19</option>
-                                <option>🤒 Influenza</option>
+                                <option value="dengue">🦟 Dengue</option>
+                                <option value="chikungunya">� Chikungunya</option>
+                                <option value="zika">🦟 Zika</option>
+                                <option value="leishmaniose">🦗 Leishmaniose</option>
+                                <option value="hanseniase">🦠 Hanseníase</option>
+                                <option value="esquistossomose">� Esquistossomose</option>
                             </select>
-                            <select id="municipality-select" class="control-select">
-                                <option value="gps">📍 Minha Localização</option>
-                                <option value="saopaulo">São Paulo - SP</option>
-                                <option value="rio">Rio de Janeiro - RJ</option>
+                            <select id="municipality-select" class="control-select" style="display: none;">
+                                <option value="maraba">Marabá - PA</option>
                             </select>
                         </div>
                         <div id="epidemiological-map" style="height: 420px; border-radius: 12px; overflow: hidden;">
@@ -578,7 +586,8 @@
         <nav class="bottom-nav">
             <button class="nav-item active" data-screen="dashboard"><i
                     class="fas fa-home"></i><span>Início</span></button>
-            <button class="nav-item" data-screen="case-notification"><i class="fas fa-file-medical"></i><span>Notificar</span></button>
+            <button class="nav-item" data-screen="case-notification"><i
+                    class="fas fa-file-medical"></i><span>Notificar</span></button>
             <button class="nav-item" data-screen="chat"><i class="fas fa-comment-medical"></i><span>Chat</span></button>
             <button class="nav-item" data-screen="library"><i
                     class="fas fa-book-medical"></i><span>Biblioteca</span></button>
