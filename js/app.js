@@ -2431,257 +2431,76 @@ const MapModule = {
 
   init() {
     this.setupEventListeners();
+    // Load initial data
+    setTimeout(() => {
+      this.generateCasesList('maraba');
+    }, 500);
   },
 
   setupEventListeners() {
-    const enableBtn = document.getElementById('enable-location-btn');
-    const selectDisease = document.getElementById('disease-select');
-
-    // Automatically load Marabá on start
-    setTimeout(() => {
-      this.loadMapAt(this.cities['maraba'].coords[0], this.cities['maraba'].coords[1], 'maraba');
-    }, 500);
-
-
-    if (enableBtn) {
-      enableBtn.onclick = () => this.requestLocation();
-    }
-
+    const selectDisease = document.getElementById('case-filter-disease');
     if (selectDisease) {
       selectDisease.addEventListener('change', (e) => {
         this.currentDisease = e.target.value;
-        const center = this.map ? this.map.getCenter() : { lat: this.cities['maraba'].coords[0], lng: this.cities['maraba'].coords[1] };
-        if (this.map) {
-          this.generateCaseMarkers(center.lat, center.lng, 'maraba');
-        }
+        this.generateCasesList('maraba');
       });
     }
   },
 
-  requestLocation() {
-    const overlay = document.getElementById('map-permission-overlay');
-    const btn = document.getElementById('enable-location-btn');
-
-    if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Localizando...';
-
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          this.userLocation = [position.coords.latitude, position.coords.longitude];
-          // Pass 'gps' to trigger dynamic generation around user
-          this.loadMapAt(this.userLocation[0], this.userLocation[1], 'gps');
-          if (overlay) overlay.style.display = 'none';
-          if (btn) btn.innerHTML = 'Ativar Localização';
-        },
-        (error) => {
-          console.error("Erro GPS:", error);
-          alert("Não foi possível obter sua localização. Mostrando São Paulo por padrão.");
-          this.loadMapAt(this.cities['saopaulo'].coords[0], this.cities['saopaulo'].coords[1], 'saopaulo');
-          if (overlay) overlay.style.display = 'none';
-          if (btn) btn.innerHTML = 'Ativar Localização';
-        }
-      );
-    } else {
-      alert("Seu navegador não suporta Geolocalização.");
-      this.loadMapAt(this.cities['maraba'].coords[0], this.cities['maraba'].coords[1], 'maraba');
-      if (overlay) overlay.style.display = 'none';
-    }
-  },
-
-  loadMapAt(lat, lng, cityKey = 'maraba') {
-    if (this.map) {
-      this.map.flyTo([lat, lng], 12);
-      this.generateCaseMarkers(lat, lng, cityKey);
-      return;
-    }
-
-    setTimeout(() => {
-      this.map = L.map('epidemiological-map', {
-        zoomControl: false
-      }).setView([lat, lng], 12);
-
-      L.control.zoom({ position: 'topright' }).addTo(this.map);
-
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap &copy; CARTO',
-        subdomains: 'abcd',
-        maxZoom: 19
-      }).addTo(this.map);
-
-      this.layerGroup = L.layerGroup().addTo(this.map);
-
-      this.generateBubbleData(lat, lng, cityKey);
-      this.addLegend();
-    }, 100);
-  },
-
-  generateBubbleData(lat, lng, cityKey) {
-    if (!this.layerGroup) return;
-    this.layerGroup.clearLayers();
-
-    let neighborhoods;
-
-    // 1. Get Neighborhoods
-    if (this.neighborhoodsData[cityKey]) {
-      // Use predefined real data
-      neighborhoods = this.neighborhoodsData[cityKey];
-    } else {
-      // Dynamic Generation for GPS/Unknown locations
-      // Generate points relative to the provided lat/lng center
-      neighborhoods = [
-        { name: 'Centro Local', lat: lat, lng: lng },
-        { name: 'Região Norte', lat: lat + 0.02, lng: lng },
-        { name: 'Região Sul', lat: lat - 0.02, lng: lng },
-        { name: 'Região Leste', lat: lat, lng: lng + 0.02 },
-        { name: 'Região Oeste', lat: lat, lng: lng - 0.02 },
-        { name: 'Área Industrial', lat: lat + 0.015, lng: lng + 0.015 },
-        { name: 'Área Residencial', lat: lat - 0.015, lng: lng - 0.015 }
-      ];
-    }
-
-    neighborhoods.forEach(hood => {
-      // Number of sub-bubbles to generate per neighborhood to create "heat"
-      const subBubbles = 3;
-
-      for (let i = 0; i < subBubbles; i++) {
-        // Random offset within SAFE radius (avoiding rivers)
-        // Use logic: random angle, random distance < hood.radius
-        const angle = Math.random() * Math.PI * 2;
-        const dist = Math.random() * (hood.radius || 0.005);
-        const pLat = hood.lat + (Math.sin(angle) * dist);
-        const pLng = hood.lng + (Math.cos(angle) * dist);
-
-        // Generate intensity
-        // Realistic numbers for Marabá context
-        let intensity = Math.floor(Math.random() * 80) + 10;
-
-        // Disease Specific Adjustments (Using only allowed diseases)
-        // Dengue/Chikungunya/Zika -> VETOR (High in urban areas)
-        if (['dengue', 'chikungunya', 'zika'].includes(this.currentDisease)) {
-          intensity *= 1.5;
-        }
-        // Leishmaniose -> Usually more peripheral or near forests, but we simplify
-        if (this.currentDisease.includes('leishmaniose')) {
-          intensity *= 1.2;
-        }
-        // Geohelmintíases (Verminoses)
-        if (['ascaridiase', 'esquistossomose'].includes(this.currentDisease)) {
-          intensity *= 0.8;
-        }
-
-        intensity = Math.floor(intensity);
-        if (intensity < 10) intensity = 10;
-
-        let color = this.colors.low;
-        if (intensity > 40) color = this.colors.medium;
-        if (intensity > 80) color = this.colors.high;
-        if (intensity > 120) color = this.colors.critical;
-
-        // USE L.circle (METERS) instead of L.circleMarker (PIXELS)
-        // This ensures bubbles shrink when zooming out
-        // Radius reduced to 150m for tighter packing
-        const circle = L.circle([pLat, pLng], {
-          color: 'transparent',
-          fillColor: color,
-          fillOpacity: 0.6,
-          radius: 150 // Strict small radius to avoid river bleed
-        });
-
-        // Simplified popup
-        const disLabel = this.currentDisease.charAt(0).toUpperCase() + this.currentDisease.slice(1);
-        circle.bindPopup(`<b>${hood.name}</b><br>${disLabel}: Foco Detectado<br>Intensidade: ${intensity}`);
-
-        this.layerGroup.addLayer(circle);
-      }
-    });
-
-    // 6. Add Health Centers Markers
-    this.addHealthCenters();
-  },
-
-  generateCaseMarkers(lat, lng, cityKey) {
-    if (!this.layerGroup) return;
-    this.layerGroup.clearLayers();
-
-    const listContainer = document.getElementById('active-cases-list');
-    if (listContainer) listContainer.innerHTML = '';
+  // Simplified List Generation - No Map
+  generateCasesList(cityKey) {
+    const tbody = document.getElementById('full-cases-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
 
     let neighborhoods;
     if (this.neighborhoodsData[cityKey]) {
       neighborhoods = this.neighborhoodsData[cityKey];
     } else {
-      neighborhoods = [{ name: 'Centro', lat: lat, lng: lng, radius: 0.005 }];
+      neighborhoods = [{ name: 'Centro' }];
     }
 
     // Mock Names
-    const names = ['Maria Silva', 'João Souza', 'Ana Oliveira', 'Pedro Santos', 'Lucas Pereira', 'Carla Lima', 'Fernanda Costa', 'Marcos Alves', 'Juliana Rocha', 'Gabriel Dias', 'Patricia Gomes', 'Rafael Martins', 'Beatriz Araujo', 'Thiago Lopes', 'Vanessa Cardoso'];
+    const names = ['Maria Silva', 'João Souza', 'Ana Oliveira', 'Pedro Santos', 'Lucas Pereira', 'Carla Lima', 'Fernanda Costa', 'Marcos Alves', 'Juliana Rocha', 'Gabriel Dias', 'Patricia Gomes', 'Rafael Martins', 'Beatriz Araujo', 'Thiago Lopes', 'Vanessa Cardoso', 'Rodrigo Lima', 'Camila Ferreira', 'Felipe Santos', 'Mariana Costa', 'Bruno Oliveira'];
 
-    // Generate ~15 Cases
-    const numCases = 15;
+    // Generate 20 Cases
+    const numCases = 20;
 
     for (let i = 0; i < numCases; i++) {
       const hood = neighborhoods[Math.floor(Math.random() * neighborhoods.length)];
-
-      // Random Pos within radius
-      const angle = Math.random() * Math.PI * 2;
-      const dist = Math.random() * (hood.radius || 0.005) * 0.8; // Safe margin
-      const pLat = hood.lat + (Math.sin(angle) * dist);
-      const pLng = hood.lng + (Math.cos(angle) * dist);
-
       const patientName = names[i % names.length];
-      const status = Math.random() > 0.3 ? 'Confirmado' : 'Em Análise';
+      const status = Math.random() > 0.4 ? 'Confirmado' : 'Em Análise';
 
-      // Create Marker
-      const marker = L.marker([pLat, pLng], {
-        title: patientName
-      });
+      // Random Date (Last 30 days)
+      const date = new Date();
+      date.setDate(date.getDate() - Math.floor(Math.random() * 30));
+      const dateStr = date.toLocaleDateString('pt-BR');
 
-      const disLabel = this.currentDisease.charAt(0).toUpperCase() + this.currentDisease.slice(1);
+      let disease = this.currentDisease;
+      if (disease === 'all' || !disease) {
+        const diseases = ['Dengue', 'Zika', 'Chikungunya', 'Leishmaniose', 'Hanseníase'];
+        disease = diseases[Math.floor(Math.random() * diseases.length)];
+      } else {
+        disease = disease.charAt(0).toUpperCase() + disease.slice(1);
+      }
 
-      const popupContent = `
-            <div style="text-align:center;">
-                <b>${patientName}</b><br>
-                <small>${hood.name}</small><br>
-                <span style="color: ${status === 'Confirmado' ? '#F44336' : '#FF9800'}; font-weight:bold;">
-                    ${disLabel} - ${status}
+      const tr = document.createElement('tr');
+      tr.style.borderBottom = '1px solid #eee';
+
+      tr.innerHTML = `
+            <td style="padding: 15px; font-weight: 500; color: #333;">${patientName}</td>
+            <td style="padding: 15px; color: #666;">${hood.name}</td>
+            <td style="padding: 15px; color: var(--primary-color); font-weight: 500;">${disease}</td>
+            <td style="padding: 15px; color: #666;">${dateStr}</td>
+            <td style="padding: 15px;">
+                <span style="padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 500; background: ${status === 'Confirmado' ? '#ffebee' : '#fff3e0'}; color: ${status === 'Confirmado' ? '#c62828' : '#ef6c00'};">
+                    ${status}
                 </span>
-            </div>
+            </td>
         `;
 
-      marker.bindPopup(popupContent);
-      this.layerGroup.addLayer(marker);
-
-      // Add to List UI
-      if (listContainer) {
-        const item = document.createElement('div');
-        item.className = 'case-item-row';
-        item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 12px; background: white; margin-bottom: 8px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s;';
-        item.innerHTML = `
-                <div style="display:flex; flex-direction:column;">
-                    <span style="font-weight: 600; color: #333;">${patientName}</span>
-                    <span style="font-size: 0.85rem; color: #666;"><i class="fas fa-map-marker-alt" style="font-size:10px;"></i> ${hood.name}</span>
-                </div>
-                <div style="text-align:right;">
-                     <div style="font-weight:bold; color: var(--primary-color); font-size: 0.9rem;">${disLabel}</div>
-                     <span style="font-size: 0.8rem; padding: 4px 8px; border-radius: 12px; background: ${status === 'Confirmado' ? '#ffebee' : '#fff3e0'}; color: ${status === 'Confirmado' ? '#c62828' : '#ef6c00'};">
-                        ${status}
-                     </span>
-                </div>
-            `;
-
-        item.onclick = () => {
-          this.map.flyTo([pLat, pLng], 15);
-          marker.openPopup();
-        };
-        item.onmouseenter = () => item.style.transform = 'translateY(-2px)';
-        item.onmouseleave = () => item.style.transform = 'translateY(0)';
-
-        listContainer.appendChild(item);
-      }
+      tbody.appendChild(tr);
     }
-
-    // 6. Add Health Centers Markers
-    this.addHealthCenters();
   },
 
   addLegend() {
