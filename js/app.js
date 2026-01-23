@@ -134,6 +134,44 @@ const sampleData = {
         timestamp: '2025-12-18T10:45:00',
         read: false
       }
+    ],
+    'room-002': [
+      {
+        id: 'msg-201',
+        senderId: 'user-004',
+        senderName: 'Ana Pereira',
+        content: 'Equipe, o relatório consolidado das visitas já está na pasta da rede.',
+        timestamp: '2025-12-18T09:00:00',
+        read: true
+      },
+      {
+        id: 'msg-202',
+        senderId: 'user-001',
+        senderName: 'João Silva',
+        content: 'Excelente, vou analisar para o boletim semanal.',
+        timestamp: '2025-12-18T09:15:00',
+        read: true
+      }
+    ],
+    'room-003': [
+      {
+        id: 'msg-301',
+        senderId: 'user-005',
+        senderName: 'Dr. Roberto',
+        content: 'Alguém tem experiência com o novo protocolo de tratamento para Chikungunya?',
+        timestamp: '2025-12-17T16:20:00',
+        read: false
+      }
+    ],
+    'room-004': [
+      {
+        id: 'msg-401',
+        senderId: 'user-006',
+        senderName: 'Coordenação',
+        content: 'Lembrete: Campanha de vacinação contra a gripe será antecipada.',
+        timestamp: '2025-12-17T14:10:00',
+        read: true
+      }
     ]
   },
 
@@ -1727,17 +1765,18 @@ const AnalyticsModule = {
     const admittedEl = document.getElementById('metric-admitted');
     const recoveredEl = document.getElementById('metric-recovered');
 
-    if (activeEl) this.animateValue(activeEl, 0, this.metrics.active, 1500);
-    if (admittedEl) this.animateValue(admittedEl, 0, this.metrics.admitted, 1000);
-    if (recoveredEl) this.animateValue(recoveredEl, 0, this.metrics.recovered, 2000);
+    // Realistic numbers for Marabá (~280k population)
+    // Active cases across all monitored diseases
+    if (activeEl) this.animateValue(activeEl, 0, 342, 1500);
+    // Admitted in hospitals (HMM, Regional)
+    if (admittedEl) this.animateValue(admittedEl, 0, 28, 1000);
+    // Total recovered this year
+    if (recoveredEl) this.animateValue(recoveredEl, 0, 4150, 2000);
 
     // Animate CSS Charts (Simple trick: set height after load)
     const bars = document.querySelectorAll('.simple-bar-chart .bar');
     // Using setTimeout to trigger CSS transition
     setTimeout(() => {
-      // Force relayout if needed, or just let CSS height transition kick in naturally if heights are inline.
-      // Since heights are inline in HTML, we might need to "reset" them to 0 and then back to value to animate.
-      // For simplicity in this demo, we assume they animate on view or we just leave them static.
     }, 500);
   },
 
@@ -2199,8 +2238,8 @@ const PatientModule = {
 
   renderRecents() {
     const container = document.getElementById('recent-patients-list');
-    // Mock Recents (Just showing Maria for now)
-    const recent = [this.mockDB[0]];
+    // Mostrar todos os pacientes do banco
+    const recent = this.mockDB;
 
     container.innerHTML = '';
     recent.forEach(p => {
@@ -2212,7 +2251,7 @@ const PatientModule = {
                 </div>
                 <div class="p-item-info">
                     <h4>${p.name}</h4>
-                    <p>Acessado há 2 horas</p>
+                    <p>${p.cns}</p>
                 </div>
             `;
       card.onclick = () => this.openProfile(p);
@@ -2318,50 +2357,47 @@ const MapModule = {
     critical: '#B71C1C' // Vermelho Escuro (Crítico)
   },
 
-  // Cidades Predefinidas
+  // Cidades Predefinidas - Focada em Marabá
   cities: {
-    'saopaulo': { coords: [-23.5505, -46.6333], label: 'São Paulo' },
-    'rio': { coords: [-22.9068, -43.1729], label: 'Rio de Janeiro' },
-    'brasilia': { coords: [-15.7975, -47.8919], label: 'Brasília' },
-    'salvador': { coords: [-12.9774, -38.5016], label: 'Salvador' },
-    'manaus': { coords: [-3.1190, -60.0217], label: 'Manaus' }
+    'maraba': { coords: [-5.3699, -49.1169], label: 'Marabá' }
   },
 
-  // Dados Reais de Bairros (Latitude, Longitude)
+  // Dados Reais de Bairros de Marabá (Latitude, Longitude)
   neighborhoodsData: {
-    'saopaulo': [
-      { name: 'Vila Mariana', lat: -23.5837, lng: -46.6339 },
-      { name: 'Mooca', lat: -23.5592, lng: -46.5981 },
-      { name: 'Pinheiros', lat: -23.5653, lng: -46.6914 },
-      { name: 'Itaquera', lat: -23.5344, lng: -46.4515 },
-      { name: 'Santana', lat: -23.4994, lng: -46.6316 },
-      { name: 'Santo Amaro', lat: -23.6559, lng: -46.7027 }
-    ],
-    'rio': [
-      { name: 'Copacabana', lat: -22.9707, lng: -43.1824 },
-      { name: 'Tijuca', lat: -22.9255, lng: -43.2521 },
-      { name: 'Barra da Tijuca', lat: -23.0004, lng: -43.3659 },
-      { name: 'Madureira', lat: -22.8810, lng: -43.3400 },
-      { name: 'Centro', lat: -22.9068, lng: -43.1729 }
-    ],
-    'brasilia': [
-      { name: 'Asa Sul', lat: -15.8131, lng: -47.8961 },
-      { name: 'Asa Norte', lat: -15.7631, lng: -47.8836 },
-      { name: 'Águas Claras', lat: -15.8400, lng: -48.0300 },
-      { name: 'Taguatinga', lat: -15.8333, lng: -48.0564 },
-      { name: 'Plano Piloto', lat: -15.7975, lng: -47.8919 }
-    ],
-    'salvador': [
-      { name: 'Pelourinho', lat: -12.9711, lng: -38.5108 },
-      { name: 'Barra', lat: -13.0084, lng: -38.5283 },
-      { name: 'Rio Vermelho', lat: -13.0125, lng: -38.4906 }
-    ],
-    'manaus': [
-      { name: 'Centro', lat: -3.1190, lng: -60.0217 },
-      { name: 'Adrianópolis', lat: -3.1096, lng: -60.0135 },
-      { name: 'Ponta Negra', lat: -3.0734, lng: -60.0776 }
+    'maraba': [
+      // Nova Marabá
+      { name: 'Folha 31 (Nova Marabá)', lat: -5.3520, lng: -49.0950 },
+      { name: 'Folha 28 (Nova Marabá)', lat: -5.3580, lng: -49.0980 },
+      { name: 'Folha 16 (Nova Marabá)', lat: -5.3610, lng: -49.1020 },
+
+      // Cidade Nova
+      { name: 'Liberdade (Cidade Nova)', lat: -5.3650, lng: -49.0750 },
+      { name: 'Novo Horizonte (Cidade Nova)', lat: -5.3700, lng: -49.0800 },
+
+      // Velha Marabá (Marabá Pioneira)
+      { name: 'Marabá Pioneira', lat: -5.3450, lng: -49.1250 },
+      { name: 'Sta. Rosa (Pioneira)', lat: -5.3400, lng: -49.1220 },
+
+      // São Félix
+      { name: 'São Félix I', lat: -5.3350, lng: -49.1550 },
+      { name: 'São Félix II', lat: -5.3300, lng: -49.1600 }
     ]
   },
+
+  // Postos de Saúde e Hospitais de Marabá
+  healthCenters: [
+    { name: 'Hospital Municipal de Marabá (HMM)', lat: -5.3550, lng: -49.0900, type: 'hospital', info: 'Atendimento de Urgência e Emergência 24h.' },
+    { name: 'Hospital Regional do Sudeste do Pará', lat: -5.3620, lng: -49.0850, type: 'hospital', info: 'Alta complexidade e especialidades.' },
+    { name: 'Hosp. Materno Infantil', lat: -5.3530, lng: -49.0920, type: 'hospital', info: 'Atendimento especializado gestantes/crianças.' },
+    { name: 'UBS Hiroshi Matsuda', lat: -5.3500, lng: -49.1000, type: 'ubs', info: 'Folha 11. Vacinação: 08h às 17h.' },
+    { name: 'UBS Laranjeiras', lat: -5.3680, lng: -49.0780, type: 'ubs', info: 'Cidade Nova. Clínico Geral.' },
+    { name: 'UBS Demétrio Ribeiro', lat: -5.3460, lng: -49.1240, type: 'ubs', info: 'Marabá Pioneira.' },
+    { name: 'UBS Enfermeira Zezinha', lat: -5.3510, lng: -49.0960, type: 'ubs', info: 'Nova Marabá, Folha 23.' },
+    { name: 'UBS Jaime Pinto', lat: -5.3590, lng: -49.1010, type: 'ubs', info: 'Nova Marabá.' },
+    { name: 'UBS Amadeu Vivacqua', lat: -5.3360, lng: -49.1560, type: 'ubs', info: 'São Félix II.' },
+    { name: 'UBS Morada Nova', lat: -5.3750, lng: -49.0500, type: 'ubs', info: 'Morada Nova.' },
+    { name: 'Centro de Controle de Zoonoses', lat: -5.3480, lng: -49.1100, type: 'ubs', info: 'Controle vetorial.' }
+  ],
 
   init() {
     this.setupEventListeners();
@@ -2371,6 +2407,12 @@ const MapModule = {
     const enableBtn = document.getElementById('enable-location-btn');
     const selectCity = document.getElementById('municipality-select');
     const selectDisease = document.getElementById('disease-select');
+
+    // Automatically load Marabá on start
+    setTimeout(() => {
+      this.loadMapAt(this.cities['maraba'].coords[0], this.cities['maraba'].coords[1], 'maraba');
+    }, 500);
+
 
     if (enableBtn) {
       enableBtn.onclick = () => this.requestLocation();
@@ -2393,7 +2435,7 @@ const MapModule = {
         this.currentDisease = e.target.value;
         // Determine current city context correctly
         const selectCity = document.getElementById('municipality-select');
-        let currentCity = 'saopaulo';
+        let currentCity = 'maraba';
 
         if (selectCity) {
           if (selectCity.value === 'gps') {
@@ -2436,12 +2478,12 @@ const MapModule = {
       );
     } else {
       alert("Seu navegador não suporta Geolocalização.");
-      this.loadMapAt(this.cities['saopaulo'].coords[0], this.cities['saopaulo'].coords[1], 'saopaulo');
+      this.loadMapAt(this.cities['maraba'].coords[0], this.cities['maraba'].coords[1], 'maraba');
       if (overlay) overlay.style.display = 'none';
     }
   },
 
-  loadMapAt(lat, lng, cityKey = 'saopaulo') {
+  loadMapAt(lat, lng, cityKey = 'maraba') {
     if (this.map) {
       this.map.flyTo([lat, lng], 12);
       this.generateBubbleData(lat, lng, cityKey);
@@ -2494,11 +2536,16 @@ const MapModule = {
 
     neighborhoods.forEach(hood => {
       // 2. Generate Random Case Counts
-      let cases = Math.floor(Math.random() * 500) + 20; // 20 to 520 cases
+      // Realistic numbers for Marabá
+      let cases = Math.floor(Math.random() * 50) + 5;
 
-      // Disease Multipliers
-      if (this.currentDisease === 'covid') cases *= 1.5;
-      if (this.currentDisease === 'zika') cases *= 0.3;
+      // Disease Multipliers & Adjustments
+      if (this.currentDisease === 'dengue') cases = Math.floor(cases * 2.5); // Endemic
+      if (this.currentDisease === 'hanseniase') cases = Math.floor(Math.random() * 10) + 1; // Lower numbers
+      if (this.currentDisease === 'leishmaniose') cases = Math.floor(Math.random() * 15) + 2;
+
+      // Zero check
+      if (cases < 0) cases = 0;
 
       cases = Math.floor(cases);
 
@@ -2507,9 +2554,9 @@ const MapModule = {
       const radius = Math.sqrt(cases) * 1.5;
 
       let color = this.colors.low;
-      if (cases > 100) color = this.colors.medium;
-      if (cases > 300) color = this.colors.high;
-      if (cases > 600) color = this.colors.critical;
+      if (cases > 20) color = this.colors.medium;
+      if (cases > 50) color = this.colors.high;
+      if (cases > 100) color = this.colors.critical;
 
       // 4. Create Circle Marker at coordinates
       const circle = L.circleMarker([hood.lat, hood.lng], {
@@ -2546,6 +2593,9 @@ const MapModule = {
 
       this.layerGroup.addLayer(circle);
     });
+
+    // 6. Add Health Centers Markers
+    this.addHealthCenters();
   },
 
   addLegend() {
@@ -2560,6 +2610,39 @@ const MapModule = {
     };
 
     legend.addTo(this.map);
+  },
+
+  addHealthCenters() {
+    // Custom Icons
+    const hospitalIcon = L.divIcon({
+      className: 'custom-map-icon',
+      html: '<div style="background-color: #D32F2F; width: 24px; height: 24px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"><i class="fas fa-hospital-symbol"></i></div>',
+      iconSize: [24, 24],
+      iconAnchor: [12, 12]
+    });
+
+    const ubsIcon = L.divIcon({
+      className: 'custom-map-icon',
+      html: '<div style="background-color: #1976D2; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"><i class="fas fa-clinic-medical"></i></div>',
+      iconSize: [20, 20],
+      iconAnchor: [10, 10]
+    });
+
+    if (this.healthCenters) {
+      this.healthCenters.forEach(center => {
+        const icon = center.type === 'hospital' ? hospitalIcon : ubsIcon;
+        const marker = L.marker([center.lat, center.lng], { icon: icon });
+
+        marker.bindPopup(`
+                  <div style="text-align: center; min-width: 150px;">
+                      <strong style="color: #333; display: block; margin-bottom: 5px;">${center.name}</strong>
+                      <span style="font-size: 0.85em; color: #666;">${center.info}</span>
+                  </div>
+              `);
+
+        this.layerGroup.addLayer(marker);
+      });
+    }
   },
 
   updateLegendContent(div) {
@@ -3072,6 +3155,20 @@ const App = {
             CaseNotificationModule.init();
           }
         }, 100);
+        break;
+      case 'patients':
+        // Force reset patient view to search/list mode
+        if (PatientModule) {
+          const profileView = document.getElementById('patient-profile-view');
+          const searchBar = document.querySelector('.patient-search-bar');
+          const recents = document.getElementById('patient-recents');
+          const results = document.getElementById('patient-results');
+
+          if (profileView) profileView.style.display = 'none';
+          if (searchBar) searchBar.style.display = 'block';
+          if (recents) recents.style.display = 'block';
+          if (results) results.style.display = 'none';
+        }
         break;
     }
   },
