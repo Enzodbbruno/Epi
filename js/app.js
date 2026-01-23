@@ -2452,7 +2452,7 @@ const MapModule = {
         this.currentDisease = e.target.value;
         const center = this.map ? this.map.getCenter() : { lat: this.cities['maraba'].coords[0], lng: this.cities['maraba'].coords[1] };
         if (this.map) {
-          this.generateBubbleData(center.lat, center.lng, 'maraba');
+          this.generateCaseMarkers(center.lat, center.lng, 'maraba');
         }
       });
     }
@@ -2491,7 +2491,7 @@ const MapModule = {
   loadMapAt(lat, lng, cityKey = 'maraba') {
     if (this.map) {
       this.map.flyTo([lat, lng], 12);
-      this.generateBubbleData(lat, lng, cityKey);
+      this.generateCaseMarkers(lat, lng, cityKey);
       return;
     }
 
@@ -2594,6 +2594,91 @@ const MapModule = {
         this.layerGroup.addLayer(circle);
       }
     });
+
+    // 6. Add Health Centers Markers
+    this.addHealthCenters();
+  },
+
+  generateCaseMarkers(lat, lng, cityKey) {
+    if (!this.layerGroup) return;
+    this.layerGroup.clearLayers();
+
+    const listContainer = document.getElementById('active-cases-list');
+    if (listContainer) listContainer.innerHTML = '';
+
+    let neighborhoods;
+    if (this.neighborhoodsData[cityKey]) {
+      neighborhoods = this.neighborhoodsData[cityKey];
+    } else {
+      neighborhoods = [{ name: 'Centro', lat: lat, lng: lng, radius: 0.005 }];
+    }
+
+    // Mock Names
+    const names = ['Maria Silva', 'João Souza', 'Ana Oliveira', 'Pedro Santos', 'Lucas Pereira', 'Carla Lima', 'Fernanda Costa', 'Marcos Alves', 'Juliana Rocha', 'Gabriel Dias', 'Patricia Gomes', 'Rafael Martins', 'Beatriz Araujo', 'Thiago Lopes', 'Vanessa Cardoso'];
+
+    // Generate ~15 Cases
+    const numCases = 15;
+
+    for (let i = 0; i < numCases; i++) {
+      const hood = neighborhoods[Math.floor(Math.random() * neighborhoods.length)];
+
+      // Random Pos within radius
+      const angle = Math.random() * Math.PI * 2;
+      const dist = Math.random() * (hood.radius || 0.005) * 0.8; // Safe margin
+      const pLat = hood.lat + (Math.sin(angle) * dist);
+      const pLng = hood.lng + (Math.cos(angle) * dist);
+
+      const patientName = names[i % names.length];
+      const status = Math.random() > 0.3 ? 'Confirmado' : 'Em Análise';
+
+      // Create Marker
+      const marker = L.marker([pLat, pLng], {
+        title: patientName
+      });
+
+      const disLabel = this.currentDisease.charAt(0).toUpperCase() + this.currentDisease.slice(1);
+
+      const popupContent = `
+            <div style="text-align:center;">
+                <b>${patientName}</b><br>
+                <small>${hood.name}</small><br>
+                <span style="color: ${status === 'Confirmado' ? '#F44336' : '#FF9800'}; font-weight:bold;">
+                    ${disLabel} - ${status}
+                </span>
+            </div>
+        `;
+
+      marker.bindPopup(popupContent);
+      this.layerGroup.addLayer(marker);
+
+      // Add to List UI
+      if (listContainer) {
+        const item = document.createElement('div');
+        item.className = 'case-item-row';
+        item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 12px; background: white; margin-bottom: 8px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s;';
+        item.innerHTML = `
+                <div style="display:flex; flex-direction:column;">
+                    <span style="font-weight: 600; color: #333;">${patientName}</span>
+                    <span style="font-size: 0.85rem; color: #666;"><i class="fas fa-map-marker-alt" style="font-size:10px;"></i> ${hood.name}</span>
+                </div>
+                <div style="text-align:right;">
+                     <div style="font-weight:bold; color: var(--primary-color); font-size: 0.9rem;">${disLabel}</div>
+                     <span style="font-size: 0.8rem; padding: 4px 8px; border-radius: 12px; background: ${status === 'Confirmado' ? '#ffebee' : '#fff3e0'}; color: ${status === 'Confirmado' ? '#c62828' : '#ef6c00'};">
+                        ${status}
+                     </span>
+                </div>
+            `;
+
+        item.onclick = () => {
+          this.map.flyTo([pLat, pLng], 15);
+          marker.openPopup();
+        };
+        item.onmouseenter = () => item.style.transform = 'translateY(-2px)';
+        item.onmouseleave = () => item.style.transform = 'translateY(0)';
+
+        listContainer.appendChild(item);
+      }
+    }
 
     // 6. Add Health Centers Markers
     this.addHealthCenters();
