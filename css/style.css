@@ -218,8 +218,8 @@ body {
     overflow-x: hidden;
     /* Scroll ONLY content */
     padding: var(--spacing-md);
-    padding-bottom: 100px;
-    /* Space for bottom nav on mobile */
+    padding-bottom: 120px;
+    /* Space for bottom nav on mobile - increased for better visibility */
     max-width: 100%;
     -webkit-overflow-scrolling: touch;
     /* Smooth scrolling on iOS */
@@ -2818,8 +2818,29 @@ body {
     overflow-y: auto;
     overflow-x: hidden;
     background: #f9fafb;
-    padding-bottom: 100px;
+    padding-bottom: 120px;
     -webkit-overflow-scrolling: touch;
+}
+
+/* Mobile: Extra padding to ensure content is fully visible */
+@media (max-width: 1023px) {
+    .main-content {
+        padding-bottom: 150px !important;
+    }
+    
+    /* Ensure all screen sections have enough bottom padding */
+    .screen {
+        padding-bottom: 20px;
+    }
+    
+    /* Specific padding for case notification screen */
+    #case-notification-screen {
+        padding-bottom: 160px !important;
+    }
+    
+    #case-notification-screen .notification-form-container {
+        padding-bottom: 160px !important;
+    }
 }
 
 /* Screen Base */
@@ -3199,6 +3220,9 @@ input:checked + .toggle-slider:before {
     justify-content: space-around;
     padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
     z-index: 100;
+    height: auto;
+    min-height: 60px;
+    max-height: 80px;
 }
 
 .bottom-nav .nav-item {
@@ -4021,11 +4045,15 @@ input:checked + .toggle-slider:before {
 
     .notification-form-container {
         padding: 16px;
+        padding-bottom: 140px;
+        /* Extra space for bottom nav on mobile */
     }
 
     .notification-form-card {
         padding: 24px 16px;
         border-radius: 12px;
+        margin-bottom: 20px;
+        /* Extra margin to ensure button is visible */
     }
 
     .form-header {
@@ -4045,6 +4073,8 @@ input:checked + .toggle-slider:before {
     .btn-notify {
         padding: 14px 20px;
         font-size: 1rem;
+        margin-bottom: 20px;
+        /* Extra margin to ensure button is fully visible */
     }
 }
 
