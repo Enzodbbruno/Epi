@@ -39,6 +39,8 @@
             <nav class="desktop-nav">
                 <a href="#" class="nav-item active" data-screen="dashboard"><i class="fas fa-home"></i>
                     <span>Início</span></a>
+                <a href="#" class="nav-item" data-screen="case-notification"><i class="fas fa-file-medical"></i>
+                    <span>Notificar Caso</span></a>
                 <a href="#" class="nav-item" data-screen="notifications"><i class="fas fa-bell"></i>
                     <span>Notificações</span></a>
                 <a href="#" class="nav-item" data-screen="analytics"><i class="fas fa-chart-line"></i>
@@ -84,6 +86,10 @@
                     </div>
 
                     <div class="quick-actions-grid">
+                        <div class="quick-card" data-screen="case-notification">
+                            <i class="fas fa-file-medical"></i>
+                            <span>Notificar Caso</span>
+                        </div>
                         <div class="quick-card" data-screen="notifications">
                             <i class="fas fa-bell"></i>
                             <span>Notificações</span>
@@ -201,7 +207,372 @@
                     </div>
                 </section>
 
-                <!-- 4. Notificações -->
+                <!-- 4. Notificação de Casos -->
+                <section class="screen" id="case-notification-screen" style="display:none;">
+                    <div class="notification-header">
+                        <button class="back-button-header" data-screen="dashboard">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <div class="notification-header-content">
+                            <h1>Notificação de Doenças Tropicais Negligenciadas</h1>
+                            <p>Município de Marabá - Pará</p>
+                        </div>
+                    </div>
+
+                    <div class="disease-tabs-container">
+                        <div class="disease-tabs" id="disease-tabs">
+                            <button class="disease-tab active" data-disease="dengue">
+                                <i class="fas fa-mosquito"></i>
+                                <span>Dengue</span>
+                            </button>
+                            <button class="disease-tab" data-disease="leishmaniose">
+                                <i class="fas fa-bug"></i>
+                                <span>Leishmaniose</span>
+                            </button>
+                            <button class="disease-tab" data-disease="chagas">
+                                <i class="fas fa-home"></i>
+                                <span>Doença de Chagas</span>
+                            </button>
+                            <button class="disease-tab" data-disease="hanseniase">
+                                <i class="fas fa-user-injured"></i>
+                                <span>Hanseniase</span>
+                            </button>
+                            <button class="disease-tab" data-disease="esquistossomose">
+                                <i class="fas fa-eye"></i>
+                                <span>Esquistossomose</span>
+                            </button>
+                            <button class="disease-tab" data-disease="raiva">
+                                <i class="fas fa-paw"></i>
+                                <span>Raiva</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="notification-form-container">
+                        <div class="notification-form-card">
+                            <div class="disease-form active" id="form-dengue">
+                                <div class="form-header">
+                                    <i class="fas fa-mosquito"></i>
+                                    <h2>Dengue</h2>
+                                </div>
+                                <form id="notification-form-dengue" class="notification-form">
+                                    <div class="form-group">
+                                        <label for="patient-name-dengue">
+                                            <i class="fas fa-user"></i>
+                                            Nome do paciente:
+                                        </label>
+                                        <input type="text" id="patient-name-dengue" placeholder="Digite o nome" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="patient-age-dengue">
+                                            <i class="fas fa-birthday-cake"></i>
+                                            Idade:
+                                        </label>
+                                        <input type="number" id="patient-age-dengue" placeholder="Digite a idade" min="0" max="150" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="patient-location-dengue">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            Bairro / Localidade:
+                                        </label>
+                                        <input type="text" id="patient-location-dengue" placeholder="Informe o bairro em Marabá" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="symptoms-date-dengue">
+                                            <i class="fas fa-calendar"></i>
+                                            Data dos sintomas:
+                                        </label>
+                                        <div class="date-input-wrapper">
+                                            <input type="date" id="symptoms-date-dengue" required>
+                                            <button type="button" class="date-picker-btn" onclick="document.getElementById('symptoms-date-dengue').showPicker()">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label for="main-symptoms-dengue">
+                                            <i class="fas fa-notes-medical"></i>
+                                            Sintomas principais:
+                                        </label>
+                                        <textarea id="main-symptoms-dengue" rows="4" placeholder="Descreva os sintomas principais (ex.: febre alta, dor no corpo, manchas vermelhas, etc.)" required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn-notify">
+                                        <i class="fas fa-paper-plane"></i>
+                                        Notificar Caso
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- Forms for other diseases (similar structure) -->
+                            <div class="disease-form" id="form-leishmaniose" style="display:none;">
+                                <div class="form-header">
+                                    <i class="fas fa-bug"></i>
+                                    <h2>Leishmaniose</h2>
+                                </div>
+                                <form id="notification-form-leishmaniose" class="notification-form">
+                                    <div class="form-group">
+                                        <label for="patient-name-leishmaniose">
+                                            <i class="fas fa-user"></i>
+                                            Nome do paciente:
+                                        </label>
+                                        <input type="text" id="patient-name-leishmaniose" placeholder="Digite o nome" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="patient-age-leishmaniose">
+                                            <i class="fas fa-birthday-cake"></i>
+                                            Idade:
+                                        </label>
+                                        <input type="number" id="patient-age-leishmaniose" placeholder="Digite a idade" min="0" max="150" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="patient-location-leishmaniose">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            Bairro / Localidade:
+                                        </label>
+                                        <input type="text" id="patient-location-leishmaniose" placeholder="Informe o bairro em Marabá" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="symptoms-date-leishmaniose">
+                                            <i class="fas fa-calendar"></i>
+                                            Data dos sintomas:
+                                        </label>
+                                        <div class="date-input-wrapper">
+                                            <input type="date" id="symptoms-date-leishmaniose" required>
+                                            <button type="button" class="date-picker-btn" onclick="document.getElementById('symptoms-date-leishmaniose').showPicker()">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label for="main-symptoms-leishmaniose">
+                                            <i class="fas fa-notes-medical"></i>
+                                            Sintomas principais:
+                                        </label>
+                                        <textarea id="main-symptoms-leishmaniose" rows="4" placeholder="Descreva os sintomas principais (ex.: lesões cutâneas, febre, perda de peso, etc.)" required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn-notify">
+                                        <i class="fas fa-paper-plane"></i>
+                                        Notificar Caso
+                                    </button>
+                                </form>
+                            </div>
+
+                            <div class="disease-form" id="form-chagas" style="display:none;">
+                                <div class="form-header">
+                                    <i class="fas fa-home"></i>
+                                    <h2>Doença de Chagas</h2>
+                                </div>
+                                <form id="notification-form-chagas" class="notification-form">
+                                    <div class="form-group">
+                                        <label for="patient-name-chagas">
+                                            <i class="fas fa-user"></i>
+                                            Nome do paciente:
+                                        </label>
+                                        <input type="text" id="patient-name-chagas" placeholder="Digite o nome" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="patient-age-chagas">
+                                            <i class="fas fa-birthday-cake"></i>
+                                            Idade:
+                                        </label>
+                                        <input type="number" id="patient-age-chagas" placeholder="Digite a idade" min="0" max="150" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="patient-location-chagas">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            Bairro / Localidade:
+                                        </label>
+                                        <input type="text" id="patient-location-chagas" placeholder="Informe o bairro em Marabá" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="symptoms-date-chagas">
+                                            <i class="fas fa-calendar"></i>
+                                            Data dos sintomas:
+                                        </label>
+                                        <div class="date-input-wrapper">
+                                            <input type="date" id="symptoms-date-chagas" required>
+                                            <button type="button" class="date-picker-btn" onclick="document.getElementById('symptoms-date-chagas').showPicker()">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label for="main-symptoms-chagas">
+                                            <i class="fas fa-notes-medical"></i>
+                                            Sintomas principais:
+                                        </label>
+                                        <textarea id="main-symptoms-chagas" rows="4" placeholder="Descreva os sintomas principais (ex.: febre, mal-estar, inchaço no local da picada, etc.)" required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn-notify">
+                                        <i class="fas fa-paper-plane"></i>
+                                        Notificar Caso
+                                    </button>
+                                </form>
+                            </div>
+
+                            <div class="disease-form" id="form-hanseniase" style="display:none;">
+                                <div class="form-header">
+                                    <i class="fas fa-user-injured"></i>
+                                    <h2>Hanseniase</h2>
+                                </div>
+                                <form id="notification-form-hanseniase" class="notification-form">
+                                    <div class="form-group">
+                                        <label for="patient-name-hanseniase">
+                                            <i class="fas fa-user"></i>
+                                            Nome do paciente:
+                                        </label>
+                                        <input type="text" id="patient-name-hanseniase" placeholder="Digite o nome" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="patient-age-hanseniase">
+                                            <i class="fas fa-birthday-cake"></i>
+                                            Idade:
+                                        </label>
+                                        <input type="number" id="patient-age-hanseniase" placeholder="Digite a idade" min="0" max="150" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="patient-location-hanseniase">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            Bairro / Localidade:
+                                        </label>
+                                        <input type="text" id="patient-location-hanseniase" placeholder="Informe o bairro em Marabá" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="symptoms-date-hanseniase">
+                                            <i class="fas fa-calendar"></i>
+                                            Data dos sintomas:
+                                        </label>
+                                        <div class="date-input-wrapper">
+                                            <input type="date" id="symptoms-date-hanseniase" required>
+                                            <button type="button" class="date-picker-btn" onclick="document.getElementById('symptoms-date-hanseniase').showPicker()">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label for="main-symptoms-hanseniase">
+                                            <i class="fas fa-notes-medical"></i>
+                                            Sintomas principais:
+                                        </label>
+                                        <textarea id="main-symptoms-hanseniase" rows="4" placeholder="Descreva os sintomas principais (ex.: manchas na pele, perda de sensibilidade, etc.)" required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn-notify">
+                                        <i class="fas fa-paper-plane"></i>
+                                        Notificar Caso
+                                    </button>
+                                </form>
+                            </div>
+
+                            <div class="disease-form" id="form-esquistossomose" style="display:none;">
+                                <div class="form-header">
+                                    <i class="fas fa-eye"></i>
+                                    <h2>Esquistossomose</h2>
+                                </div>
+                                <form id="notification-form-esquistossomose" class="notification-form">
+                                    <div class="form-group">
+                                        <label for="patient-name-esquistossomose">
+                                            <i class="fas fa-user"></i>
+                                            Nome do paciente:
+                                        </label>
+                                        <input type="text" id="patient-name-esquistossomose" placeholder="Digite o nome" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="patient-age-esquistossomose">
+                                            <i class="fas fa-birthday-cake"></i>
+                                            Idade:
+                                        </label>
+                                        <input type="number" id="patient-age-esquistossomose" placeholder="Digite a idade" min="0" max="150" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="patient-location-esquistossomose">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            Bairro / Localidade:
+                                        </label>
+                                        <input type="text" id="patient-location-esquistossomose" placeholder="Informe o bairro em Marabá" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="symptoms-date-esquistossomose">
+                                            <i class="fas fa-calendar"></i>
+                                            Data dos sintomas:
+                                        </label>
+                                        <div class="date-input-wrapper">
+                                            <input type="date" id="symptoms-date-esquistossomose" required>
+                                            <button type="button" class="date-picker-btn" onclick="document.getElementById('symptoms-date-esquistossomose').showPicker()">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label for="main-symptoms-esquistossomose">
+                                            <i class="fas fa-notes-medical"></i>
+                                            Sintomas principais:
+                                        </label>
+                                        <textarea id="main-symptoms-esquistossomose" rows="4" placeholder="Descreva os sintomas principais (ex.: febre, dor abdominal, diarreia, etc.)" required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn-notify">
+                                        <i class="fas fa-paper-plane"></i>
+                                        Notificar Caso
+                                    </button>
+                                </form>
+                            </div>
+
+                            <div class="disease-form" id="form-raiva" style="display:none;">
+                                <div class="form-header">
+                                    <i class="fas fa-paw"></i>
+                                    <h2>Raiva</h2>
+                                </div>
+                                <form id="notification-form-raiva" class="notification-form">
+                                    <div class="form-group">
+                                        <label for="patient-name-raiva">
+                                            <i class="fas fa-user"></i>
+                                            Nome do paciente:
+                                        </label>
+                                        <input type="text" id="patient-name-raiva" placeholder="Digite o nome" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="patient-age-raiva">
+                                            <i class="fas fa-birthday-cake"></i>
+                                            Idade:
+                                        </label>
+                                        <input type="number" id="patient-age-raiva" placeholder="Digite a idade" min="0" max="150" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="patient-location-raiva">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            Bairro / Localidade:
+                                        </label>
+                                        <input type="text" id="patient-location-raiva" placeholder="Informe o bairro em Marabá" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="symptoms-date-raiva">
+                                            <i class="fas fa-calendar"></i>
+                                            Data dos sintomas:
+                                        </label>
+                                        <div class="date-input-wrapper">
+                                            <input type="date" id="symptoms-date-raiva" required>
+                                            <button type="button" class="date-picker-btn" onclick="document.getElementById('symptoms-date-raiva').showPicker()">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label for="main-symptoms-raiva">
+                                            <i class="fas fa-notes-medical"></i>
+                                            Sintomas principais:
+                                        </label>
+                                        <textarea id="main-symptoms-raiva" rows="4" placeholder="Descreva os sintomas principais (ex.: agitação, hidrofobia, febre, etc.)" required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn-notify">
+                                        <i class="fas fa-paper-plane"></i>
+                                        Notificar Caso
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. Notificações (Lista) -->
                 <section class="screen" id="notifications-screen" style="display:none;">
                     <div class="screen-header">
                         <button class="back-button" data-screen="dashboard"><i class="fas fa-arrow-left"></i></button>
@@ -214,7 +585,7 @@
                     </div>
                 </section>
 
-                <!-- 5. Chat Profissional -->
+                <!-- 6. Chat Profissional -->
                 <section class="screen" id="chat-screen" style="display:none;">
                     <div class="screen-header">
                         <button class="back-button" data-screen="dashboard"><i class="fas fa-arrow-left"></i></button>
@@ -241,7 +612,7 @@
                     </div>
                 </section>
 
-                <!-- 6. Biblioteca Digital -->
+                <!-- 7. Biblioteca Digital -->
                 <section class="screen" id="library-screen" style="display:none;">
                     <div class="screen-header">
                         <button class="back-button" data-screen="dashboard"><i class="fas fa-arrow-left"></i></button>
@@ -259,7 +630,7 @@
                     </div>
                 </section>
 
-                <!-- 7. Configurações -->
+                <!-- 8. Configurações -->
                 <section class="screen" id="settings-screen" style="display:none;">
                     <div class="screen-header">
                         <button class="back-button" data-screen="dashboard"><i class="fas fa-arrow-left"></i></button>
@@ -299,7 +670,7 @@
                     </div>
                 </section>
 
-                <!-- 8. Pacientes (Preserved from previous implementation) -->
+                <!-- 9. Pacientes (Preserved from previous implementation) -->
                 <section id="patients-screen" class="screen" style="display: none;">
                     <div class="patient-app-header">
                         <div class="header-left">
@@ -494,13 +865,12 @@
         <nav class="bottom-nav">
             <button class="nav-item active" data-screen="dashboard"><i
                     class="fas fa-home"></i><span>Início</span></button>
+            <button class="nav-item" data-screen="case-notification"><i class="fas fa-file-medical"></i><span>Notificar</span></button>
             <button class="nav-item" data-screen="chat"><i class="fas fa-comment-medical"></i><span>Chat</span></button>
             <button class="nav-item" data-screen="library"><i
                     class="fas fa-book-medical"></i><span>Biblioteca</span></button>
             <button class="nav-item" data-screen="patients"><i
                     class="fas fa-user-injured"></i><span>Pacientes</span></button>
-            <button class="nav-item" data-screen="settings"><i
-                    class="fas fa-cog"></i><span>Configurações</span></button>
         </nav>
 
         <!-- Loading Overlay -->

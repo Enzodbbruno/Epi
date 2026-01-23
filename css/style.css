@@ -53,19 +53,21 @@ body {
     font-family: 'Roboto', 'Segoe UI', sans-serif;
     line-height: 1.5;
     font-size: 16px;
-    height: 100vh;
-    overflow: hidden;
-    /* App-like feel */
+    min-height: 100vh;
+    overflow-x: hidden;
+    /* Allow vertical scroll on mobile */
+    -webkit-overflow-scrolling: touch;
 }
 
 /* ==========================================================================
    #LAYOUT STRUCTURE - DEFINING DESKTOP VS MOBILE
    ========================================================================== */
 .app-container {
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     background: var(--bg-body);
+    position: relative;
 }
 
 /* ==========================================================================
@@ -213,11 +215,15 @@ body {
 .main-content {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     /* Scroll ONLY content */
     padding: var(--spacing-md);
-    padding-bottom: 80px;
+    padding-bottom: 100px;
     /* Space for bottom nav on mobile */
     max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+    /* Smooth scrolling on iOS */
+    position: relative;
 }
 
 /* ==========================================================================
@@ -2810,8 +2816,10 @@ body {
 .main-content {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     background: #f9fafb;
-    padding-bottom: 80px;
+    padding-bottom: 100px;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Screen Base */
@@ -3679,5 +3687,424 @@ input:checked + .toggle-slider:before {
 @media (min-width: 768px) {
     .charts-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* =========================================
+   NOTIFICAÇÃO DE CASOS - FORMULÁRIO
+   ========================================= */
+
+.notification-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    padding: 32px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.back-button-header {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 2;
+}
+
+.back-button-header:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.notification-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 20px,
+        rgba(255, 255, 255, 0.03) 20px,
+        rgba(255, 255, 255, 0.03) 40px
+    );
+    opacity: 0.3;
+}
+
+.notification-header-content {
+    position: relative;
+    z-index: 1;
+}
+
+.notification-header h1 {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+}
+
+.notification-header p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.disease-tabs-container {
+    background: white;
+    border-bottom: 2px solid var(--border-color);
+    padding: 0 20px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.disease-tabs {
+    display: flex;
+    gap: 8px;
+    min-width: max-content;
+    padding: 12px 0;
+}
+
+.disease-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: transparent;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.disease-tab i {
+    font-size: 1.125rem;
+}
+
+.disease-tab:hover {
+    background: var(--primary-light);
+    color: var(--primary-color);
+}
+
+.disease-tab.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(0, 119, 204, 0.3);
+}
+
+.notification-form-container {
+    padding: 24px 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.notification-form-card {
+    background: white;
+    border-radius: 16px;
+    padding: 32px 24px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--border-color);
+}
+
+.form-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.form-header i {
+    font-size: 2rem;
+    color: var(--primary-color);
+}
+
+.form-header h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.notification-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group.full-width {
+    width: 100%;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.form-group label i {
+    color: var(--primary-color);
+    font-size: 1rem;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--text-primary);
+    background: #f9fafb;
+    transition: all 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(0, 119, 204, 0.1);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.6;
+}
+
+.date-input-wrapper {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.date-input-wrapper input {
+    flex: 1;
+}
+
+.date-picker-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    border: 2px solid var(--border-color);
+    background: white;
+    color: var(--primary-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.date-picker-btn:hover {
+    background: var(--primary-light);
+    border-color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+    font-family: inherit;
+}
+
+.btn-notify {
+    width: 100%;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, var(--secondary-color) 0%, #00A043 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.125rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(0, 200, 83, 0.3);
+    margin-top: 8px;
+}
+
+.btn-notify:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 200, 83, 0.4);
+}
+
+.btn-notify:active {
+    transform: translateY(0);
+}
+
+.btn-notify i {
+    font-size: 1.25rem;
+}
+
+.disease-form {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.disease-form.active {
+    display: block;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .notification-header {
+        padding: 24px 16px 24px 60px;
+    }
+
+    .back-button-header {
+        left: 12px;
+        width: 36px;
+        height: 36px;
+    }
+
+    .notification-header h1 {
+        font-size: 1.25rem;
+    }
+
+    .notification-header p {
+        font-size: 0.875rem;
+    }
+
+    .disease-tabs-container {
+        padding: 0 16px;
+    }
+
+    .disease-tab {
+        padding: 10px 16px;
+        font-size: 0.8125rem;
+    }
+
+    .disease-tab span {
+        display: none;
+    }
+
+    .disease-tab i {
+        font-size: 1.25rem;
+    }
+
+    .notification-form-container {
+        padding: 16px;
+    }
+
+    .notification-form-card {
+        padding: 24px 16px;
+        border-radius: 12px;
+    }
+
+    .form-header {
+        margin-bottom: 24px;
+    }
+
+    .form-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        padding: 12px 14px;
+        font-size: 0.9375rem;
+    }
+
+    .btn-notify {
+        padding: 14px 20px;
+        font-size: 1rem;
+    }
+}
+
+/* =========================================
+   TOAST NOTIFICATIONS
+   ========================================= */
+
+.toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--text-primary);
+    color: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    z-index: 10000;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    min-width: 280px;
+    max-width: 90%;
+    text-align: center;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+
+.toast.toast-success {
+    background: var(--secondary-color);
+}
+
+.toast.toast-error {
+    background: #dc2626;
+}
+
+.toast.toast-warning {
+    background: #f59e0b;
+}
+
+.toast.toast-info {
+    background: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+    .toast {
+        bottom: 80px;
+        min-width: calc(100% - 32px);
+        left: 16px;
+        right: 16px;
+        transform: translateY(100px);
+    }
+
+    .toast.show {
+        transform: translateY(0);
     }
 }

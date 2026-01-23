@@ -2313,6 +2313,116 @@ const MapModule = {
 // Expose to Window for Debugging/Inline access
 window.MapModule = MapModule;
 
+// Módulo de Notificação de Casos
+const CaseNotificationModule = {
+  currentDisease: 'dengue',
+
+  init() {
+    this.setupDiseaseTabs();
+    this.setupForms();
+  },
+
+  setupDiseaseTabs() {
+    const tabs = document.querySelectorAll('.disease-tab');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const disease = tab.dataset.disease;
+        this.switchDisease(disease);
+      });
+    });
+  },
+
+  switchDisease(disease) {
+    this.currentDisease = disease;
+
+    // Update tabs
+    document.querySelectorAll('.disease-tab').forEach(tab => {
+      if (tab.dataset.disease === disease) {
+        tab.classList.add('active');
+      } else {
+        tab.classList.remove('active');
+      }
+    });
+
+    // Update forms
+    document.querySelectorAll('.disease-form').forEach(form => {
+      if (form.id === `form-${disease}`) {
+        form.style.display = 'block';
+        form.classList.add('active');
+      } else {
+        form.style.display = 'none';
+        form.classList.remove('active');
+      }
+    });
+  },
+
+  setupForms() {
+    const diseases = ['dengue', 'leishmaniose', 'chagas', 'hanseniase', 'esquistossomose', 'raiva'];
+    
+    diseases.forEach(disease => {
+      const form = document.getElementById(`notification-form-${disease}`);
+      if (form) {
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.handleFormSubmit(disease, form);
+        });
+      }
+    });
+  },
+
+  handleFormSubmit(disease, form) {
+    const formData = new FormData(form);
+    const data = {
+      disease: disease,
+      patientName: document.getElementById(`patient-name-${disease}`).value,
+      patientAge: document.getElementById(`patient-age-${disease}`).value,
+      location: document.getElementById(`patient-location-${disease}`).value,
+      symptomsDate: document.getElementById(`symptoms-date-${disease}`).value,
+      mainSymptoms: document.getElementById(`main-symptoms-${disease}`).value
+    };
+
+    // Validate
+    if (!data.patientName || !data.patientAge || !data.location || !data.symptomsDate || !data.mainSymptoms) {
+      App.showToast('Por favor, preencha todos os campos obrigatórios.', 'error');
+      return;
+    }
+
+    // Show loading
+    const submitBtn = form.querySelector('.btn-notify');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+    submitBtn.disabled = true;
+
+    // Simulate API call
+    setTimeout(() => {
+      // Success
+      App.showToast(`Caso de ${this.getDiseaseName(disease)} notificado com sucesso!`, 'success');
+      
+      // Reset form
+      form.reset();
+      
+      // Reset button
+      submitBtn.innerHTML = originalText;
+      submitBtn.disabled = false;
+
+      // Log data (in real app, this would be sent to server)
+      console.log('Notificação enviada:', data);
+    }, 1500);
+  },
+
+  getDiseaseName(disease) {
+    const names = {
+      'dengue': 'Dengue',
+      'leishmaniose': 'Leishmaniose',
+      'chagas': 'Doença de Chagas',
+      'hanseniase': 'Hanseníase',
+      'esquistossomose': 'Esquistossomose',
+      'raiva': 'Raiva'
+    };
+    return names[disease] || disease;
+  }
+};
+
 // Módulo Principal do Aplicativo
 const App = {
   currentScreen: 'dashboard',
@@ -2336,6 +2446,7 @@ const App = {
       AnalyticsModule.init(); // Init Analytics
       MapModule.init(); // Init Map Listener
       PatientModule.init(); // Init Patient Module
+      CaseNotificationModule.init(); // Init Case Notification
 
       // Mostra a tela inicial
       this.showScreen('dashboard');
@@ -2393,7 +2504,7 @@ const App = {
     });
 
     // Back Buttons
-    const backButtons = document.querySelectorAll('.back-button');
+    const backButtons = document.querySelectorAll('.back-button, .back-button-header');
     backButtons.forEach(button => {
       button.addEventListener('click', (e) => {
         e.preventDefault();
@@ -2499,6 +2610,13 @@ const App = {
           setTimeout(() => {
             MapModule.init();
           }, 100);
+        }
+        break;
+      case 'case-notification':
+        // Ensure case notification module is initialized
+        if (CaseNotificationModule && !CaseNotificationModule.initialized) {
+          CaseNotificationModule.init();
+          CaseNotificationModule.initialized = true;
         }
         break;
     }
@@ -2714,6 +2832,7 @@ const App = {
       SettingsModule.init();
       PatientModule.init();
       MapModule.init();
+      CaseNotificationModule.init();
 
       // Hide loading overlay after everything is loaded
       setTimeout(() => {
@@ -2818,11 +2937,25 @@ const App = {
   },
 
   showToast(message, type = 'info') {
+    // Remove existing toasts
+    const existingToasts = document.querySelectorAll('.toast');
+    existingToasts.forEach(t => {
+      t.classList.remove('show');
+      setTimeout(() => {
+        if (t.parentNode) {
+          t.parentNode.removeChild(t);
+        }
+      }, 300);
+    });
+
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.textContent = message;
 
     document.body.appendChild(toast);
+
+    // Force reflow
+    toast.offsetHeight;
 
     // Mostra o toast
     setTimeout(() => {
@@ -2833,7 +2966,9 @@ const App = {
     setTimeout(() => {
       toast.classList.remove('show');
       setTimeout(() => {
-        document.body.removeChild(toast);
+        if (toast.parentNode) {
+          toast.parentNode.removeChild(toast);
+        }
       }, 300);
     }, 3000);
   }
