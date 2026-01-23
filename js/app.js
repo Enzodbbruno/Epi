@@ -2439,11 +2439,23 @@ const MapModule = {
 
   setupEventListeners() {
     const selectDisease = document.getElementById('case-filter-disease');
+    const applyBtn = document.getElementById('apply-filter-btn');
+
     if (selectDisease) {
       selectDisease.addEventListener('change', (e) => {
         this.currentDisease = e.target.value;
-        this.generateCasesList('maraba');
       });
+    }
+
+    if (applyBtn) {
+      applyBtn.onclick = () => {
+        // Add loading effect
+        applyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Aplicando...';
+        setTimeout(() => {
+          this.generateCasesList('maraba');
+          applyBtn.innerHTML = '<i class="fas fa-filter"></i> Aplicar';
+        }, 600); // Small delay for UX
+      };
     }
   },
 
