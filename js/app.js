@@ -2895,15 +2895,10 @@ const CaseNotificationModule = {
             </div>
           </div>
           <div class="form-group full-width">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <label for="main-symptoms-${id}">
-                <i class="fas fa-notes-medical"></i>
-                Sintomas principais:
-              </label>
-              <button type="button" class="btn btn-outline small" onclick="SymptomSearchModule.openModal('${id}')" style="padding: 5px 10px; font-size: 0.85rem; border-radius: 6px;">
-                <i class="fas fa-search"></i> Pesquisar Sintoma
-              </button>
-            </div>
+            <label for="main-symptoms-${id}" style="display:block; margin-bottom:8px;">
+              <i class="fas fa-notes-medical"></i>
+              Sintomas principais:
+            </label>
             <textarea id="main-symptoms-${id}" rows="4" placeholder="Descreva os sintomas principais..." required></textarea>
           </div>
           <button type="submit" class="btn-notify">
