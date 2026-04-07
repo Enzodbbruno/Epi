@@ -79,15 +79,37 @@
             <main class="main-content">
 
                 <!-- 1. Dashboard -->
-                <section class="screen active" id="dashboard-screen" style="padding: 0; background: #f8f9fc; min-height: 100vh; overflow-x: hidden;">
+                <section class="screen active" id="dashboard-screen"
+                    style="padding: 0; background: #f8f9fc; min-height: 100vh; overflow-x: hidden;">
                     <style>
                         /* Força a remoção de qualquer espaçamento ao redor do dashboard */
-                        .main-content { padding: 0 !important; margin: 0 !important; max-width: 100% !important; width: 100% !important; }
-                        #dashboard-screen { padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; }
-                        
-                        .dash-card:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important; }
-                        .main-action:hover { box-shadow: 0 12px 30px rgba(255, 107, 107, 0.6) !important; }
-                        .see-more-btn-dash:hover { background: var(--primary-color) !important; color: white !important; }
+                        .main-content {
+                            padding: 0 !important;
+                            margin: 0 !important;
+                            max-width: 100% !important;
+                            width: 100% !important;
+                        }
+
+                        #dashboard-screen {
+                            padding: 0 !important;
+                            margin: 0 !important;
+                            width: 100% !important;
+                            max-width: 100% !important;
+                        }
+
+                        .dash-card:hover {
+                            transform: translateY(-3px) scale(1.02);
+                            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+                        }
+
+                        .main-action:hover {
+                            box-shadow: 0 12px 30px rgba(255, 107, 107, 0.6) !important;
+                        }
+
+                        .see-more-btn-dash:hover {
+                            background: var(--primary-color) !important;
+                            color: white !important;
+                        }
 
                         /* Dashboard Grid Layouts */
                         .dashboard-custom-grid {
@@ -96,7 +118,7 @@
                             gap: 20px;
                             margin-bottom: 35px;
                         }
-                        
+
                         .col-span-2 {
                             grid-column: span 2;
                         }
@@ -106,90 +128,128 @@
                                 grid-template-columns: repeat(4, 1fr);
                             }
                         }
+
                         @media (max-width: 480px) {
-                            .dash-hero-container { padding: 30px 20px !important; margin-bottom: -20px !important;}
-                            .dash-content-container { padding: 40px 20px 20px 20px !important; }
-                            .dashboard-custom-grid { gap: 12px; margin-bottom: 25px; }
+                            .dash-hero-container {
+                                padding: 30px 20px !important;
+                                margin-bottom: -20px !important;
+                            }
+
+                            .dash-content-container {
+                                padding: 40px 20px 20px 20px !important;
+                            }
+
+                            .dashboard-custom-grid {
+                                gap: 12px;
+                                margin-bottom: 25px;
+                            }
                         }
                     </style>
 
                     <!-- Hero / Welcome Banner -->
-                    <div class="dash-hero-container" style="background: linear-gradient(135deg, var(--primary-color) 0%, #085a7d 100%); padding: 50px 35px; border-radius: 0 0 35px 35px; color: white; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px rgba(13, 138, 188, 0.4); margin-bottom: -35px; position: relative; z-index: 2; width: 100%;">
+                    <div class="dash-hero-container"
+                        style="background: linear-gradient(135deg, var(--primary-color) 0%, #085a7d 100%); padding: 50px 35px; border-radius: 0 0 35px 35px; color: white; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px rgba(13, 138, 188, 0.4); margin-bottom: -35px; position: relative; z-index: 2; width: 100%;">
                         <div>
-                            <h1 style="font-size: 2rem; margin-bottom: 5px; font-weight: 700;">Olá, <span id="user-name">Dr(a).</span>! 👋</h1>
-                            <p style="font-size: 1.05rem; opacity: 0.85;" id="current-date">Bem-vindo(a) ao seu painel EpiConecta</p>
+                            <h1 style="font-size: 2rem; margin-bottom: 5px; font-weight: 700;">Olá, <span
+                                    id="user-name">Dr(a).</span>! 👋</h1>
+                            <p style="font-size: 1.05rem; opacity: 0.85;" id="current-date">Bem-vindo(a) ao seu painel
+                                EpiConecta</p>
                         </div>
-                        <div style="width: 65px; height: 65px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+                        <div
+                            style="width: 65px; height: 65px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
                             <i class="fas fa-stethoscope" style="font-size: 2rem;"></i>
                         </div>
                     </div>
 
                     <div class="dash-content-container" style="padding: 65px 35px 35px 35px;">
-                        <h2 style="font-size: 1.3rem; color: #2c3e50; margin-bottom: 20px; font-weight: 700;">Acesso Rápido</h2>
-                        
+                        <h2 style="font-size: 1.3rem; color: #2c3e50; margin-bottom: 20px; font-weight: 700;">Acesso
+                            Rápido</h2>
+
                         <div class="dashboard-custom-grid">
                             <!-- Primary Action -->
-                            <div class="dash-card main-action quick-card col-span-2" data-screen="case-notification" style="background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); color: white; min-height: 120px; padding: 25px; border-radius: 24px; box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4); cursor: pointer; display: flex; align-items: center; justify-content: flex-start; gap: 25px; position: relative; overflow: hidden; transition: all 0.3s;">
-                                <div style="background: rgba(255,255,255,0.25); min-width: 60px; height: 60px; border-radius: 18px; display: flex; align-items: center; justify-content: center;">
+                            <div class="dash-card main-action quick-card col-span-2" data-screen="case-notification"
+                                style="background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); color: white; min-height: 120px; padding: 25px; border-radius: 24px; box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4); cursor: pointer; display: flex; align-items: center; justify-content: flex-start; gap: 25px; position: relative; overflow: hidden; transition: all 0.3s;">
+                                <div
+                                    style="background: rgba(255,255,255,0.25); min-width: 60px; height: 60px; border-radius: 18px; display: flex; align-items: center; justify-content: center;">
                                     <i class="fas fa-file-medical" style="font-size: 2rem;"></i>
                                 </div>
                                 <div>
-                                    <h3 style="font-size: 1.5rem; font-weight: 700; margin: 0; line-height: 1.2;">Notificar<br>Caso</h3>
+                                    <h3 style="font-size: 1.5rem; font-weight: 700; margin: 0; line-height: 1.2;">
+                                        Notificar<br>Caso</h3>
                                 </div>
                             </div>
-                            
+
                             <!-- Other Actions -->
-                            <div class="dash-card quick-card" data-screen="symptoms" style="background: white; padding: 20px 15px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid #f0f4f8; transition: all 0.3s; justify-content: center;">
-                                <div style="color: #4CAF50; background: #e8f5e9; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                            <div class="dash-card quick-card" data-screen="symptoms"
+                                style="background: white; padding: 20px 15px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid #f0f4f8; transition: all 0.3s; justify-content: center;">
+                                <div
+                                    style="color: #4CAF50; background: #e8f5e9; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
                                     <i class="fas fa-clipboard-check" style="font-size: 1.5rem;"></i>
                                 </div>
                                 <span style="font-weight: 600; color: #444; font-size: 1rem;">Triagem</span>
                             </div>
 
-                            <div class="dash-card quick-card" data-screen="patients" style="background: white; padding: 20px 15px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid #f0f4f8; transition: all 0.3s; justify-content: center;">
-                                <div style="color: #9C27B0; background: #f3e5f5; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                            <div class="dash-card quick-card" data-screen="patients"
+                                style="background: white; padding: 20px 15px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid #f0f4f8; transition: all 0.3s; justify-content: center;">
+                                <div
+                                    style="color: #9C27B0; background: #f3e5f5; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
                                     <i class="fas fa-user-injured" style="font-size: 1.5rem;"></i>
                                 </div>
                                 <span style="font-weight: 600; color: #444; font-size: 1rem;">Pacientes</span>
                             </div>
 
-                            <div class="dash-card quick-card" data-screen="analytics" style="background: white; padding: 20px 15px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid #f0f4f8; transition: all 0.3s; justify-content: center;">
-                                <div style="color: #2196F3; background: #e3f2fd; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                            <div class="dash-card quick-card" data-screen="analytics"
+                                style="background: white; padding: 20px 15px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid #f0f4f8; transition: all 0.3s; justify-content: center;">
+                                <div
+                                    style="color: #2196F3; background: #e3f2fd; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
                                     <i class="fas fa-chart-line" style="font-size: 1.5rem;"></i>
                                 </div>
                                 <span style="font-weight: 600; color: #444; font-size: 1rem;">Estatísticas</span>
                             </div>
 
-                            <div class="dash-card quick-card" data-screen="library" style="background: white; padding: 20px 15px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid #f0f4f8; transition: all 0.3s; justify-content: center;">
-                                <div style="color: #FF9800; background: #fff3e0; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                            <div class="dash-card quick-card" data-screen="library"
+                                style="background: white; padding: 20px 15px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid #f0f4f8; transition: all 0.3s; justify-content: center;">
+                                <div
+                                    style="color: #FF9800; background: #fff3e0; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
                                     <i class="fas fa-book-medical" style="font-size: 1.5rem;"></i>
                                 </div>
                                 <span style="font-weight: 600; color: #444; font-size: 1rem;">Biblioteca</span>
                             </div>
-                            
+
                             <!-- Chat Spans 2 -->
-                            <div class="dash-card quick-card col-span-2" data-screen="chat" style="background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer; display: flex; align-items: center; gap: 20px; border: 1px solid #f0f4f8; transition: all 0.3s;">
-                                <div style="color: #00BCD4; background: #e0f7fa; width: 60px; height: 60px; min-width: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <div class="dash-card quick-card col-span-2" data-screen="chat"
+                                style="background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer; display: flex; align-items: center; gap: 20px; border: 1px solid #f0f4f8; transition: all 0.3s;">
+                                <div
+                                    style="color: #00BCD4; background: #e0f7fa; width: 60px; height: 60px; min-width: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
                                     <i class="fas fa-comments" style="font-size: 1.5rem;"></i>
                                 </div>
                                 <div style="text-align: left;">
-                                    <h3 style="margin: 0 0 5px 0; font-weight: 700; color: #2c3e50; font-size: 1.1rem;">Chat Central</h3>
-                                    <p style="margin: 0; color: #7f8c8d; font-size: 0.9rem; line-height: 1.4;">Comunicação equipe SESPA/Marabá</p>
+                                    <h3 style="margin: 0 0 5px 0; font-weight: 700; color: #2c3e50; font-size: 1.1rem;">
+                                        Chat Central</h3>
+                                    <p style="margin: 0; color: #7f8c8d; font-size: 0.9rem; line-height: 1.4;">
+                                        Comunicação com IAs especializadas</p>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="alerts-section" style="background: white; border-radius: 24px; padding: 25px; box-shadow: 0 6px 20px rgba(0,0,0,0.02); border: 1px solid #f0f4f8;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                                <h2 style="font-size: 1.25rem; margin: 0; display: flex; align-items: center; gap: 10px; color: #2c3e50; font-weight: 700; flex: 1;">
-                                    <span style="background: #fff3e0; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 10px;">
+                        <div class="alerts-section"
+                            style="background: white; border-radius: 24px; padding: 25px; box-shadow: 0 6px 20px rgba(0,0,0,0.02); border: 1px solid #f0f4f8;">
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                <h2
+                                    style="font-size: 1.25rem; margin: 0; display: flex; align-items: center; gap: 10px; color: #2c3e50; font-weight: 700; flex: 1;">
+                                    <span
+                                        style="background: #fff3e0; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 10px;">
                                         <i class="fas fa-bell" style="color: #FF9800; font-size: 1.1rem;"></i>
                                     </span>
                                     Fique Atento
                                 </h2>
-                                <button class="see-more-btn see-more-btn-dash quick-card" data-screen="notifications" style="background: #f0f7fb; color: var(--primary-color); border: none; padding: 8px 16px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; width: auto !important; max-width: 150px; flex-shrink: 0; text-wrap: nowrap; margin-top: 0;">Ver todos</button>
+                                <button class="see-more-btn see-more-btn-dash quick-card" data-screen="notifications"
+                                    style="background: #f0f7fb; color: var(--primary-color); border: none; padding: 8px 16px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; width: auto !important; max-width: 150px; flex-shrink: 0; text-wrap: nowrap; margin-top: 0;">Ver
+                                    todos</button>
                             </div>
-                            <div class="alerts-grid" id="recent-alerts" style="display: flex; flex-direction: column; gap: 12px;">
+                            <div class="alerts-grid" id="recent-alerts"
+                                style="display: flex; flex-direction: column; gap: 12px;">
                                 <!-- Populated by JS -->
                             </div>
                         </div>
@@ -346,12 +406,16 @@
                     <p class="instruction-text">Marque os sintomas apresentados para uma análise preliminar.</p>
 
                     <div class="triage-search-actions" style="margin: 0 auto 25px auto; max-width: 600px; width: 100%;">
-                        <label style="display: block; font-weight: 600; color: var(--primary-color); font-size: 0.95rem; text-align: left; margin-bottom: 8px;">
+                        <label
+                            style="display: block; font-weight: 600; color: var(--primary-color); font-size: 0.95rem; text-align: left; margin-bottom: 8px;">
                             <i class="fas fa-keyboard"></i> Busque o sintoma pelo nome
                         </label>
-                        <div class="symptom-search-bar" style="display: flex; gap: 10px; align-items: center; background: #f0f7fb; padding: 12px 18px; border-radius: 14px; border: 2px solid var(--primary-color); box-shadow: 0 4px 12px rgba(13, 138, 188, 0.1);">
+                        <div class="symptom-search-bar"
+                            style="display: flex; gap: 10px; align-items: center; background: #f0f7fb; padding: 12px 18px; border-radius: 14px; border: 2px solid var(--primary-color); box-shadow: 0 4px 12px rgba(13, 138, 188, 0.1);">
                             <i class="fas fa-search" style="color: var(--primary-color); font-size: 1.2rem;"></i>
-                            <input type="text" id="triage-symptom-search" placeholder="Buscar sintoma digitando (ex: febre)..." style="flex: 1; border: none; outline: none; font-size: 1.1rem; padding: 8px; background: transparent; color: #333; font-weight: 500;">
+                            <input type="text" id="triage-symptom-search"
+                                placeholder="Buscar sintoma digitando (ex: febre)..."
+                                style="flex: 1; border: none; outline: none; font-size: 1.1rem; padding: 8px; background: transparent; color: #333; font-weight: 500;">
                         </div>
                     </div>
 
@@ -386,10 +450,14 @@
                     </div>
 
                     <!-- Search Disease Input -->
-                    <div class="disease-search-wrapper" style="margin: 25px auto 30px auto; max-width: 600px; width: 100%;">
-                        <div class="disease-search-container" style="display: flex; gap: 10px; align-items: center; background: #f0f7fb; padding: 12px 18px; border-radius: 14px; border: 2px solid var(--primary-color); box-shadow: 0 6px 16px rgba(13, 138, 188, 0.15); transition: all 0.3s ease;">
+                    <div class="disease-search-wrapper"
+                        style="margin: 25px auto 30px auto; max-width: 600px; width: 100%;">
+                        <div class="disease-search-container"
+                            style="display: flex; gap: 10px; align-items: center; background: #f0f7fb; padding: 12px 18px; border-radius: 14px; border: 2px solid var(--primary-color); box-shadow: 0 6px 16px rgba(13, 138, 188, 0.15); transition: all 0.3s ease;">
                             <i class="fas fa-search" style="color: var(--primary-color); font-size: 1.2rem;"></i>
-                            <input type="text" id="disease-search-input" placeholder="Pesquisar doença (ex: Dengue, Zika)..." style="flex: 1; border: none; outline: none; font-size: 1.1rem; padding: 8px; background: transparent; color: #333; font-weight: 500;">
+                            <input type="text" id="disease-search-input"
+                                placeholder="Pesquisar doença (ex: Dengue, Zika)..."
+                                style="flex: 1; border: none; outline: none; font-size: 1.1rem; padding: 8px; background: transparent; color: #333; font-weight: 500;">
                         </div>
                     </div>
 
@@ -721,34 +789,52 @@
         </div>
 
         <!-- Voice Search/Listening Overlay -->
-        <div class="listening-overlay" id="listening-overlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; color: white;">
-            <div class="mic-pulse" style="width: 80px; height: 80px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 20px; animation: pulse 1.5s infinite;">
+        <div class="listening-overlay" id="listening-overlay"
+            style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; color: white;">
+            <div class="mic-pulse"
+                style="width: 80px; height: 80px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 20px; animation: pulse 1.5s infinite;">
                 <i class="fas fa-microphone"></i>
             </div>
             <h2 style="margin-bottom: 10px;">Ouvindo...</h2>
-            <p id="listening-text" style="opacity: 0.8; font-size: 1.1rem; max-width: 80%; text-align: center;">Fale o sintoma desejado</p>
-            <button id="cancel-listening-btn" style="margin-top: 30px; background: transparent; border: 1px solid white; color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Cancelar</button>
+            <p id="listening-text" style="opacity: 0.8; font-size: 1.1rem; max-width: 80%; text-align: center;">Fale o
+                sintoma desejado</p>
+            <button id="cancel-listening-btn"
+                style="margin-top: 30px; background: transparent; border: 1px solid white; color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Cancelar</button>
         </div>
 
         <!-- Modal de Busca de Sintomas (Botão Notificar Caso) -->
-        <div class="modal" id="symptom-search-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9000; align-items: center; justify-content: center;">
-            <div class="modal-content" style="background: white; width: 90%; max-width: 500px; border-radius: 16px; display: flex; flex-direction: column; max-height: 85vh; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-                <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
-                    <h2 style="font-size: 1.2rem; margin: 0;"><i class="fas fa-search-plus" style="color: var(--primary-color); margin-right: 10px;"></i>Pesquisar Sintomas</h2>
-                    <button class="close-modal-btn" onclick="document.getElementById('symptom-search-modal').style.display='none'" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #888;"><i class="fas fa-times"></i></button>
+        <div class="modal" id="symptom-search-modal"
+            style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9000; align-items: center; justify-content: center;">
+            <div class="modal-content"
+                style="background: white; width: 90%; max-width: 500px; border-radius: 16px; display: flex; flex-direction: column; max-height: 85vh; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                <div class="modal-header"
+                    style="padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="font-size: 1.2rem; margin: 0;"><i class="fas fa-search-plus"
+                            style="color: var(--primary-color); margin-right: 10px;"></i>Pesquisar Sintomas</h2>
+                    <button class="close-modal-btn"
+                        onclick="document.getElementById('symptom-search-modal').style.display='none'"
+                        style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #888;"><i
+                            class="fas fa-times"></i></button>
                 </div>
                 <div class="modal-body" style="padding: 20px; overflow-y: auto; flex: 1;">
                     <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                        <input type="text" id="modal-symptom-input" placeholder="Digite o sintoma..." style="flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none;">
-                        <button id="modal-mic-btn" style="background: var(--primary-color); color: white; border: none; border-radius: 8px; width: 45px; cursor: pointer;"><i class="fas fa-microphone"></i></button>
+                        <input type="text" id="modal-symptom-input" placeholder="Digite o sintoma..."
+                            style="flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none;">
+                        <button id="modal-mic-btn"
+                            style="background: var(--primary-color); color: white; border: none; border-radius: 8px; width: 45px; cursor: pointer;"><i
+                                class="fas fa-microphone"></i></button>
                     </div>
                     <div id="modal-symptoms-results" style="display: flex; flex-direction: column; gap: 8px;">
                         <!-- Results injected here -->
                     </div>
                 </div>
-                <div class="modal-footer" style="padding: 15px 20px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 10px;">
-                    <button onclick="document.getElementById('symptom-search-modal').style.display='none'" style="padding: 10px 20px; border-radius: 8px; border: 1px solid #ccc; background: transparent; cursor: pointer;">Cancelar</button>
-                    <button id="confirm-symptoms-btn" style="padding: 10px 20px; border-radius: 8px; border: none; background: var(--primary-color); color: white; cursor: pointer; font-weight: 500;">Adicionar Selecionados</button>
+                <div class="modal-footer"
+                    style="padding: 15px 20px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 10px;">
+                    <button onclick="document.getElementById('symptom-search-modal').style.display='none'"
+                        style="padding: 10px 20px; border-radius: 8px; border: 1px solid #ccc; background: transparent; cursor: pointer;">Cancelar</button>
+                    <button id="confirm-symptoms-btn"
+                        style="padding: 10px 20px; border-radius: 8px; border: none; background: var(--primary-color); color: white; cursor: pointer; font-weight: 500;">Adicionar
+                        Selecionados</button>
                 </div>
             </div>
         </div>
@@ -761,12 +847,12 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const triageSearch = document.getElementById('triage-symptom-search');
-            if(triageSearch) {
-                triageSearch.addEventListener('input', function(e) {
+            if (triageSearch) {
+                triageSearch.addEventListener('input', function (e) {
                     const q = e.target.value.toLowerCase().trim();
                     const grid = document.getElementById('symptoms-grid');
-                    if(!grid) return;
-                    
+                    if (!grid) return;
+
                     const chips = grid.querySelectorAll('.symptom-chip');
                     chips.forEach(chip => {
                         if (chip.textContent.toLowerCase().includes(q)) {
