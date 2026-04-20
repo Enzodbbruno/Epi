@@ -66,6 +66,7 @@
                     <h1>EpiConecta</h1>
                 </div>
                 <div class="header-actions">
+                    <button id="header-login-btn" style="background: var(--primary-color); color: white; border: none; border-radius: 8px; padding: 6px 14px; font-weight: 600; font-size: 0.9rem; cursor: pointer; margin-right: 10px;">Login</button>
                     <button class="icon-button" id="notifications-button">
                         <i class="fas fa-bell"></i>
                         <span class="badge">3</span>
@@ -151,9 +152,10 @@
                         style="background: linear-gradient(135deg, var(--primary-color) 0%, #085a7d 100%); padding: 50px 35px; border-radius: 0 0 35px 35px; color: white; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px rgba(13, 138, 188, 0.4); margin-bottom: -35px; position: relative; z-index: 2; width: 100%;">
                         <div>
                             <h1 style="font-size: 2rem; margin-bottom: 5px; font-weight: 700;">Olá, <span
-                                    id="user-name">Dr(a).</span>! 👋</h1>
+                                    id="user-name">Visitante</span>! 👋</h1>
                             <p style="font-size: 1.05rem; opacity: 0.85;" id="current-date">Bem-vindo(a) ao seu painel
                                 EpiConecta</p>
+                            <button id="home-action-login" style="margin-top: 15px; background: white; color: var(--primary-color); font-weight: 700; border-radius: 8px; padding: 10px 20px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);"><i class="fas fa-user-md"></i> Fazer Login Exclusivo</button>
                         </div>
                         <div
                             style="width: 65px; height: 65px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
@@ -287,6 +289,45 @@
                                 <h3>Recuperados</h3>
                                 <p class="value" id="metric-recovered">9.876</p>
                                 <span class="trend up">+7% hoje</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hospitalizations Section -->
+                    <div class="stats-extended-section hospital-stats" style="margin-top: 20px; margin-bottom: 20px;">
+                        <h2>Internações por Setor - HMM</h2>
+                        <div style="background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #f0f4f8;">
+                            <div class="vaccine-list">
+                                <div class="vaccine-item">
+                                    <div class="v-header"><span>Pronto-Socorro</span> <span>32</span></div>
+                                    <div class="progress-bar"><div class="fill" style="width: 80%; background: var(--secondary-color);"></div></div>
+                                </div>
+                                <div class="vaccine-item">
+                                    <div class="v-header"><span>Clínica Médica</span> <span>25</span></div>
+                                    <div class="progress-bar"><div class="fill" style="width: 60%; background: var(--secondary-color);"></div></div>
+                                </div>
+                                <div class="vaccine-item">
+                                    <div class="v-header"><span>UCE</span> <span>15</span></div>
+                                    <div class="progress-bar"><div class="fill" style="width: 35%; background: var(--secondary-color);"></div></div>
+                                </div>
+                                <div class="vaccine-item">
+                                    <div class="v-header"><span>UTI</span> <span>8</span></div>
+                                    <div class="progress-bar"><div class="fill" style="width: 20%; background: var(--secondary-color);"></div></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h2>Internações por Setor - HRSP</h2>
+                        <div style="background: white; border-radius: 20px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #f0f4f8;">
+                            <div class="vaccine-list">
+                                <div class="vaccine-item">
+                                    <div class="v-header"><span>Clínica Médica</span> <span>18</span></div>
+                                    <div class="progress-bar"><div class="fill" style="width: 70%; background: #4CAF50;"></div></div>
+                                </div>
+                                <div class="vaccine-item">
+                                    <div class="v-header"><span>UTI</span> <span>10</span></div>
+                                    <div class="progress-bar"><div class="fill" style="width: 40%; background: #4CAF50;"></div></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -521,20 +562,27 @@
                 </section>
 
                 <!-- 7. Biblioteca Digital -->
-                <section class="screen" id="library-screen" style="display:none;">
-                    <div class="screen-header">
-                        <button class="back-button" data-screen="dashboard"><i class="fas fa-arrow-left"></i></button>
-                        <h1>Biblioteca Digital</h1>
-                        <button class="icon-button" id="search-library-btn"><i class="fas fa-search"></i></button>
+                <section class="screen" id="library-screen" style="display:none; background: #f8fbff; min-height: 100vh;">
+                    <div class="dash-hero-container" style="background: linear-gradient(135deg, #1A2980 0%, #26D0CE 100%); padding: 50px 35px 70px 35px; border-radius: 0 0 35px 35px; color: white; display: flex; flex-direction: column; box-shadow: 0 10px 25px rgba(38, 208, 206, 0.4); margin-bottom: -40px; position: relative; z-index: 2; width: 100%;">
+                        <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 25px;">
+                            <button class="back-button" data-screen="dashboard" style="background: rgba(255,255,255,0.2) !important; color: white !important; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); border: none; cursor: pointer;"><i class="fas fa-arrow-left"></i></button>
+                            <div style="width: 55px; height: 55px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+                                <i class="fas fa-book-medical" style="font-size: 1.6rem;"></i>
+                            </div>
+                        </div>
+                        <h1 style="font-size: 2.2rem; margin-bottom: 5px; font-weight: 700;">Biblioteca Digital</h1>
+                        <p style="font-size: 1.05rem; opacity: 0.9;">Acesso a Manuais e Protocolos Clínicos</p>
                     </div>
 
-                    <div class="search-bar-container">
-                        <input type="text" id="library-search" class="search-input"
-                            placeholder="Buscar protocolos, manuais...">
-                    </div>
+                    <div style="padding: 0 25px;">
+                        <div class="search-bar-container" style="background: white; border-radius: 20px; padding: 10px 20px; display: flex; align-items: center; box-shadow: 0 8px 25px rgba(0,0,0,0.06); margin-top: 15px; position: relative; z-index: 5;">
+                            <i class="fas fa-search" style="color: #a0aec0; margin-right: 15px; font-size: 1.2rem;"></i>
+                            <input type="text" id="library-search" class="search-input" placeholder="Buscar protocolos..." style="border: none; outline: none; width: 100%; font-size: 1.05rem; background: transparent; padding: 8px 0;">
+                        </div>
 
-                    <div class="documents-list" id="documents-list">
-                        <!-- Populated by JS -->
+                        <div class="documents-list" id="documents-list" style="margin-top: 35px; padding-bottom: 100px;">
+                            <!-- Populated by JS -->
+                        </div>
                     </div>
                 </section>
 
@@ -875,6 +923,28 @@
             }
         });
     </script>
+    </script>
+
+    <!-- Modal de Login -->
+    <div class="modal" id="login-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: white; width: 90%; max-width: 400px; text-align: center; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            <div style="background: var(--primary-light); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto;">
+                <i class="fas fa-user-md" style="font-size: 2.5rem; color: var(--primary-color);"></i>
+            </div>
+            <h2 style="margin-bottom: 10px; color: var(--text-primary);">Acesso Restrito</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 25px;">Faça login para utilizar as funcionalidades exclusivas de profissionais de saúde.</p>
+            <div class="form-group" style="text-align: left; margin-bottom: 15px;">
+                <label for="login-name" style="display: block; margin-bottom: 5px; font-weight: 500;">Nome Completo</label>
+                <input type="text" id="login-name" placeholder="Ex: Dr. Roberto" style="width: 100%; border: 1px solid #ddd; padding: 12px; border-radius: 8px; outline: none;">
+            </div>
+            <div class="form-group" style="text-align: left; margin-bottom: 25px;">
+                <label for="login-password" style="display: block; margin-bottom: 5px; font-weight: 500;">Senha (Acesso Livre Temporariamente)</label>
+                <input type="password" id="login-password" placeholder="******" style="width: 100%; border: 1px solid #ddd; padding: 12px; border-radius: 8px; outline: none;">
+            </div>
+            <button id="btn-do-login" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1.1rem; border-radius: 8px;">Entrar no Sistema</button>
+            <button id="btn-cancel-login" class="btn btn-secondary" style="width: 100%; padding: 14px; font-size: 1.1rem; border-radius: 8px; margin-top: 10px; background: transparent; color: #666; border: 1px solid #ddd;">Voltar ao Início</button>
+        </div>
+    </div>
 </body>
 
 </html>

@@ -4,9 +4,9 @@
 const sampleData = {
   user: {
     id: 'user-001',
-    name: 'João Silva',
-    role: 'Enfermeiro',
-    healthCenter: 'UBS Jardim das Flores',
+    name: 'Visitante',
+    role: 'Convidado',
+    healthCenter: 'Sem lotação',
     avatar: 'JS',
     notificationsEnabled: true,
     emailNotifications: true,
@@ -258,6 +258,122 @@ const sampleData = {
       }
     }
   ]
+};
+
+// Módulo de Autenticação
+const AuthModule = {
+  currentUser: null,
+  pendingCallback: null,
+
+  init() {
+    this.setupListeners();
+  },
+
+  setupListeners() {
+    const btnLogin = document.getElementById('btn-do-login');
+    const btnCancel = document.getElementById('btn-cancel-login');
+    const headerBtn = document.getElementById('header-login-btn');
+    
+    if (btnLogin) {
+       btnLogin.addEventListener('click', () => this.handleLogin());
+    }
+    if (btnCancel) {
+       btnCancel.addEventListener('click', () => {
+          const modal = document.getElementById('login-modal');
+          if (modal) modal.classList.remove('show');
+          App.showScreen('dashboard');
+       });
+    }
+    if (headerBtn) {
+        headerBtn.addEventListener('click', () => {
+            if (this.currentUser) {
+                // Logout logic
+                this.currentUser = null;
+                sampleData.user.name = 'Visitante';
+                headerBtn.textContent = 'Login';
+                const userNameEl = document.getElementById('user-name');
+                if (userNameEl) userNameEl.textContent = 'Visitante';
+                if(App && App.showToast) App.showToast('Sessão encerrada.', 'info');
+                
+                const homeBtn = document.getElementById('home-action-login');
+                if (homeBtn) homeBtn.style.display = 'inline-flex';
+
+                App.showScreen('dashboard');
+            } else {
+                const modal = document.getElementById('login-modal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                    modal.classList.add('show');
+                }
+            }
+        });
+    }
+
+    const homeBtn = document.getElementById('home-action-login');
+    if (homeBtn) {
+        homeBtn.addEventListener('click', () => {
+            const modal = document.getElementById('login-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.classList.add('show');
+            }
+        });
+    }
+  },
+
+  requireAuth(callback) {
+     if (this.currentUser) {
+         callback();
+     } else {
+         const modal = document.getElementById('login-modal');
+         if (modal) {
+            modal.style.display = 'flex';
+            modal.style.zIndex = '999999';
+            modal.classList.add('show');
+         }
+         this.pendingCallback = callback;
+     }
+  },
+
+  handleLogin() {
+    const nameInput = document.getElementById('login-name');
+    const passInput = document.getElementById('login-password');
+    if (!nameInput || !passInput) return;
+
+    if (!nameInput.value.trim() || !passInput.value.trim()) {
+        if(App && App.showToast) App.showToast('Preencha nome e senha.', 'error');
+        return;
+    }
+    
+    this.currentUser = {
+        name: nameInput.value.trim(),
+        role: 'Profissional de Saúde'
+    };
+    
+    sampleData.user.name = this.currentUser.name;
+    
+    const modal = document.getElementById('login-modal');
+    if (modal) modal.classList.remove('show');
+    
+    const headerName = document.querySelector('.user-info h3');
+    if (headerName) headerName.textContent = this.currentUser.name;
+
+    const userNameEl = document.getElementById('user-name');
+    if (userNameEl) userNameEl.textContent = this.currentUser.name;
+
+    const headerBtn = document.getElementById('header-login-btn');
+    if (headerBtn) headerBtn.textContent = 'Sair';
+
+    const homeBtn = document.getElementById('home-action-login');
+    if (homeBtn) homeBtn.style.display = 'none';
+
+    if(App && App.showToast) App.showToast(`Bem-vindo(a), ${this.currentUser.name}!`, 'success');
+    
+    if (this.pendingCallback) {
+        this.pendingCallback();
+        this.pendingCallback = null;
+    }
+  }
 };
 
 // Módulo de Notificações
@@ -851,31 +967,53 @@ const LibraryModule = {
       return;
     }
 
-    // Use grid layout
-    container.className = 'documents-grid';
+    // Use gallery layout
+    container.className = 'documents-gallery';
 
-    container.innerHTML = filteredDocs.map(doc => `
-      <div class="document-card" data-id="${doc.id}">
-        <div class="doc-icon-wrapper ${doc.format.toLowerCase()}">
-          <i class="${this.getDocumentIcon(doc.format)}"></i>
-        </div>
-        <button class="doc-download-btn" data-id="${doc.id}" title="Baixar">
-             <i class="fas fa-download"></i>
-        </button>
-        <div class="doc-info">
-          <h4 class="doc-title" title="${doc.title}">${doc.title}</h4>
-          <div class="doc-meta">
-            <span>${doc.format.toUpperCase()}</span>
-            <span>•</span>
-            <span>${doc.size}</span>
+    container.innerHTML = filteredDocs.map(doc => {
+      // Create a nice CSS paper preview based on format
+      let badgeClass = 'badge-link';
+      let formatDisplay = 'LINK';
+      if(doc.format.toLowerCase().includes('pdf')) { badgeClass = 'badge-pdf'; formatDisplay = 'PDF'; }
+      if(doc.format.toLowerCase().includes('doc')) { badgeClass = 'badge-doc'; formatDisplay = 'DOC'; }
+
+      return `
+      <div class="gallery-card" data-id="${doc.id}">
+        <!-- Paper Preview Thumbnail -->
+        <div class="doc-paper-preview">
+          <div class="doc-badge ${badgeClass}">${formatDisplay}</div>
+          <div class="preview-content">
+            <div class="preview-line title w-80"></div>
+            <div class="preview-line w-100"></div>
+            <div class="preview-line w-60"></div>
+            <div style="margin-top: 15px;"></div>
+            <div class="preview-line title w-40"></div>
+            <div class="preview-line w-90"></div>
+            <div class="preview-line w-70"></div>
+            <div class="preview-line w-80"></div>
+            <div style="margin-top: auto; display:flex; justify-content: flex-end;">
+              <i class="${this.getDocumentIcon(doc.format)}" style="color: #cbd5e0; font-size: 2rem; opacity: 0.5;"></i>
+            </div>
           </div>
-          <div class="doc-tags">
-            ${doc.tags.slice(0, 2).map(tag => `<span class="doc-tag">${tag}</span>`).join('')}
-            ${doc.tags.length > 2 ? `<span class="doc-tag">+${doc.tags.length - 2}</span>` : ''}
+        </div>
+        
+        <!-- Document Info -->
+        <div class="gallery-info">
+          <h4 class="gallery-title" title="${doc.title}">${doc.title}</h4>
+          <div class="gallery-meta">${doc.size}</div>
+          
+          <div class="gallery-footer">
+            <div class="gallery-tags">
+              ${doc.tags.slice(0, 2).map(tag => `<span class="gallery-tag">${tag}</span>`).join('')}
+              ${doc.tags.length > 2 ? `<span class="gallery-tag">+${doc.tags.length - 2}</span>` : ''}
+            </div>
+            <button class="gallery-download-btn" data-id="${doc.id}" title="Baixar">
+                 <i class="fas fa-download"></i>
+            </button>
           </div>
         </div>
       </div>
-    `).join('');
+    `}).join('');
 
     // Adiciona os event listeners para os botões de download
     document.querySelectorAll('.doc-download-btn').forEach(button => {
@@ -1778,6 +1916,69 @@ const AnalyticsModule = {
     // Using setTimeout to trigger CSS transition
     setTimeout(() => {
     }, 500);
+
+    this.renderHospitalCharts();
+  },
+
+  renderHospitalCharts() {
+    const hmmCanvas = document.getElementById('hmm-chart');
+    const hrspCanvas = document.getElementById('hrsp-chart');
+    
+    if (hmmCanvas && !this.hmmChart) {
+        this.hmmChart = new Chart(hmmCanvas.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['UCE', 'UTI', 'Clínica Médica', 'Pronto-Socorro'],
+                datasets: [{
+                    label: 'Internados (HMM)',
+                    data: [15, 8, 25, 32],
+                    backgroundColor: 'rgba(13, 138, 188, 0.7)',
+                    borderColor: 'rgba(13, 138, 188, 1)',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { beginAtZero: true }
+                }
+            }
+        });
+    }
+
+    if (hrspCanvas && !this.hrspChart) {
+        this.hrspChart = new Chart(hrspCanvas.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['UTI', 'Clínica Médica'],
+                datasets: [{
+                    label: 'Internados (HRSP)',
+                    data: [10, 18],
+                    backgroundColor: 'rgba(76, 175, 80, 0.7)',
+                    borderColor: 'rgba(76, 175, 80, 1)',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { beginAtZero: true }
+                }
+            }
+        });
+    }
   },
 
   animateValue(obj, start, end, duration) {
@@ -2818,6 +3019,19 @@ const CaseNotificationModule = {
           <h2>${disease.name}</h2>
         </div>
         <form id="notification-form-${id}" class="notification-form">
+          <div class="form-group" style="margin-bottom: 20px; background: #fff3e0; padding: 15px; border-radius: 12px; border: 1px dashed #ffb74d;">
+            <label for="patient-search-id-${id}" style="color: #e65100; font-weight: bold;">
+              <i class="fas fa-search"></i>
+              Buscar Dados (Opcional):
+            </label>
+            <div style="display: flex; gap: 5px; margin-top: 5px;">
+               <input type="text" id="patient-search-id-${id}" placeholder="CPF, CNS ou Nome..." onblur="if(typeof autocompletePatient === 'function') autocompletePatient('${id}')" style="flex: 1; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px;">
+               <button type="button" class="btn btn-outline small" onclick="if(typeof autocompletePatient === 'function') autocompletePatient('${id}')" style="padding: 0 15px; background: white; border-radius: 8px;">
+                 <i class="fas fa-search"></i>
+               </button>
+            </div>
+            <p style="font-size: 0.8rem; color: #666; margin-top: 5px;">Puxe os dados informando o CPF ou Número do SUS.</p>
+          </div>
           <div class="form-group">
             <label for="patient-name-${id}">
               <i class="fas fa-user"></i>
@@ -2951,6 +3165,12 @@ const CaseNotificationModule = {
     // Simulate API call
     setTimeout(() => {
       App.showToast(`Caso de ${this.diseases[disease].name} notificado com sucesso!`, 'success');
+      
+      // Sync patient with PatientModule locally
+      if (typeof syncPatientData === 'function') {
+         syncPatientData(data);
+      }
+
       form.reset();
       submitBtn.innerHTML = originalText;
       submitBtn.disabled = false;
@@ -2989,6 +3209,92 @@ window.fetchCepForLocation = async function(id) {
             if (btn) btn.innerHTML = '<i class="fas fa-search"></i>';
         }
     }
+};
+
+window.autocompletePatient = function(id) {
+    const searchInput = document.getElementById(`patient-search-id-${id}`);
+    if (!searchInput || !searchInput.value) return;
+
+    let term = searchInput.value.toLowerCase().replace(/[.\-\s/]/g, '');
+    if (!term) return;
+
+    const btn = searchInput.nextElementSibling;
+    if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+    setTimeout(() => {
+        if (btn) btn.innerHTML = '<i class="fas fa-search"></i>';
+        if (PatientModule && PatientModule.mockDB) {
+            const patient = PatientModule.mockDB.find(p => {
+                const cpf = p.cpf ? p.cpf.replace(/[.\-]/g, '') : '';
+                const cns = p.cns ? p.cns.replace(/\s/g, '') : '';
+                const name = p.name ? p.name.toLowerCase() : '';
+                return cpf.includes(term) || cns.includes(term) || name.includes(searchInput.value.toLowerCase().trim());
+            });
+
+            if (patient) {
+                const nameInput = document.getElementById(`patient-name-${id}`);
+                const ageInput = document.getElementById(`patient-age-${id}`);
+                if (nameInput) nameInput.value = patient.name;
+                if (ageInput) ageInput.value = patient.age;
+
+                if (App && App.showToast) App.showToast('Dados do paciente carregados!', 'success');
+            } else {
+                if (App && App.showToast) App.showToast('Paciente não encontrado. Pode preencher manualmente.', 'info');
+            }
+        }
+    }, 600);
+};
+
+window.syncPatientData = function(data) {
+    if (!PatientModule || !PatientModule.mockDB) return;
+
+    // Check if patient already exists
+    let existingPatient = PatientModule.mockDB.find(p => p.name.toLowerCase() === data.patientName.toLowerCase());
+    const notificatorName = AuthModule && AuthModule.currentUser ? AuthModule.currentUser.name : sampleData.user.name;
+
+    if (existingPatient) {
+        // Prepare new history/notification
+        existingPatient.history.unshift({
+            date: new Date().toLocaleDateString('pt-BR'),
+            title: `Notificação - ${CaseNotificationModule.getDiseaseName(data.disease)}`,
+            desc: `Paciente notificado por suspeita. Sintomas reportados: ${data.mainSymptoms}. Local: ${data.location}. Notificado por: ${notificatorName}`
+        });
+
+        // Add a badge if it doesn't exist
+        const hasBadge = existingPatient.badges.some(b => b.text === 'Suspeita Ativa');
+        if (!hasBadge) {
+            existingPatient.badges.unshift({ text: 'Suspeita Ativa', type: 'alert' });
+        }
+    } else {
+        // Create new patient
+        const newPatient = {
+            id: Date.now(),
+            name: data.patientName,
+            age: data.patientAge,
+            sex: 'Não informado',
+            cpf: 'Não cadastrado',
+            cns: 'Não cadastrado',
+            blood: '-',
+            photo: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.patientName)}&background=random&color=fff`,
+            birthDate: '-',
+            badges: [{ text: 'Suspeita Ativa', type: 'alert' }, { text: 'Novo', type: 'info' }],
+            allergies: [],
+            conditions: [],
+            vitals: { bp: '-', weight: '-', temp: '-', o2: '-', heartRate: '-' },
+            history: [
+                {
+                    date: new Date().toLocaleDateString('pt-BR'),
+                    title: `Notificação Inicial - ${CaseNotificationModule.getDiseaseName(data.disease)}`,
+                    desc: `Primeira notificação registrada no sistema. Sintomas: ${data.mainSymptoms}. Notificado por: ${notificatorName}`
+                }
+            ],
+            vaccines: []
+        };
+        PatientModule.mockDB.unshift(newPatient);
+    }
+    
+    // Update Patient Module UI if required
+    PatientModule.renderRecents();
 };
 
 // Módulo de Busca de Sintomas e Reconhecimento de Voz
@@ -3323,6 +3629,15 @@ const App = {
   },
 
   showScreen(screenId) {
+    // Intercept screens that require authentication
+    const restrictedScreens = ['case-notification', 'patients'];
+    if (restrictedScreens.includes(screenId) && (!AuthModule || !AuthModule.currentUser)) {
+       if (AuthModule && AuthModule.requireAuth) {
+           AuthModule.requireAuth(() => this.showScreen(screenId));
+           return;
+       }
+    }
+
     // Hide all screens
     const screens = document.querySelectorAll('.screen');
     screens.forEach(screen => {
@@ -3635,15 +3950,19 @@ const App = {
       this.setupNavigation();
       this.setupUI();
       this.updateCurrentDate();
+      if (typeof AuthModule !== 'undefined') AuthModule.init();
 
       NotificationsModule.init();
       ChatModule.init();
       LibraryModule.init();
       SymptomsModule.init();
       SettingsModule.init();
+      AnalyticsModule.init(); // Init Analytics chart
       PatientModule.init();
       MapModule.init();
       CaseNotificationModule.init();
+
+      this.showScreen('dashboard'); // Pre-load active screen
 
       // Hide loading overlay after everything is loaded
       setTimeout(() => {
