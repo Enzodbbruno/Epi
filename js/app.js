@@ -276,7 +276,8 @@ const AuthModule = {
           this.currentUser = {
             id: user.id,
             name: user.name,
-            role: user.role === 'admin' ? 'Administrador' : (user.role === 'medico' ? 'Médico' : 'Profissional de Saúde')
+            role: user.role === 'admin' ? 'Administrador' : (user.role === 'medico' ? 'Médico' : 'Profissional de Saúde'),
+            healthCenter: user.healthCenter || user.health_center
           };
           sampleData.user.name = this.currentUser.name;
           this.updateLoginUI(true);
@@ -399,10 +400,11 @@ const AuthModule = {
         const user = await EpiAPI.login(cpf, password);
         
         this.currentUser = {
-            id: user.id,
-            name: user.name,
-            role: user.role === 'admin' ? 'Administrador' : (user.role === 'medico' ? 'Médico' : 'Profissional de Saúde')
-        };
+             id: user.id,
+             name: user.name,
+             role: user.role === 'admin' ? 'Administrador' : (user.role === 'medico' ? 'Médico' : 'Profissional de Saúde'),
+             healthCenter: user.healthCenter || user.health_center
+         };
         
         sampleData.user.name = this.currentUser.name;
         
@@ -2560,7 +2562,24 @@ const PatientModule = {
                       // Preenche unidade de saúde padrão
                       const unitEl = document.getElementById(`health-unit-${id}`);
                       if (unitEl) {
-                          unitEl.value = 'UBS Cidade Nova';
+                          let defaultUnit = 'ubs_hiroshi';
+                          if (typeof AuthModule !== 'undefined' && AuthModule.currentUser && AuthModule.currentUser.healthCenter) {
+                              const centerLower = AuthModule.currentUser.healthCenter.toLowerCase();
+                              if (centerLower.includes('hiroshi')) defaultUnit = 'ubs_hiroshi';
+                              else if (centerLower.includes('demetrio') || centerLower.includes('demétrio')) defaultUnit = 'ubs_demetrio';
+                              else if (centerLower.includes('zoonoses')) defaultUnit = 'centro_zoonoses';
+                              else if (centerLower.includes('municipal') || centerLower.includes('hmm')) defaultUnit = 'hmm';
+                              else if (centerLower.includes('regional')) defaultUnit = 'regional';
+                              else if (centerLower.includes('materno') || centerLower.includes('infantil') || centerLower.includes('hmi')) defaultUnit = 'hmi';
+                              else if (centerLower.includes('zezinha')) defaultUnit = 'ubs_zezinha';
+                              else if (centerLower.includes('laranjeiras')) defaultUnit = 'ubs_laranjeiras';
+                              else if (centerLower.includes('pedro') || centerLower.includes('cavalcante')) defaultUnit = 'ubs_pedro_cavalcante';
+                              else if (centerLower.includes('amadeu') || centerLower.includes('vivacqua')) defaultUnit = 'ubs_amadeu';
+                              else if (centerLower.includes('morada')) defaultUnit = 'ubs_morada_nova';
+                              else if (centerLower.includes('secretaria') || centerLower.includes('saúde') || centerLower.includes('saude')) defaultUnit = 'ubs_hiroshi';
+                              else defaultUnit = 'outra';
+                          }
+                          unitEl.value = defaultUnit;
                       }
                   });
                 }
@@ -3474,9 +3493,18 @@ const CaseNotificationModule = {
                  <div class="form-group span-3">
                      <label>6 - Unidade de Saúde (ou Outra Fonte Notificadora)</label>
                      <select id="health-unit-${id}" required>
-                         <option value="ubs_hiroshi">UBS Hiroshi Matsuda (CNES: 2301389)</option>
-                         <option value="outra">Outra / Rede Particular</option>
-                     </select>
+                          <option value="ubs_hiroshi">UBS Hiroshi Matsuda (CNES: 2301389)</option>
+                          <option value="ubs_demetrio">UBS Demétrio Ribeiro (CNES: 2301621)</option>
+                          <option value="centro_zoonoses">Centro de Zoonoses (CNES: 2301702)</option>
+                          <option value="hmm">Hospital Municipal de Marabá - HMM (CNES: 2301850)</option>
+                          <option value="regional">Hospital Regional do Sudeste do Pará (CNES: 5249449)</option>
+                          <option value="hmi">Hospital Materno Infantil - HMI (CNES: 2301893)</option>
+                          <option value="ubs_zezinha">UBS Enfermeira Zezinha (CNES: 2301907)</option>
+                          <option value="ubs_laranjeiras">UBS Laranjeiras (CNES: 2301923)</option>
+                          <option value="ubs_pedro_cavalcante">UBS Pedro Cavalcante (CNES: 2301931)</option>
+                          <option value="ubs_amadeu">UBS Amadeu Vivacqua (CNES: 2301958)</option>
+                          <option value="ubs_morada_nova">UBS Morada Nova (CNES: 2301966)</option>
+                          <option value="outra">Outra / Rede Particular</option></select>
                  </div>
                  <div class="form-group">
                      <label>7 - Data dos Primeiros Sintomas *</label>
@@ -5439,9 +5467,46 @@ window.printNotificationData = function(data) {
         return dateStr;
     }
 
-    const unitCodeMap = { ubs_hiroshi: '2301389', outra: '-------' };
-    const cnesCode = unitCodeMap[data.healthUnit] || '-------';
-    const unitName = data.healthUnitText || (data.healthUnit === 'ubs_hiroshi' ? 'UBS HIROSHI MATSUDA' : 'OUTRA UNIDADE');
+    let cleanUnit = String(data.healthUnit || '').toLowerCase().trim();
+    let cnesCode = '-------';
+    let unitName = 'OUTRA UNIDADE';
+
+    if (cleanUnit.includes('hiroshi') || cleanUnit.includes('2301389') || cleanUnit === 'ubs_hiroshi') {
+        cnesCode = '2301389';
+        unitName = 'UBS HIROSHI MATSUDA';
+    } else if (cleanUnit.includes('demetrio') || cleanUnit.includes('demétrio') || cleanUnit === 'ubs_demetrio') {
+        cnesCode = '2301621';
+        unitName = 'UBS DEMETRIO RIBEIRO';
+    } else if (cleanUnit.includes('zoonoses') || cleanUnit === 'centro_zoonoses') {
+        cnesCode = '2301702';
+        unitName = 'CENTRO DE ZOONOSES';
+    } else if (cleanUnit.includes('municipal') || cleanUnit.includes('hmm') || cleanUnit === 'hmm') {
+        cnesCode = '2301850';
+        unitName = 'HOSPITAL MUNICIPAL DE MARABA';
+    } else if (cleanUnit.includes('regional') || cleanUnit === 'regional') {
+        cnesCode = '5249449';
+        unitName = 'HOSPITAL REGIONAL DO SUDESTE DO PARA';
+    } else if (cleanUnit.includes('materno') || cleanUnit.includes('infantil') || cleanUnit.includes('hmi') || cleanUnit === 'hmi') {
+        cnesCode = '2301893';
+        unitName = 'HOSPITAL MATERNO INFANTIL';
+    } else if (cleanUnit.includes('zezinha') || cleanUnit === 'ubs_zezinha') {
+        cnesCode = '2301907';
+        unitName = 'UBS ENFERMEIRA ZEZINHA';
+    } else if (cleanUnit.includes('laranjeiras') || cleanUnit === 'ubs_laranjeiras') {
+        cnesCode = '2301923';
+        unitName = 'UBS LARANJEIRAS';
+    } else if (cleanUnit.includes('pedro') || cleanUnit.includes('cavalcante') || cleanUnit === 'ubs_pedro_cavalcante') {
+        cnesCode = '2301931';
+        unitName = 'UBS PEDRO CAVALCANTE';
+    } else if (cleanUnit.includes('amadeu') || cleanUnit.includes('vivacqua') || cleanUnit === 'ubs_amadeu') {
+        cnesCode = '2301958';
+        unitName = 'UBS AMADEU VIVACQUA';
+    } else if (cleanUnit.includes('morada') || cleanUnit === 'ubs_morada_nova') {
+        cnesCode = '2301966';
+        unitName = 'UBS MORADA NOVA';
+    } else {
+        unitName = data.healthUnitText || data.healthUnit || 'OUTRA UNIDADE';
+    }
 
     // Tipo notificacao
     const tipoNotif = data.tipoNotificacao || '2';
