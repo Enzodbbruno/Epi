@@ -4,18 +4,18 @@
  * Todas as chamadas passam por aqui — nunca acesse fetch() diretamente.
  */
 const EpiAPI = (() => {
-  // Detecção dinâmica de origem da API (Métricas Corporativas/Padrão de Mercado)
   const getApiBase = () => {
     const loc = window.location;
-    // Se a página está rodando no Live Server local do VS Code ou arquivos locais,
-    // direciona para o backend local rodando na porta padrão 3001.
-    if (loc.hostname === 'localhost' || loc.hostname === '127.0.0.1' || !loc.hostname) {
-      if (loc.port === '5500' || loc.port === '5501' || loc.port === '3000' || !loc.port) {
-        return 'http://localhost:3001/api/v1';
-      }
+    // Se estiver rodando com uma porta de desenvolvimento (ex: Live Server 5500 ou similar)
+    // direciona para a porta 3001 no mesmo host (útil para celulares na mesma rede)
+    if (loc.port && loc.port !== '3001') {
+      return `${loc.protocol}//${loc.hostname}:3001/api/v1`;
     }
-    // Em produção ou acesso via IP local na rede (ex: 192.168.x.x), 
-    // assume que o backend está hospedado no mesmo host ativo.
+    // Fallback para arquivos locais abertos diretamente
+    if (!loc.hostname) {
+      return 'http://localhost:3001/api/v1';
+    }
+    // Produção ou acesso normal (ex: backend servindo o frontend no mesmo host/porta)
     return `${loc.origin}/api/v1`;
   };
 

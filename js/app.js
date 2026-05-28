@@ -4468,6 +4468,18 @@ const App = {
         }
       });
     });
+
+    // Mobile Bottom Navigation
+    const bottomNavItems = document.querySelectorAll('.bottom-nav .nav-item');
+    bottomNavItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        const screen = item.dataset.screen;
+        if (screen) {
+          this.showScreen(screen);
+        }
+      });
+    });
     // Global Search Listener
     const globalSearch = document.getElementById('global-patient-search');
     if(globalSearch) {

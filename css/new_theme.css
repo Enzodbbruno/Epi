@@ -333,6 +333,15 @@ body {
 }
 @media (max-width: 768px) {
     .sidebar { display: none; }
+    
+    .screen:not(#dashboard-screen):not(#case-notification-screen) {
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        padding: 16px !important;
+        margin-bottom: 0 !important;
+    }
 }
 
 /* Modificações para encapsular telas existentes na nova grid */
