@@ -62,6 +62,31 @@ app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 // ── Global Rate Limiter ───────────────────────────────
 app.use('/api/', apiLimiter);
 
+let dbInitPromise = null;
+
+async function ensureDbInitialized() {
+  if (!dbInitPromise) {
+    dbInitPromise = (async () => {
+      console.log('[EpiConecta] Inicializando banco de dados...');
+      await runMigrations();
+      await seed();
+      console.log('[EpiConecta] Banco de dados inicializado com sucesso.');
+    })();
+  }
+  return dbInitPromise;
+}
+
+// ── Db Initialization Middleware ──────────────────────
+app.use(async (req, res, next) => {
+  try {
+    await ensureDbInitialized();
+    next();
+  } catch (err) {
+    console.error('[EpiConecta Initialization Error]', err);
+    res.status(500).json({ error: `Falha na inicialização do servidor: ${err.message}` });
+  }
+});
+
 // ── API Routes ────────────────────────────────────────
 app.use('/api/v1/auth',          authRoutes);
 app.use('/api/v1/patients',      patientRoutes);
@@ -89,9 +114,8 @@ app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
 // ── Boot ──────────────────────────────────────────────
 async function bootstrap() {
   try {
-    await runMigrations();
-    await seed();
     if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+      await ensureDbInitialized();
       app.listen(PORT, () => {
         console.log('');
         console.log('  ╔═══════════════════════════════════════╗');
