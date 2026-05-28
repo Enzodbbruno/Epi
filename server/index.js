@@ -83,7 +83,15 @@ app.use(async (req, res, next) => {
     next();
   } catch (err) {
     console.error('[EpiConecta Initialization Error]', err);
-    res.status(500).json({ error: `Falha na inicialização do servidor: ${err.message}` });
+    res.status(500).json({ 
+      error: `Falha na inicialização do servidor: ${err.message}`,
+      stack: err.stack,
+      env: {
+        NODE_ENV: process.env.NODE_ENV,
+        VERCEL: process.env.VERCEL,
+        HAS_DB_URL: !!(process.env.DATABASE_URL || process.env.POSTGRES_URL)
+      }
+    });
   }
 });
 
@@ -108,7 +116,10 @@ app.get('/{*path}', (req, res) => {
 // ── Global Error Handler ──────────────────────────────
 app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
   console.error('[EpiConecta Error]', err.message);
-  res.status(err.status || 500).json({ error: err.message || 'Erro interno do servidor.' });
+  res.status(err.status || 500).json({ 
+    error: err.message || 'Erro interno do servidor.',
+    stack: err.stack
+  });
 });
 
 // ── Boot ──────────────────────────────────────────────
