@@ -7,22 +7,34 @@ const EpiAPI = (() => {
   const getApiBase = () => {
     const loc = window.location;
     
-    // Se estivermos em produção (ex: Vercel) e houver uma URL configurada no window.EPI_CONFIG, usa ela.
-    const isLocal = loc.hostname === 'localhost' || loc.hostname === '127.0.0.1' || !loc.hostname;
-    if (!isLocal && window.EPI_CONFIG && window.EPI_CONFIG.API_URL) {
-      return window.EPI_CONFIG.API_URL;
+    // Check if we are running locally (localhost, 127.0.0.1, local IP or empty hostname)
+    const isLocalIP = /^192\.168\./.test(loc.hostname) ||
+                      /^10\./.test(loc.hostname) ||
+                      /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(loc.hostname) ||
+                      loc.hostname.endsWith('.local');
+                      
+    const isLocal = loc.hostname === 'localhost' || loc.hostname === '127.0.0.1' || !loc.hostname || isLocalIP;
+
+    // If we are hosted on Render, the backend serves the frontend from the same origin
+    if (loc.hostname.endsWith('.onrender.com')) {
+      return `${loc.origin}/api/v1`;
     }
 
-    // Se estiver rodando com uma porta de desenvolvimento (ex: Live Server 5500 ou similar)
-    // direciona para a porta 3001 no mesmo host (útil para celulares na mesma rede)
-    if (loc.port && loc.port !== '3001') {
+    // If it's local dev, and we are using a development port (like 5500 for Live Server)
+    if (isLocal && loc.port && loc.port !== '3001') {
       return `${loc.protocol}//${loc.hostname}:3001/api/v1`;
     }
-    // Fallback para arquivos locais abertos diretamente
+    
+    // Fallback for local files opened directly
     if (!loc.hostname) {
       return 'http://localhost:3001/api/v1';
     }
-    // Produção ou acesso normal (ex: backend servindo o frontend no mesmo host/porta)
+
+    // For other production platforms (e.g. Vercel, Netlify) connecting to external API
+    if (window.EPI_CONFIG && window.EPI_CONFIG.API_URL) {
+      return window.EPI_CONFIG.API_URL;
+    }
+
     return `${loc.origin}/api/v1`;
   };
 
