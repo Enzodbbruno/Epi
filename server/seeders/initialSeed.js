@@ -7,27 +7,44 @@ require('dotenv').config();
 
 async function seed() {
   try {
-    // Verifica se já existe admin
-    const existsRes = await db.query('SELECT id FROM users WHERE role = $1', ['admin']);
+    // Verifica se já existe admin e se as credenciais estão corretas
+    const existsRes = await db.query('SELECT id, cpf_hash, password_hash FROM users WHERE role = $1', ['admin']);
     const exists = existsRes.rows[0];
-    if (exists) {
-      console.log('[Seed] Admin já existe. Pulando seed de usuários.');
-      return;
-    }
 
     const passwordHash = await bcrypt.hash(process.env.ADMIN_PASSWORD || '2026', 12);
     const cpfRaw = process.env.ADMIN_CPF || '000.000.000-00';
+    const currentCpfHash = hashIndex(cpfRaw);
 
-    await db.query(`
-      INSERT INTO users (id, name, cpf_hash, cpf_encrypted, role, password_hash, health_center)
-      VALUES ($1, $2, $3, $4, 'admin', $5, 'Secretaria Municipal de Saúde')
-    `, [
-      randomUUID(),
-      process.env.ADMIN_NAME || 'Administrador EpiConecta',
-      hashIndex(cpfRaw),
-      encrypt(cpfRaw),
-      passwordHash
-    ]);
+    if (exists) {
+      const passMatch = await bcrypt.compare(process.env.ADMIN_PASSWORD || '2026', exists.password_hash);
+      if (exists.cpf_hash !== currentCpfHash || !passMatch) {
+        console.log('[Seed] Admin existe mas com credenciais desatualizadas. Atualizando...');
+        await db.query(`
+          UPDATE users 
+          SET cpf_hash = $1, cpf_encrypted = $2, password_hash = $3
+          WHERE id = $4
+        `, [
+          currentCpfHash,
+          encrypt(cpfRaw),
+          passwordHash,
+          exists.id
+        ]);
+      } else {
+        console.log('[Seed] Admin já existe com credenciais corretas. Pulando.');
+      }
+    } else {
+      console.log('[Seed] Criando administrador...');
+      await db.query(`
+        INSERT INTO users (id, name, cpf_hash, cpf_encrypted, role, password_hash, health_center)
+        VALUES ($1, $2, $3, $4, 'admin', $5, 'Secretaria Municipal de Saúde')
+      `, [
+        randomUUID(),
+        process.env.ADMIN_NAME || 'Administrador EpiConecta',
+        currentCpfHash,
+        encrypt(cpfRaw),
+        passwordHash
+      ]);
+    }
 
     // Seeda pacientes de exemplo (espelha o mockDB do frontend)
     const samplePatients = [
