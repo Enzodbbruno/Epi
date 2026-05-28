@@ -2562,24 +2562,38 @@ const PatientModule = {
                       // Preenche unidade de saúde padrão
                       const unitEl = document.getElementById(`health-unit-${id}`);
                       if (unitEl) {
-                          let defaultUnit = 'ubs_hiroshi';
-                          if (typeof AuthModule !== 'undefined' && AuthModule.currentUser && AuthModule.currentUser.healthCenter) {
-                              const centerLower = AuthModule.currentUser.healthCenter.toLowerCase();
-                              if (centerLower.includes('hiroshi')) defaultUnit = 'ubs_hiroshi';
-                              else if (centerLower.includes('demetrio') || centerLower.includes('demétrio')) defaultUnit = 'ubs_demetrio';
-                              else if (centerLower.includes('zoonoses')) defaultUnit = 'centro_zoonoses';
-                              else if (centerLower.includes('municipal') || centerLower.includes('hmm')) defaultUnit = 'hmm';
-                              else if (centerLower.includes('regional')) defaultUnit = 'regional';
-                              else if (centerLower.includes('materno') || centerLower.includes('infantil') || centerLower.includes('hmi')) defaultUnit = 'hmi';
-                              else if (centerLower.includes('zezinha')) defaultUnit = 'ubs_zezinha';
-                              else if (centerLower.includes('laranjeiras')) defaultUnit = 'ubs_laranjeiras';
-                              else if (centerLower.includes('pedro') || centerLower.includes('cavalcante')) defaultUnit = 'ubs_pedro_cavalcante';
-                              else if (centerLower.includes('amadeu') || centerLower.includes('vivacqua')) defaultUnit = 'ubs_amadeu';
-                              else if (centerLower.includes('morada')) defaultUnit = 'ubs_morada_nova';
-                              else if (centerLower.includes('secretaria') || centerLower.includes('saúde') || centerLower.includes('saude')) defaultUnit = 'ubs_hiroshi';
-                              else defaultUnit = 'outra';
-                          }
-                          unitEl.value = defaultUnit;
+                           let defaultUnit = 'ubs_hiroshi_matsuda';
+                           if (typeof AuthModule !== 'undefined' && AuthModule.currentUser && AuthModule.currentUser.healthCenter) {
+                               const centerLower = AuthModule.currentUser.healthCenter.toLowerCase();
+                               if (centerLower.includes('hiroshi') || centerLower.includes('hirochi')) defaultUnit = 'ubs_hiroshi_matsuda';
+                               else if (centerLower.includes('jaime')) defaultUnit = 'ubs_jaime_pinto';
+                               else if (centerLower.includes('laranjeiras')) defaultUnit = 'ubs_laranjeiras';
+                               else if (centerLower.includes('liberdade')) defaultUnit = 'ubs_liberdade';
+                               else if (centerLower.includes('pedro') || centerLower.includes('cavalcante')) defaultUnit = 'ubs_pedro_cavalcante';
+                               else if (centerLower.includes('jose pereira') || centerLower.includes('josé pereira')) defaultUnit = 'ubs_jose_pereira';
+                               else if (centerLower.includes('crismu')) defaultUnit = 'crismu';
+                               else if (centerLower.includes('edivan')) defaultUnit = 'ubs_edivan_xavier';
+                               else if (centerLower.includes('zezinha')) defaultUnit = 'ubs_zezinha';
+                               else if (centerLower.includes('mariana')) defaultUnit = 'ubs_mariana_moraes';
+                               else if (centerLower.includes('demosthenes') || centerLower.includes('demóstenes')) defaultUnit = 'ubs_demosthenes_azevedo';
+                               else if (centerLower.includes('joão batista') || centerLower.includes('joao batista')) defaultUnit = 'ubs_joao_batista';
+                               else if (centerLower.includes('amadeu') || centerLower.includes('vivacqua') || centerLower.includes('vivácqua')) defaultUnit = 'ubs_amadeu_vivacqua';
+                               else if (centerLower.includes('bico doce') || centerLower.includes('maria bico')) defaultUnit = 'ubs_maria_bico_doce';
+                               else if (centerLower.includes('carlos') || centerLower.includes('barreto')) defaultUnit = 'ubs_carlos_barreto';
+                               else if (centerLower.includes('maria bahia')) defaultUnit = 'posto_maria_bahia';
+                               else if (centerLower.includes('elisa') || centerLower.includes('chavito')) defaultUnit = 'ubs_elisa_chavito';
+                               else if (centerLower.includes('antonio arruda') || centerLower.includes('antônio arruda') || centerLower.includes('itainópolis') || centerLower.includes('itainopolis')) defaultUnit = 'posto_antonio_arruda';
+                               else if (centerLower.includes('jhonatas') || centerLower.includes('sororó') || centerLower.includes('sororo')) defaultUnit = 'ubs_jhonatas_moraes';
+                               else if (centerLower.includes('cristalândia') || centerLower.includes('cristalandia')) defaultUnit = 'posto_cristalandia';
+                               else if (centerLower.includes('carimã') || centerLower.includes('carima')) defaultUnit = 'posto_carima';
+                               else if (centerLower.includes('jose manoel') || centerLower.includes('josé manoel') || centerLower.includes('anunciação')) defaultUnit = 'posto_jose_manoel';
+                               else if (centerLower.includes('municipal') || centerLower.includes('hmm')) defaultUnit = 'hmm';
+                               else if (centerLower.includes('regional')) defaultUnit = 'regional';
+                               else if (centerLower.includes('materno') || centerLower.includes('infantil') || centerLower.includes('hmi')) defaultUnit = 'hmi';
+                               else if (centerLower.includes('secretaria') || centerLower.includes('saúde') || centerLower.includes('saude')) defaultUnit = 'ubs_hiroshi_matsuda';
+                               else defaultUnit = 'outra';
+                           }
+                           unitEl.value = defaultUnit;
                       }
                   });
                 }
@@ -3493,18 +3507,42 @@ const CaseNotificationModule = {
                  <div class="form-group span-3">
                      <label>6 - Unidade de Saúde (ou Outra Fonte Notificadora)</label>
                      <select id="health-unit-${id}" required>
-                          <option value="ubs_hiroshi">UBS Hiroshi Matsuda (CNES: 2301389)</option>
-                          <option value="ubs_demetrio">UBS Demétrio Ribeiro (CNES: 2301621)</option>
-                          <option value="centro_zoonoses">Centro de Zoonoses (CNES: 2301702)</option>
+                          <option value="">- Selecione -</option>
+                          <!-- Cidade Nova -->
+                          <option value="ubs_jaime_pinto">UBS Jaime Pinto (CNES: 2614901)</option>
+                          <option value="ubs_laranjeiras">UBS Laranjeiras (CNES: 2614774)</option>
+                          <option value="ubs_liberdade">UBS Liberdade (Dr. Emerson Caselli) (CNES: 2614790)</option>
+                          <option value="ubs_pedro_cavalcante">UBS Pedro Cavalcante (CNES: 2614931)</option>
+                          <option value="ubs_jose_pereira">UBS José Pereira de Araújo (CNES: 0826359)</option>
+                          <!-- Nova Marabá -->
+                          <option value="crismu">CRISMU - Centro de Referência Integrado da Saúde da Mulher (CNES: 9006095)</option>
+                          <option value="ubs_edivan_xavier">UBS Edivan Xavier dos Santos (CNES: 0270199)</option>
+                          <option value="ubs_zezinha">UBS Enfermeira Zezinha (CNES: 2301907)</option>
+                          <option value="ubs_hiroshi_matsuda">UBS Hiroshi Matsuda (CNES: 2301389)</option>
+                          <option value="ubs_mariana_moraes">UBS Mariana Moraes (CNES: 2614804)</option>
+                          <!-- Velha Marabá -->
+                          <option value="ubs_demosthenes_azevedo">UBS Demósthenes Azevedo (CNES: 2614839)</option>
+                          <option value="ubs_joao_batista">UBS João Batista Bezerra (CNES: 2614766)</option>
+                          <!-- São Félix -->
+                          <option value="ubs_amadeu_vivacqua">UBS Amadeu Vivácqua (CNES: 2301958)</option>
+                          <option value="ubs_maria_bico_doce">UBS Parteira Maria Bico Doce (CNES: 2614758)</option>
+                          <!-- Morada Nova -->
+                          <option value="ubs_carlos_barreto">UBS Carlos Barreto (CNES: 2614855)</option>
+                          <!-- Zona Rural -->
+                          <option value="posto_maria_bahia">Posto de Saúde Maria Bahia da Conceição (CNES: 2614723)</option>
+                          <option value="ubs_elisa_chavito">UBS Elisa Monteiro Chavito (CNES: 2614715)</option>
+                          <option value="posto_antonio_arruda">Posto de Saúde Antônio Arruda (CNES: 2614669)</option>
+                          <option value="ubs_jhonatas_moraes">UBS Pastor Jhonatas Moraes Cavalcante (CNES: 9066403)</option>
+                          <option value="posto_cristalandia">Posto de Saúde Cristalândia (CNES: 2614979)</option>
+                          <option value="posto_carima">Posto de Saúde Carimã (CNES: 7711883)</option>
+                          <option value="posto_jose_manoel">Posto de Saúde José Manoel da Anunciação (CNES: 2614707)</option>
+                          <!-- Hospitais -->
                           <option value="hmm">Hospital Municipal de Marabá - HMM (CNES: 2301850)</option>
                           <option value="regional">Hospital Regional do Sudeste do Pará (CNES: 5249449)</option>
                           <option value="hmi">Hospital Materno Infantil - HMI (CNES: 2301893)</option>
-                          <option value="ubs_zezinha">UBS Enfermeira Zezinha (CNES: 2301907)</option>
-                          <option value="ubs_laranjeiras">UBS Laranjeiras (CNES: 2301923)</option>
-                          <option value="ubs_pedro_cavalcante">UBS Pedro Cavalcante (CNES: 2301931)</option>
-                          <option value="ubs_amadeu">UBS Amadeu Vivacqua (CNES: 2301958)</option>
-                          <option value="ubs_morada_nova">UBS Morada Nova (CNES: 2301966)</option>
-                          <option value="outra">Outra / Rede Particular</option></select>
+                          <!-- Outros -->
+                          <option value="outra">Outra / Rede Particular</option>
+                     </select>
                  </div>
                  <div class="form-group">
                      <label>7 - Data dos Primeiros Sintomas *</label>
@@ -3699,105 +3737,6 @@ const CaseNotificationModule = {
                      <label>33 - País (se residir fora do Brasil)</label>
                      <input type="text" id="patient-country-${id}" placeholder="Ex: Argentina">
                  </div>
-             </div>
-          </div>
-
-          <!-- BLOCO 5: DADOS CLINICOS E LABORATORIAIS -->
-          <div class="sinan-section">
-             <div class="sinan-section-title"><i class="fas fa-stethoscope"></i> Dados Clinicos e Laboratoriais</div>
-             <div class="sinan-grid-4">
-                 <div class="form-group span-2">
-                     <label>01 - Data da Coleta da 1ª Amostra da Sorologia</label>
-                     <input type="date" id="inv-date-${id}">
-                 </div>
-                 <div class="form-group span-2">
-                     <label>02 - Data da Coleta da 1ª Amostra de Outra Amostra</label>
-                     <input type="date" id="inv-date2-${id}">
-                 </div>
-                 <div class="form-group span-4">
-                     <label>03 - Especificar Tipo de Exame</label>
-                     <input type="text" id="lab-exame-type-${id}" placeholder="NS1, IgM, RT-PCR..." value="NS1 / Sorologia IgM / RT-PCR">
-                 </div>
-             </div>
-
-             <label class="sinan-subsection mt-3">Sinais Clinicos</label>
-             <div class="sinan-checkbox-grid">
-                 <label><input type="checkbox" value="Febre"> Febre</label>
-                 <label><input type="checkbox" value="Mialgia"> Mialgia</label>
-                 <label><input type="checkbox" value="Cefaleia"> Cefaleia</label>
-                 <label><input type="checkbox" value="Exantema"> Exantema</label>
-                 <label><input type="checkbox" value="Vomito"> Vomito</label>
-                 <label><input type="checkbox" value="Nauseas"> Nauseas</label>
-                 <label><input type="checkbox" value="Dor nas costas"> Dor nas costas</label>
-                 <label><input type="checkbox" value="Conjuntivite"> Conjuntivite</label>
-                 <label><input type="checkbox" value="Artrite"> Artrite</label>
-                 <label><input type="checkbox" value="Artralgia intensa"> Artralgia intensa</label>
-                 <label><input type="checkbox" value="Petequias"> Petequias</label>
-                 <label><input type="checkbox" value="Leucopenia"> Leucopenia</label>
-                 <label><input type="checkbox" value="Dor retroorbital"> Dor retroorbital</label>
-             </div>
-
-             <label class="sinan-subsection mt-3">Doencas Pre-existentes</label>
-             <div class="sinan-grid-4">
-                 <div class="form-group"><label>Diabetes</label><select id="pre-diabetes-${id}"><option value="1">1-Sim</option><option value="2">2-Nao</option><option value="9" selected>9-Ignorado</option></select></div>
-                 <div class="form-group"><label>Hepatopatias</label><select id="pre-hepatopatias-${id}"><option value="1">1-Sim</option><option value="2">2-Nao</option><option value="9" selected>9-Ignorado</option></select></div>
-                 <div class="form-group"><label>Hipertensao</label><select id="pre-hipertensao-${id}"><option value="1">1-Sim</option><option value="2">2-Nao</option><option value="9" selected>9-Ignorado</option></select></div>
-                 <div class="form-group"><label>D. Hematologicas</label><select id="pre-hematologicas-${id}"><option value="1">1-Sim</option><option value="2">2-Nao</option><option value="9" selected>9-Ignorado</option></select></div>
-                 <div class="form-group"><label>Doenca Renal</label><select id="pre-renal-${id}"><option value="1">1-Sim</option><option value="2">2-Nao</option><option value="9" selected>9-Ignorado</option></select></div>
-                 <div class="form-group"><label>D. Auto-imunes</label><select id="pre-autoimunes-${id}"><option value="1">1-Sim</option><option value="2">2-Nao</option><option value="9" selected>9-Ignorado</option></select></div>
-             </div>
-
-             <label class="sinan-subsection mt-3">Exames Laboratoriais</label>
-             <div class="sinan-grid-4">
-                 <div class="form-group span-2">
-                     <label>Sorologia IgM Chikungunya</label>
-                     <select id="lab-igm-chik-${id}"><option value="1">1-Positivo</option><option value="2">2-Negativo</option><option value="3">3-Inconclusivo</option><option value="4" selected>4-Nao realizado</option></select>
-                 </div>
-                 <div class="form-group span-2">
-                     <label>Sorologia IgM Dengue</label>
-                     <select id="lab-igm-dengue-${id}"><option value="1">1-Positivo</option><option value="2">2-Negativo</option><option value="3">3-Inconclusivo</option><option value="4" selected>4-Nao realizado</option></select>
-                 </div>
-                 <div class="form-group span-2">
-                     <label>Exame NS1</label>
-                     <select id="lab-ns1-${id}"><option value="1">1-Positivo</option><option value="2">2-Negativo</option><option value="3">3-Inconclusivo</option><option value="4" selected>4-Nao realizado</option></select>
-                 </div>
-                 <div class="form-group span-2">
-                     <label>Isolamento / RT-PCR</label>
-                     <select id="lab-rt-pcr-${id}"><option value="1">1-Positivo</option><option value="2">2-Negativo</option><option value="3">3-Inconclusivo</option><option value="4" selected>4-Nao realizado</option></select>
-                 </div>
-                 <div class="form-group span-4">
-                     <label>Resultado Bacterioscopia</label>
-                     <input type="text" id="lab-bacterioscopia-${id}" placeholder="Nao realizado / Negativo / Positivo">
-                 </div>
-             </div>
-          </div>
-
-          <!-- BLOCO 6: SINAIS DE ALARME E GRAVIDADE -->
-          <div class="sinan-section">
-             <div class="sinan-section-title"><i class="fas fa-exclamation-triangle"></i> Gravidade e Sinais de Alarme</div>
-             <label class="sinan-subsection">Dengue com Sinais de Alarme</label>
-             <div class="sinan-checkbox-grid">
-                 <label><input type="checkbox" value="Hipotensao postural"> Hipotensao postural</label>
-                 <label><input type="checkbox" value="Dor Abdominal intensa"> Dor Abdominal intensa</label>
-                 <label><input type="checkbox" value="Hepatomegalia >= 2cm"> Hepatomegalia >= 2cm</label>
-                 <label><input type="checkbox" value="Queda abrupta plaquetas"> Queda abrupta plaquetas</label>
-                 <label><input type="checkbox" value="Letargia/irritabilidade"> Letargia/irritabilidade</label>
-                 <label><input type="checkbox" value="Acumulo de liquidos"> Acumulo de liquidos</label>
-                 <label><input type="checkbox" value="Vomitos persistentes"> Vomitos persistentes</label>
-                 <label><input type="checkbox" value="Sangramento mucosa"> Sangramento mucosa</label>
-                 <label><input type="checkbox" value="Aumento Hematocrito"> Aumento Hematocrito</label>
-             </div>
-             <label class="sinan-subsection mt-3">Dengue Grave | Extravasamento / Sangramento</label>
-             <div class="sinan-checkbox-grid">
-                 <label><input type="checkbox" value="Pulso debil / indetectavel"> Pulso debil / indetectavel</label>
-                 <label><input type="checkbox" value="Taquicardia"> Taquicardia</label>
-                 <label><input type="checkbox" value="Hematermese"> Hematermese</label>
-                 <label><input type="checkbox" value="PA convergente <= 20"> PA convergente <= 20</label>
-                 <label><input type="checkbox" value="Extremidades frias"> Extremidades frias</label>
-                 <label><input type="checkbox" value="Melena"> Melena</label>
-                 <label><input type="checkbox" value="Acumulo liquidos (resp)"> Acumulo liquidos (resp)</label>
-                 <label><input type="checkbox" value="Hipotensao arterial"> Hipotensao arterial</label>
-                 <label><input type="checkbox" value="Metrorragia / Sang. SNC"> Metrorragia / Sang. SNC</label>
              </div>
           </div>
 
@@ -4209,12 +4148,12 @@ const CaseNotificationModule = {
       symptomsDate: symptomsDateEl ? symptomsDateEl.value : '',
       symptoms: checkedSymptoms,
       clinicalSigns: {
-        diabetes:          getVal(`pre-diabetes-${disease}`) || '9',
-        hepatopatias:      getVal(`pre-hepatopatias-${disease}`) || '9',
-        hipertensao:       getVal(`pre-hipertensao-${disease}`) || '9',
-        hematologicas:     getVal(`pre-hematologicas-${disease}`) || '9',
-        renal:             getVal(`pre-renal-${disease}`) || '9',
-        autoimunes:        getVal(`pre-autoimunes-${disease}`) || '9',
+        diabetes:          '9',
+        hepatopatias:      '9',
+        hipertensao:       '9',
+        hematologicas:     '9',
+        renal:             '9',
+        autoimunes:        '9',
         occupation:        getVal(`occupation-${disease}`) || '',
         pregnant:          getVal(`patient-pregnant-${disease}`) || '9',
         obito:             getVal(`comp-obito-${disease}`) || '9',
@@ -4232,14 +4171,14 @@ const CaseNotificationModule = {
         hospitalizacaoDate:getVal(`comp-hosp-date-${disease}`) || '',
       },
       labResults: {
-        igmChikungunya:    getVal(`lab-igm-chik-${disease}`) || '4',
-        igmDengue:         getVal(`lab-igm-dengue-${disease}`) || '4',
-        ns1:               getVal(`lab-ns1-${disease}`) || '4',
-        rtPcr:             getVal(`lab-rt-pcr-${disease}`) || '4',
-        investigationDate: getVal(`inv-date-${disease}`) || '',
-        investigationDate2:getVal(`inv-date2-${disease}`) || '',
-        exameType:         getVal(`lab-exame-type-${disease}`) || 'NS1 / Sorologia IgM / RT-PCR',
-        bacterioscopia:    getVal(`lab-bacterioscopia-${disease}`) || '',
+        igmChikungunya:    '4',
+        igmDengue:         '4',
+        ns1:               '4',
+        rtPcr:             '4',
+        investigationDate: '',
+        investigationDate2:'',
+        exameType:         'NS1 / Sorologia IgM / RT-PCR',
+        bacterioscopia:    '',
       },
       surtoData: {
         tipoNotificacao:getVal(`tipo-notificacao-${disease}`) || '2',
@@ -5469,39 +5408,81 @@ window.printNotificationData = function(data) {
     let cnesCode = '-------';
     let unitName = 'OUTRA UNIDADE';
 
-    if (cleanUnit.includes('hiroshi') || cleanUnit.includes('2301389') || cleanUnit === 'ubs_hiroshi') {
-        cnesCode = '2301389';
-        unitName = 'UBS HIROSHI MATSUDA';
-    } else if (cleanUnit.includes('demetrio') || cleanUnit.includes('demétrio') || cleanUnit === 'ubs_demetrio') {
-        cnesCode = '2301621';
-        unitName = 'UBS DEMETRIO RIBEIRO';
-    } else if (cleanUnit.includes('zoonoses') || cleanUnit === 'centro_zoonoses') {
-        cnesCode = '2301702';
-        unitName = 'CENTRO DE ZOONOSES';
-    } else if (cleanUnit.includes('municipal') || cleanUnit.includes('hmm') || cleanUnit === 'hmm') {
-        cnesCode = '2301850';
-        unitName = 'HOSPITAL MUNICIPAL DE MARABA';
-    } else if (cleanUnit.includes('regional') || cleanUnit === 'regional') {
-        cnesCode = '5249449';
-        unitName = 'HOSPITAL REGIONAL DO SUDESTE DO PARA';
-    } else if (cleanUnit.includes('materno') || cleanUnit.includes('infantil') || cleanUnit.includes('hmi') || cleanUnit === 'hmi') {
-        cnesCode = '2301893';
-        unitName = 'HOSPITAL MATERNO INFANTIL';
-    } else if (cleanUnit.includes('zezinha') || cleanUnit === 'ubs_zezinha') {
+    if (cleanUnit === 'ubs_jaime_pinto' || cleanUnit.includes('jaime pinto')) {
+        cnesCode = '2614901';
+        unitName = 'UBS JAIME PINTO';
+    } else if (cleanUnit === 'ubs_laranjeiras' || cleanUnit.includes('laranjeiras')) {
+        cnesCode = '2614774';
+        unitName = 'UBS LARANJEIRAS';
+    } else if (cleanUnit === 'ubs_liberdade' || cleanUnit.includes('liberdade')) {
+        cnesCode = '2614790';
+        unitName = 'UBS LIBERDADE (DR. EMERSON CASELLI)';
+    } else if (cleanUnit === 'ubs_pedro_cavalcante' || cleanUnit.includes('pedro cavalcante')) {
+        cnesCode = '2614931';
+        unitName = 'UBS PEDRO CAVALCANTE';
+    } else if (cleanUnit === 'ubs_jose_pereira' || cleanUnit.includes('josé pereira') || cleanUnit.includes('jose pereira')) {
+        cnesCode = '0826359';
+        unitName = 'UBS JOSE PEREIRA DE ARAUJO';
+    } else if (cleanUnit === 'crismu' || cleanUnit.includes('crismu')) {
+        cnesCode = '9006095';
+        unitName = 'CRISMU';
+    } else if (cleanUnit === 'ubs_edivan_xavier' || cleanUnit.includes('edivan xavier')) {
+        cnesCode = '0270199';
+        unitName = 'UBS EDIVAN XAVIER DOS SANTOS';
+    } else if (cleanUnit === 'ubs_zezinha' || cleanUnit.includes('zezinha')) {
         cnesCode = '2301907';
         unitName = 'UBS ENFERMEIRA ZEZINHA';
-    } else if (cleanUnit.includes('laranjeiras') || cleanUnit === 'ubs_laranjeiras') {
-        cnesCode = '2301923';
-        unitName = 'UBS LARANJEIRAS';
-    } else if (cleanUnit.includes('pedro') || cleanUnit.includes('cavalcante') || cleanUnit === 'ubs_pedro_cavalcante') {
-        cnesCode = '2301931';
-        unitName = 'UBS PEDRO CAVALCANTE';
-    } else if (cleanUnit.includes('amadeu') || cleanUnit.includes('vivacqua') || cleanUnit === 'ubs_amadeu') {
+    } else if (cleanUnit === 'ubs_hiroshi_matsuda' || cleanUnit === 'ubs_hiroshi' || cleanUnit.includes('hiroshi') || cleanUnit.includes('hirochi')) {
+        cnesCode = '2301389';
+        unitName = 'UBS HIROCHI MATSUDA';
+    } else if (cleanUnit === 'ubs_mariana_moraes' || cleanUnit.includes('mariana moraes')) {
+        cnesCode = '2614804';
+        unitName = 'UBS MARIANA MORAES';
+    } else if (cleanUnit === 'ubs_demosthenes_azevedo' || cleanUnit.includes('demósthenes') || cleanUnit.includes('demosthenes')) {
+        cnesCode = '2614839';
+        unitName = 'UBS DEMOSTHENES AZEVEDO';
+    } else if (cleanUnit === 'ubs_joao_batista' || cleanUnit.includes('joão batista') || cleanUnit.includes('joao batista')) {
+        cnesCode = '2614766';
+        unitName = 'UBS JOAO BATISTA BEZERRA';
+    } else if (cleanUnit === 'ubs_amadeu_vivacqua' || cleanUnit === 'ubs_amadeu' || cleanUnit.includes('amadeu') || cleanUnit.includes('vivácqua') || cleanUnit.includes('vivacqua')) {
         cnesCode = '2301958';
         unitName = 'UBS AMADEU VIVACQUA';
-    } else if (cleanUnit.includes('morada') || cleanUnit === 'ubs_morada_nova') {
-        cnesCode = '2301966';
-        unitName = 'UBS MORADA NOVA';
+    } else if (cleanUnit === 'ubs_maria_bico_doce' || cleanUnit.includes('bico doce') || cleanUnit.includes('maria bico')) {
+        cnesCode = '2614758';
+        unitName = 'UBS PARTEIRA MARIA BICO DOCE';
+    } else if (cleanUnit === 'ubs_carlos_barreto' || cleanUnit === 'ubs_morada_nova' || cleanUnit.includes('carlos barreto') || cleanUnit.includes('morada nova')) {
+        cnesCode = '2614855';
+        unitName = 'UBS CARLOS BARRETO';
+    } else if (cleanUnit === 'posto_maria_bahia' || cleanUnit.includes('maria bahia')) {
+        cnesCode = '2614723';
+        unitName = 'POSTO DE SAUDE MARIA BAHIA DA CONCEICAO';
+    } else if (cleanUnit === 'ubs_elisa_chavito' || cleanUnit.includes('elisa') || cleanUnit.includes('chavito')) {
+        cnesCode = '2614715';
+        unitName = 'UBS ELISA MONTEIRO CHAVITO';
+    } else if (cleanUnit === 'posto_antonio_arruda' || cleanUnit.includes('antonio arruda') || cleanUnit.includes('antônio arruda') || cleanUnit.includes('itainópolis') || cleanUnit.includes('itainopolis')) {
+        cnesCode = '2614669';
+        unitName = 'POSTO DE SAUDE ANTONIO ARRUDA';
+    } else if (cleanUnit === 'ubs_jhonatas_moraes' || cleanUnit.includes('jhonatas') || cleanUnit.includes('sororó') || cleanUnit.includes('sororo')) {
+        cnesCode = '9066403';
+        unitName = 'UBS PASTOR JHONATAS MORAES CAVALCANTE';
+    } else if (cleanUnit === 'posto_cristalandia' || cleanUnit.includes('cristalândia') || cleanUnit.includes('cristalandia')) {
+        cnesCode = '2614979';
+        unitName = 'POSTO DE SAUDE CRISTALANDIA';
+    } else if (cleanUnit === 'posto_carima' || cleanUnit.includes('carimã') || cleanUnit.includes('carima')) {
+        cnesCode = '7711883';
+        unitName = 'POSTO DE SAUDE CARIMA';
+    } else if (cleanUnit === 'posto_jose_manoel' || cleanUnit.includes('jose manoel') || cleanUnit.includes('josé manoel') || cleanUnit.includes('anunciação') || cleanUnit.includes('anunciacao')) {
+        cnesCode = '2614707';
+        unitName = 'POSTO DE SAUDE JOSE MANOEL DA ANUNCIACAO';
+    } else if (cleanUnit === 'hmm' || cleanUnit.includes('municipal') || cleanUnit.includes('hmm')) {
+        cnesCode = '2301850';
+        unitName = 'HOSPITAL MUNICIPAL DE MARABA';
+    } else if (cleanUnit === 'regional' || cleanUnit.includes('regional')) {
+        cnesCode = '5249449';
+        unitName = 'HOSPITAL REGIONAL DO SUDESTE DO PARA';
+    } else if (cleanUnit === 'hmi' || cleanUnit.includes('materno') || cleanUnit.includes('infantil') || cleanUnit.includes('hmi')) {
+        cnesCode = '2301893';
+        unitName = 'HOSPITAL MATERNO INFANTIL';
     } else {
         unitName = data.healthUnitText || data.healthUnit || 'OUTRA UNIDADE';
     }
@@ -5927,20 +5908,6 @@ window.printNotificationData = function(data) {
     <div class="sn-sidebar">Notificacao Individual</div>
     <div class="sn-content">
       <div class="sn-row">
-        <div class="sn-cell" style="flex:1.3;">
-          <div class="ct"><span class="cn">01</span> DATA DA COLETA DA 1A AMOSTRA DA SOROLOGIA</div>
-          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(lr.investigationDate||''), 8)}</div>
-        </div>
-        <div class="sn-cell" style="flex:1.3;">
-          <div class="ct"><span class="cn">02</span> DATA DA COLETA DA 1A AMOSTRA DE OUTRA AMOSTRA</div>
-          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(lr.investigationDate2||''), 8)}</div>
-        </div>
-        <div class="sn-cell" style="flex:1.4;">
-          <div class="ct"><span class="cn">03</span> ESPECIFICAR TIPO DE EXAME</div>
-          <div class="cv" style="font-size:8.5px;">${lr.exameType || 'NS1 / SOROLOGIA IgM / RT-PCR'}</div>
-        </div>
-      </div>
-      <div class="sn-row">
         <div class="sn-cell" style="position:relative; flex:2.0;">
           <div class="ct"><span class="cn">04</span> OBITO?</div>
           <div style="font-size:7px; line-height:1.1; margin-top:2px;">
@@ -5985,7 +5952,7 @@ window.printNotificationData = function(data) {
         </div>
       </div>
       <div class="sn-row">
-        <div class="sn-cell" style="position:relative; flex:2.0;">
+        <div class="sn-cell" style="position:relative; flex:1.0;">
           <div class="ct"><span class="cn">09</span> FOI REALIZADO LIQUOR?</div>
           <div style="font-size:7px; line-height:1.1; margin-top:2px;">
             1 - Sim &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 - N&atilde;o &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
@@ -5993,10 +5960,6 @@ window.printNotificationData = function(data) {
           <div class="single-box" style="position:absolute; right:8px; top:4px;">
             ${cs.liquor || '9'}
           </div>
-        </div>
-        <div class="sn-cell" style="flex:2.0;">
-          <div class="ct"><span class="cn">10</span> RESULTADO DA BACTERIOSCOPIA</div>
-          <div class="cv" style="font-size:8.5px;">${lr.bacterioscopia || 'NAO REALIZADO / NEGATIVO'}</div>
         </div>
       </div>
       <div class="sn-row">
@@ -6235,24 +6198,6 @@ window.enterEditNotificationMode = function(data, patient) {
     setVal(`surto-casos-num-${data.disease}`, data.surtoData?.casosSuspeitos || '');
     setVal(`surto-local-${data.disease}`, data.surtoData?.localSurto || '');
 
-    // Pré-existentes
-    setVal(`pre-diabetes-${data.disease}`, data.clinicalSigns?.diabetes);
-    setVal(`pre-hepatopatias-${data.disease}`, data.clinicalSigns?.hepatopatias);
-    setVal(`pre-hipertensao-${data.disease}`, data.clinicalSigns?.hipertensao);
-    setVal(`pre-hematologicas-${data.disease}`, data.clinicalSigns?.hematologicas);
-    setVal(`pre-renal-${data.disease}`, data.clinicalSigns?.renal);
-    setVal(`pre-autoimunes-${data.disease}`, data.clinicalSigns?.autoimunes);
-
-    // Laboratório
-    setVal(`inv-date-${data.disease}`, data.labResults?.investigationDate);
-    setVal(`inv-date2-${data.disease}`, data.labResults?.investigationDate2);
-    setVal(`lab-exame-type-${data.disease}`, data.labResults?.exameType);
-    setVal(`lab-igm-chik-${data.disease}`, data.labResults?.igmChikungunya);
-    setVal(`lab-igm-dengue-${data.disease}`, data.labResults?.igmDengue);
-    setVal(`lab-ns1-${data.disease}`, data.labResults?.ns1);
-    setVal(`lab-rt-pcr-${data.disease}`, data.labResults?.rtPcr);
-    setVal(`lab-bacterioscopia-${data.disease}`, data.labResults?.bacterioscopia);
-
     // Dados complementares
     setVal(`comp-obito-${data.disease}`, data.clinicalSigns?.obito);
     setVal(`comp-contato-${data.disease}`, data.clinicalSigns?.contato);
@@ -6276,14 +6221,6 @@ window.enterEditNotificationMode = function(data, patient) {
 
     // Observações
     setVal(`patient-obs-${data.disease}`, data.observations);
-
-    // Marcar os sintomas nos checkboxes
-    const symptomsArray = data.mainSymptoms ? data.mainSymptoms.split(',').map(s => s.trim()) : [];
-    const checkboxes = document.querySelectorAll(`#form-${data.disease} .sinan-checkbox-grid input[type="checkbox"]`);
-    checkboxes.forEach(cb => {
-        const labelText = cb.parentNode.textContent.trim();
-        cb.checked = symptomsArray.includes(labelText);
-    });
 
     // Colocar o formulário em modo de edição
     const form = document.getElementById(`notification-form-${data.disease}`);
