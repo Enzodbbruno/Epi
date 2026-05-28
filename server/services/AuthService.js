@@ -1,7 +1,7 @@
 'use strict';
 const bcrypt  = require('bcryptjs');
 const jwt     = require('jsonwebtoken');
-const { v4: uuid } = require('uuid');
+const { randomUUID } = require('crypto');
 const authCfg = require('../config/auth');
 const { hashIndex, decrypt } = require('../config/crypto');
 const UserRepo  = require('../repositories/UserRepository');
@@ -103,7 +103,7 @@ class AuthService {
     const { encrypt } = require('../config/crypto');
     const passwordHash = await bcrypt.hash(password, 12);
 
-    const id = uuid();
+    const id = randomUUID();
     await UserRepo.create({ id, name, cpfHash, cpfEncrypted: encrypt(cpf), cns, role, healthCenter, passwordHash });
 
     await AuditRepo.log({ userId: createdBy, action: 'CREATE', resource: 'users', resourceId: id, details: { name, role }, ip, userAgent });

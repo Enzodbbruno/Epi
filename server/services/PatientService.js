@@ -1,5 +1,5 @@
 'use strict';
-const { v4: uuid } = require('uuid');
+const { randomUUID } = require('crypto');
 const { hashIndex, decrypt, encrypt } = require('../config/crypto');
 const PatientRepo = require('../repositories/PatientRepository');
 const AuditRepo   = require('../repositories/AuditRepository');
@@ -88,7 +88,7 @@ class PatientService {
     const existing = await PatientRepo.findByCpfHash(cpfHash);
     if (existing) throw new Error('Paciente com este CPF já está cadastrado.');
 
-    const id = uuid();
+    const id = randomUUID();
     await PatientRepo.create({
       id,
       name:         data.name,

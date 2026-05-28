@@ -1,7 +1,7 @@
 'use strict';
 const db      = require('../config/database');
 const bcrypt  = require('bcryptjs');
-const { v4: uuid } = require('uuid');
+const { randomUUID } = require('crypto');
 const { encrypt, hashIndex } = require('../config/crypto');
 require('dotenv').config();
 
@@ -22,7 +22,7 @@ async function seed() {
       INSERT INTO users (id, name, cpf_hash, cpf_encrypted, role, password_hash, health_center)
       VALUES ($1, $2, $3, $4, 'admin', $5, 'Secretaria Municipal de Saúde')
     `, [
-      uuid(),
+      randomUUID(),
       process.env.ADMIN_NAME || 'Administrador EpiConecta',
       hashIndex(cpfRaw),
       encrypt(cpfRaw),
@@ -53,7 +53,7 @@ async function seed() {
           ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
         ON CONFLICT (cpf_hash) DO NOTHING
       `, [
-        uuid(),
+        randomUUID(),
         p.name,
         hashIndex(p.cpf),
         encrypt(p.cpf),

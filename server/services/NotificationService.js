@@ -1,5 +1,5 @@
 'use strict';
-const { v4: uuid } = require('uuid');
+const { randomUUID } = require('crypto');
 const NotifRepo   = require('../repositories/NotificationRepository');
 const PatientRepo = require('../repositories/PatientRepository');
 const AuditRepo   = require('../repositories/AuditRepository');
@@ -12,7 +12,7 @@ class NotificationService {
     const patient = await PatientRepo.findById(data.patientId);
     if (!patient) throw new Error('Paciente não encontrado.');
 
-    const id = uuid();
+    const id = randomUUID();
     await NotifRepo.create({
       id,
       patientId:     data.patientId,
