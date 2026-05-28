@@ -53,6 +53,15 @@ app.use(cors({
   credentials: true,
 }));
 
+// ── Vercel URL Path Restorer ──────────────────────────
+app.use((req, res, next) => {
+  const originalUrl = req.headers['x-matched-path'] || req.headers['x-vercel-matched-path'] || req.headers['x-forwarded-path'];
+  if (originalUrl) {
+    req.url = originalUrl;
+  }
+  next();
+});
+
 // ── Body Parser ───────────────────────────────────────
 app.use(express.json({ limit: '1mb' }));
 
@@ -99,6 +108,20 @@ app.use(async (req, res, next) => {
 app.use('/api/v1/auth',          authRoutes);
 app.use('/api/v1/patients',      patientRoutes);
 app.use('/api/v1/notifications', notifRoutes);
+
+// ── Fallback API Route for Unmatched Routes ───────────
+app.use('/api/*', (req, res) => {
+  res.status(404).json({
+    error: `Rota da API não encontrada no Express: ${req.method} ${req.url}`,
+    debug: {
+      url: req.url,
+      originalUrl: req.originalUrl,
+      method: req.method,
+      headers: req.headers,
+      query: req.query
+    }
+  });
+});
 
 // ── Health Check ──────────────────────────────────────
 app.get('/api/health', (req, res) => {
