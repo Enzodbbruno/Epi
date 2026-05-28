@@ -109,6 +109,11 @@ app.use('/api/v1/auth',          authRoutes);
 app.use('/api/v1/patients',      patientRoutes);
 app.use('/api/v1/notifications', notifRoutes);
 
+// ── Health Check ──────────────────────────────────────
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '1.0.0' });
+});
+
 // ── Fallback API Route for Unmatched Routes ───────────
 app.use('/api/*', (req, res) => {
   res.status(404).json({
@@ -121,11 +126,6 @@ app.use('/api/*', (req, res) => {
       query: req.query
     }
   });
-});
-
-// ── Health Check ──────────────────────────────────────
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '1.0.0' });
 });
 
 // ── Serve Frontend (static) ───────────────────────────
