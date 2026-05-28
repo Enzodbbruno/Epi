@@ -3535,16 +3535,18 @@ const CaseNotificationModule = {
                  <div class="form-group span-4">
                      <label>14 - Escolaridade</label>
                      <select id="patient-schooling-${id}">
-                         <option value="Analfabeto">0-Analfabeto</option>
-                         <option value="Ensino Fundamental Incompleto">1-Ensino Fundamental Incompleto</option>
-                         <option value="Ensino Fundamental Completo">3-Ensino Fundamental Completo</option>
-                         <option value="Ensino Medio Incompleto">4-Ensino Medio Incompleto</option>
-                         <option value="Ensino Medio Completo">5-Ensino Medio Completo</option>
-                         <option value="Ensino Superior Incompleto">6-Ensino Superior Incompleto</option>
-                         <option value="Ensino Superior Completo">7-Ensino Superior Completo</option>
-                         <option value="Nao se aplica">8-Nao se aplica</option>
-                         <option value="Nao informada" selected>9-Ignorado</option>
-                     </select>
+                          <option value="Analfabeto">0-Analfabeto</option>
+                          <option value="Ensino Fundamental 1a a 4a serie Incompleta">1-1ª a 4ª série incompleta do EF (antigo primário ou 1º grau)</option>
+                          <option value="Ensino Fundamental 4a serie Completa">2-4ª série completa do EF (antigo primário ou 1º grau)</option>
+                          <option value="Ensino Fundamental 5a a 8a serie Incompleta">3-5ª à 8ª série incompleta do EF (antigo ginásio ou 1º grau)</option>
+                          <option value="Ensino Fundamental Completo">4-Ensino fundamental completo (antigo ginásio ou 1º grau)</option>
+                          <option value="Ensino Medio Incompleto">5-Ensino médio incompleto (antigo colegial ou 2º grau)</option>
+                          <option value="Ensino Medio Completo">6-Ensino médio completo (antigo colegial ou 2º grau)</option>
+                          <option value="Ensino Superior Incompleto">7-Educação superior incompleta</option>
+                          <option value="Ensino Superior Completo">8-Educação superior completa</option>
+                          <option value="Nao informada" selected>9-Ignorado</option>
+                          <option value="Nao se aplica">10-Não se aplica</option>
+                      </select>
                  </div>
                  <div class="form-group span-2">
                      <label>15 - No do Cartao SUS</label>
@@ -4058,83 +4060,88 @@ const CaseNotificationModule = {
         isLocal = true;
       }
 
+      let html = '';
       if (results.length === 0) {
-        dropdown.innerHTML = `
+        html += `
           <div style="padding:10px 16px;color:#888;font-size:0.88rem;border-bottom:1px solid #f0f0f0;">
-            <i class="fas fa-info-circle"></i> Nenhum paciente encontrado para "<strong>${term.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</strong>"
-          </div>
-          <div class="autocomplete-new-patient"
-            style="padding:12px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;color:#00796b;font-weight:700;font-size:0.9rem;background:#e8f5e9;border-radius:0 0 12px 12px;">
-            <i class="fas fa-user-plus" style="font-size:1.1rem;"></i>
-            <div>
-              <div>+ Cadastrar como novo paciente</div>
-              <div style="font-size:0.75rem;font-weight:400;color:#555;">Preencha os dados abaixo e clique em Gravar</div>
-            </div>
+            <i class="fas fa-info-circle"></i> Nenhum paciente encontrado para "<strong>\${term.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</strong>"
           </div>`;
-        dropdown.style.display = 'block';
+      } else {
+        html += results.map(p => {
+          let ageText = '';
+          if (p.birthDate) {
+            let birth;
+            if (typeof p.birthDate === 'string' && p.birthDate.includes('/')) {
+              const parts = p.birthDate.split('/');
+              birth = new Date(`\${parts[2]}-\${parts[1]}-\${parts[0]}`);
+            } else {
+              birth = new Date(p.birthDate);
+            }
+            if (!isNaN(birth)) {
+              const diff = Date.now() - birth.getTime();
+              const ageDate = new Date(diff);
+              ageText = Math.abs(ageDate.getUTCFullYear() - 1970) + ' anos';
+            }
+          }
+          const sexText = p.sex === 'M' ? 'M' : (p.sex === 'F' ? 'F' : 'I');
+          const photo = `https://ui-avatars.com/api/?name=\${encodeURIComponent(p.name)}&background=e0f2f1&color=00796b&bold=true`;
 
-        const newPatientBtn = dropdown.querySelector('.autocomplete-new-patient');
-        if (newPatientBtn) {
-          const thisTerm = term;
-          newPatientBtn.addEventListener('mousedown', (ev) => {
-            ev.preventDefault();
-            const form = document.getElementById(`notification-form-${diseaseId}`);
-            const nameInput = document.getElementById(`patient-name-${diseaseId}`);
-            if (form) {
-              form.dataset.newPatient = 'true';
-              delete form.dataset.selectedPatientId;
-            }
-            if (nameInput) nameInput.value = thisTerm;
-            input.value = thisTerm;
-            input.style.background = '#fff8e1';
-            input.style.borderColor = '#ff8f00';
-            dropdown.style.display = 'none';
-            if (typeof App !== 'undefined' && App.showToast) {
-              App.showToast('Preencha os dados do paciente abaixo e clique em Gravar para cadastrar.', 'info');
-            }
-          });
-          newPatientBtn.addEventListener('mouseenter', () => newPatientBtn.style.background = '#c8e6c9');
-          newPatientBtn.addEventListener('mouseleave', () => newPatientBtn.style.background = '#e8f5e9');
-        }
-        return;
+          return `
+            <div class="autocomplete-item" data-id="\${p.id}" data-local="\${p._local ? 'true' : 'false'}"
+              style="padding:10px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid #f0f0f0;">
+              <img src="\${photo}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;" alt="">
+              <div>
+                <div style="font-weight:600;font-size:0.9rem;color:#1a1a2e;">\${p.name}</div>
+                <div style="font-size:0.77rem;color:#888;">CNS: \${p.cns} \${ageText ? '&bull; ' + ageText : ''} &bull; \${sexText} \${p._local ? '<span style="color:#00796b; font-weight:bold;">(Local)</span>' : ''}</div>
+              </div>
+            </div>`;
+        }).join('');
       }
 
-      dropdown.innerHTML = results.map(p => {
-        let ageText = '';
-        if (p.birthDate) {
-          let birth;
-          if (typeof p.birthDate === 'string' && p.birthDate.includes('/')) {
-            const parts = p.birthDate.split('/');
-            birth = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
-          } else {
-            birth = new Date(p.birthDate);
-          }
-          if (!isNaN(birth)) {
-            const diff = Date.now() - birth.getTime();
-            const ageDate = new Date(diff);
-            ageText = Math.abs(ageDate.getUTCFullYear() - 1970) + ' anos';
-          }
-        }
-        const sexText = p.sex === 'M' ? 'M' : (p.sex === 'F' ? 'F' : 'I');
-        const photo = `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=e0f2f1&color=00796b&bold=true`;
+      // Add "register new patient" button in both cases
+      html += `
+        <div class="autocomplete-new-patient"
+          style="padding:12px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;color:#00796b;font-weight:700;font-size:0.9rem;background:#e8f5e9;border-top:1px solid #f0f0f0;">
+          <i class="fas fa-user-plus" style="font-size:1.1rem;"></i>
+          <div>
+            <div>+ Cadastrar como novo paciente com este nome</div>
+            <div style="font-size:0.75rem;font-weight:400;color:#555;">Preencha os dados abaixo e clique em Gravar</div>
+          </div>
+        </div>`;
 
-        return `
-          <div class="autocomplete-item" data-id="${p.id}" data-local="${p._local ? 'true' : 'false'}"
-            style="padding:10px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid #f0f0f0;">
-            <img src="${photo}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;" alt="">
-            <div>
-              <div style="font-weight:600;font-size:0.9rem;color:#1a1a2e;">${p.name}</div>
-              <div style="font-size:0.77rem;color:#888;">CNS: ${p.cns} ${ageText ? '&bull; ' + ageText : ''} &bull; ${sexText} ${p._local ? '<span style="color:#00796b; font-weight:bold;">(Local)</span>' : ''}</div>
-            </div>
-          </div>`;
-      }).join('');
+      dropdown.innerHTML = html;
+      dropdown.style.display = 'block';
+
+      // Attach listener for the new patient option
+      const newPatientBtn = dropdown.querySelector('.autocomplete-new-patient');
+      if (newPatientBtn) {
+        const thisTerm = term;
+        newPatientBtn.addEventListener('mousedown', (ev) => {
+          ev.preventDefault();
+          const form = document.getElementById(`notification-form-${diseaseId}`);
+          const nameInput = document.getElementById(`patient-name-${diseaseId}`);
+          if (form) {
+            form.dataset.newPatient = 'true';
+            delete form.dataset.selectedPatientId;
+          }
+          if (nameInput) nameInput.value = thisTerm;
+          input.value = thisTerm;
+          input.style.background = '#fff8e1';
+          input.style.borderColor = '#ff8f00';
+          dropdown.style.display = 'none';
+          if (typeof App !== 'undefined' && App.showToast) {
+            App.showToast('Preencha os dados do paciente abaixo e clique em Gravar para cadastrar.', 'info');
+          }
+        });
+        newPatientBtn.addEventListener('mouseenter', () => newPatientBtn.style.background = '#c8e6c9');
+        newPatientBtn.addEventListener('mouseleave', () => newPatientBtn.style.background = '#e8f5e9');
+      }
 
       dropdown.querySelectorAll('.autocomplete-item').forEach(item => {
         item.addEventListener('mouseenter', () => item.style.background = '#f0f7ff');
         item.addEventListener('mouseleave', () => item.style.background = '');
       });
 
-      dropdown.style.display = 'block';
     } catch (err) {
       console.error('[EpiConecta] Erro ao renderizar dropdown:', err.message);
     }
@@ -4261,18 +4268,17 @@ const CaseNotificationModule = {
 
       // Auto-register new patient if needed
       if (!patientId && !isEditing) {
-        const sexMap = { 'M': 'Masculino', 'F': 'Feminino', 'I': 'Ignorado' };
         const newPatientData = {
           name:        payload.patientInfo.name,
           cpf:         payload.patientInfo.cpf || null,
           cns:         payload.patientInfo.cns || null,
           birthDate:   payload.patientInfo.birthDate || null,
           motherName:  payload.patientInfo.motherName || null,
-          sex:         sexMap[payload.patientInfo.sex] || 'Ignorado',
+          sex:         payload.patientInfo.sex || 'I',
           race:        payload.patientInfo.race || 'Ignorado',
           education:   payload.patientInfo.education || 'Ignorado',
           zone:        payload.patientInfo.zone || 'Urbana',
-          address:     (payload.patientInfo.address + (payload.patientInfo.number ? ', ' + payload.patientInfo.number : '')) || null,
+          address:     payload.patientInfo.address ? (payload.patientInfo.address + (payload.patientInfo.number ? ', ' + payload.patientInfo.number : '')) : null,
           neighborhood:payload.patientInfo.neighborhood || null,
           municipality:payload.patientInfo.municipality || 'MARABÁ',
           uf:          payload.patientInfo.uf || 'PA',
@@ -4285,7 +4291,10 @@ const CaseNotificationModule = {
           delete form.dataset.newPatient;
           App.showToast(`Paciente ${payload.patientInfo.name} cadastrado!`, 'success');
         } catch (createErr) {
-          console.warn('[EpiConecta] Erro ao criar paciente, continuando sem ID:', createErr.message);
+          App.showToast(`Erro ao cadastrar novo paciente: ${createErr.message}`, 'error');
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = false;
+          return;
         }
       }
 
@@ -5400,17 +5409,27 @@ window.printNotificationData = function(data) {
     const cs = data.clinicalSigns || {};
     const lr = data.labResults || {};
 
-    function splitDigits(value, length) {
-        const digits = String(value || '').replace(/\D/g, '').split('');
+    function splitDigits(value, length, padZero = false) {
+        let clean = String(value || '').replace(/\D/g, '');
+        if (clean && padZero) {
+            clean = clean.padStart(length, '0');
+        }
+        const digits = clean.split('');
         let h = '';
         for (let i = 0; i < length; i++) {
             h += '<span class="digit-box">' + (digits[i] !== undefined ? digits[i] : '&nbsp;') + '</span>';
         }
         return h;
     }
-    function checkVal(current, target) {
-        return String(current) === String(target) ? 'X' : '&nbsp;';
+
+    function formatCepDigits(cep) {
+        const clean = String(cep || '').replace(/\D/g, '');
+        if (clean.length === 8) {
+            return splitDigits(clean.substring(0, 5), 5) + '<span style="font-weight:bold;margin:0 1px;font-size:10px;">-</span>' + splitDigits(clean.substring(5), 3);
+        }
+        return splitDigits('', 5) + '<span style="font-weight:bold;margin:0 1px;font-size:10px;">-</span>' + splitDigits('', 3);
     }
+
     function formatDateDigits(dateStr) {
         if (!dateStr) return '';
         const parts = dateStr.split('-');
@@ -5420,10 +5439,6 @@ window.printNotificationData = function(data) {
         return dateStr;
     }
 
-    // Helpers for checkbox mark in PDF
-    const cv = (val, target) => String(val) === String(target) ? 'X' : '&nbsp;';
-    const hasSymptom = (s) => (data.mainSymptoms || '').includes(s);
-
     const unitCodeMap = { ubs_hiroshi: '2301389', outra: '-------' };
     const cnesCode = unitCodeMap[data.healthUnit] || '-------';
     const unitName = data.healthUnitText || (data.healthUnit === 'ubs_hiroshi' ? 'UBS HIROSHI MATSUDA' : 'OUTRA UNIDADE');
@@ -5431,11 +5446,40 @@ window.printNotificationData = function(data) {
     // Tipo notificacao
     const tipoNotif = data.tipoNotificacao || '2';
 
+    // Gestante code based on sex
+    const sexCode = data.patientSex === 'Masculino' || data.patientSex === 'M' ? 'M' : (data.patientSex === 'Feminino' || data.patientSex === 'F' ? 'F' : 'I');
+    const pregnantCode = (sexCode === 'M') ? '6' : (cs.pregnant || '9');
+
+    // Race code mapping
+    const raceCode = { 'Branca':'1', 'Preta':'2', 'Amarela':'3', 'Parda':'4', 'Indigena':'5', 'Indígena':'5', '1':'1', '2':'2', '3':'3', '4':'4', '5':'5', '9':'9' }[data.patientRace] || '9';
+
+    // Schooling code mapping
+    const schoolMap = {
+      'Analfabeto': '0',
+      'Ensino Fundamental 1a a 4a serie Incompleta': '1', '1a a 4a serie incompleta do EF': '1', '1ª a 4ª série incompleta do EF': '1',
+      'Ensino Fundamental 4a serie Completa': '2', '4a serie completa do EF': '2', '4ª série completa do EF': '2',
+      'Ensino Fundamental 5a a 8a serie Incompleta': '3', '5a a 8a serie incompleta do EF': '3', '5ª à 8ª série incompleta do EF': '3',
+      'Ensino Fundamental Completo': '4',
+      'Ensino Medio Incompleto': '5', 'Ensino Médio Incompleto': '5',
+      'Ensino Medio Completo': '6', 'Ensino Médio Completo': '6',
+      'Ensino Superior Incompleto': '7', 'Educação superior incompleta': '7',
+      'Ensino Superior Completo': '8', 'Educação superior completa': '8',
+      'Nao informada': '9', 'Não informada': '9', 'Ignorado': '9',
+      'Nao se aplica': '10', 'Não se aplica': '10'
+    };
+    const schoolCode = schoolMap[data.patientEducation] || '9';
+
+    // Surto local double digit code
+    const surtoLocalCode = data.surtoLocal ? String(data.surtoLocal).padStart(2, '0') : '';
+
+    // Zone code mapping
+    const zoneCode = { 'Urbana':'1', 'Rural':'2', 'Periurbana':'3', 'Ignorado':'9', '1':'1', '2':'2', '3':'3', '9':'9' }[data.patientZone] || '9';
+
     const html = `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Ficha SINAN - ${data.patientName || 'Paciente'}</title>
+<title>Ficha SINAN - \${data.patientName || 'Paciente'}</title>
 <style>
   @media screen { body { background:#f0f0f0; margin:0; padding:20px; display:flex; flex-direction:column; align-items:center; font-family:Arial,Helvetica,sans-serif; } .sinan-page { background:#fff; width:210mm; padding:8mm 10mm; box-sizing:border-box; margin-bottom:25px; box-shadow:0 4px 15px rgba(0,0,0,0.15); border:1px solid #ccc; } }
   @media print { body { margin:0; padding:0; background:#fff; font-family:Arial,Helvetica,sans-serif; -webkit-print-color-adjust:exact; print-color-adjust:exact; } .sinan-page { width:210mm; min-height:297mm; padding:8mm 10mm; box-sizing:border-box; page-break-after:always; background:#fff; } .no-print { display:none !important; } }
@@ -5445,7 +5489,7 @@ window.printNotificationData = function(data) {
   .sn-header-left { width:30%; font-size:10px; font-weight:bold; line-height:1.4; }
   .sn-header-center { flex:1; text-align:center; padding:0 10px; }
   .sn-header-center .sn-sinan { font-size:11px; font-weight:bold; letter-spacing:2px; margin:0; }
-  .sn-header-center .sn-title { font-size:15px; font-weight:900; margin:2px 0; letter-spacing:0.5px; }
+  .sn-header-center .sn-title { font-size:14px; font-weight:900; margin:2px 0; letter-spacing:0.5px; }
   .sn-header-center .sn-subtitle { font-size:12px; font-weight:bold; text-decoration:underline; margin:0; }
   .sn-header-right { width:22%; display:flex; flex-direction:column; align-items:flex-end; justify-content:center; }
   .sn-num-label { font-size:8px; font-weight:bold; margin-bottom:2px; }
@@ -5463,6 +5507,9 @@ window.printNotificationData = function(data) {
   .cv { font-size:9.5px; font-weight:bold; color:#000; padding-top:2px; min-height:14px; text-transform:uppercase; display:flex; align-items:center; flex-wrap:wrap; }
   .digit-box { display:inline-flex; align-items:center; justify-content:center; width:11px; height:13px; border:1px solid #000; margin-right:1px; font-size:8px; font-family:monospace; font-weight:bold; background:#fff; }
   .check-box { display:inline-flex; align-items:center; justify-content:center; width:10px; height:10px; border:1px solid #000; margin:0 2px; font-size:7.5px; font-weight:bold; background:#fff; flex-shrink:0; }
+  .single-box { display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; border:1.5px solid #000; font-size:10px; font-weight:bold; background:#fff; flex-shrink:0; line-height:1; font-family:monospace; }
+  .double-box { display:inline-flex; align-items:center; }
+  .double-box span { display:inline-flex; align-items:center; justify-content:center; width:13px; height:13px; border:1px solid #000; font-size:8px; font-weight:bold; background:#fff; margin-left:-1px; line-height:1; font-family:monospace; }
   .fr { display:flex; align-items:center; flex-wrap:wrap; gap:6px; font-size:7.5px; margin-top:2px; }
   .fi { display:flex; align-items:center; gap:1px; }
   .footer-info { display:flex; justify-content:space-between; font-size:7.5px; font-weight:bold; margin-top:3px; border-top:1px solid #888; padding-top:2px; }
@@ -5480,18 +5527,18 @@ window.printNotificationData = function(data) {
 <div class="sinan-page">
   <div class="sn-header">
     <div class="sn-header-left">
-      Republica Federativa do Brasil<br>
-      Ministerio da Saude<br>
-      Secretaria de Vigilancia em Saude
+      Rep&uacute;blica Federativa do Brasil<br>
+      Minist&eacute;rio da Sa&uacute;de<br>
+      Secretaria de Vigil&acirc;ncia em Sa&uacute;de
     </div>
     <div class="sn-header-center">
       <p class="sn-sinan">SINAN</p>
-      <p class="sn-title">SISTEMA DE INFORMACAO DE AGRAVOS DE NOTIFICACAO</p>
-      <p class="sn-subtitle">FICHA DE NOTIFICACAO</p>
+      <p class="sn-title">SISTEMA DE INFORMA&Ccedil;&Atilde;O DE AGRAVOS DE NOTIFICA&Ccedil;&Atilde;O</p>
+      <p class="sn-subtitle">FICHA DE NOTIFICA&Ccedil;&Atilde;O</p>
     </div>
     <div class="sn-header-right">
       <span class="sn-num-label">N&ordm;</span>
-      <div class="sn-num-box">${data.sinan_number || '---.---'}</div>
+      <div class="sn-num-box">\${data.sinan_number || '---.---'}</div>
     </div>
   </div>
 
@@ -5500,55 +5547,52 @@ window.printNotificationData = function(data) {
     <div class="sn-sidebar">Dados Gerais</div>
     <div class="sn-content">
       <div class="sn-row">
-        <div class="sn-cell" style="flex:2.2;">
-          <div class="ct"><span class="cn">1</span> TIPO DE NOTIFICACAO</div>
-          <div class="fr">
-            <div class="fi">1-Negativa <span class="check-box">${cv(tipoNotif,'1')}</span></div>
-            <div class="fi">2-Individual <span class="check-box">${cv(tipoNotif,'2')}</span></div>
-            <div class="fi">3-Surto <span class="check-box">${cv(tipoNotif,'3')}</span></div>
-            <div class="fi">4-Inq. Tracoma <span class="check-box">${cv(tipoNotif,'4')}</span></div>
+        <div class="sn-cell" style="position:relative; flex:1; min-height:24px;">
+          <div class="ct"><span class="cn">1</span> TIPO DE NOTIFICA&Ccedil;&Atilde;O</div>
+          <div style="font-size:7.5px; margin-top:2px;">
+            1 - Negativa &nbsp;&nbsp;&nbsp;&nbsp; 2 - Individual &nbsp;&nbsp;&nbsp;&nbsp; 3 - Surto &nbsp;&nbsp;&nbsp;&nbsp; 4 - Inqu&eacute;rito Tracoma
           </div>
-        </div>
-        <div class="sn-cell" style="flex:0.4; align-items:center; justify-content:center;">
-          <span class="digit-box" style="width:15px; height:17px; font-size:11px;">${tipoNotif}</span>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            \${tipoNotif}
+          </div>
         </div>
       </div>
       <div class="sn-row">
         <div class="sn-cell" style="flex:2.5;">
-          <div class="ct"><span class="cn">2</span> AGRAVO/DOENCA</div>
-          <div class="cv" style="font-size:11px; font-weight:900;">${diseaseName}</div>
+          <div class="ct"><span class="cn">2</span> AGRAVO/DOEN&Ccedil;A</div>
+          <div class="cv" style="font-size:11px; font-weight:900;">\${diseaseName}</div>
         </div>
         <div class="sn-cell" style="flex:1.0;">
-          <div class="ct"><span class="cn">3</span> DATA DA NOTIFICACAO</div>
-          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.dataNotificacao), 8)}</div>
+          <div class="ct"><span class="cn">3</span> DATA DA NOTIFICA&Ccedil;&Atilde;O</div>
+          <div class="cv" style="padding-top:3px;">\${splitDigits(formatDateDigits(data.dataNotificacao), 8)}</div>
         </div>
       </div>
       <div class="sn-row">
         <div class="sn-cell" style="flex:0.4;">
           <div class="ct"><span class="cn">4</span> UF</div>
-          <div class="cv">${data.ufNotificacao || 'PA'}</div>
+          <div class="cv" style="padding-top:3px;">\${splitDigits(data.ufNotificacao || 'PA', 2)}</div>
         </div>
         <div class="sn-cell" style="flex:1.8;">
           <div class="ct"><span class="cn">5</span> MUNICIPIO DE NOTIFICACAO</div>
-          <div class="cv">${data.munNotificacao || 'MARABA'}</div>
+          <div class="cv">\${data.munNotificacao || 'MARABA'}</div>
         </div>
         <div class="sn-cell" style="flex:0.8;">
           <div class="ct">CODIGO (IBGE)</div>
-          <div class="cv" style="padding-top:3px;">${splitDigits('1504208', 7)}</div>
+          <div class="cv" style="padding-top:3px;">\${splitDigits('1504208', 7)}</div>
         </div>
       </div>
       <div class="sn-row">
         <div class="sn-cell" style="flex:2.2;">
           <div class="ct"><span class="cn">6</span> UNIDADE DE SAUDE (OU OUTRA FONTE NOTIFICADORA)</div>
-          <div class="cv">${unitName}</div>
+          <div class="cv">\${unitName}</div>
         </div>
         <div class="sn-cell" style="flex:0.8;">
-          <div class="ct">CODIGO (CNES)</div>
-          <div class="cv" style="padding-top:3px;">${splitDigits(cnesCode, 7)}</div>
+          <div class="ct">CODIGO</div>
+          <div class="cv" style="padding-top:3px;">\${splitDigits(cnesCode, 7)}</div>
         </div>
         <div class="sn-cell" style="flex:1.0;">
           <div class="ct"><span class="cn">7</span> DATA DOS PRIMEIROS SINTOMAS</div>
-          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.symptomsDate), 8)}</div>
+          <div class="cv" style="padding-top:3px;">\${splitDigits(formatDateDigits(data.symptomsDate), 8)}</div>
         </div>
       </div>
     </div>
@@ -5561,79 +5605,81 @@ window.printNotificationData = function(data) {
       <div class="sn-row">
         <div class="sn-cell" style="flex:3.0;">
           <div class="ct"><span class="cn">8</span> NOME DO PACIENTE</div>
-          <div class="cv" style="font-size:10px; font-weight:900;">${data.patientName || 'Nao informado'}</div>
+          <div class="cv" style="font-size:10px; font-weight:900;">\${data.patientName || 'Nao informado'}</div>
         </div>
         <div class="sn-cell" style="flex:1.0;">
           <div class="ct"><span class="cn">9</span> DATA DE NASCIMENTO</div>
-          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.patientBirthDate), 8)}</div>
+          <div class="cv" style="padding-top:3px;">\${splitDigits(formatDateDigits(data.patientBirthDate), 8)}</div>
         </div>
       </div>
       <div class="sn-row">
         <div class="sn-cell" style="flex:0.9;">
           <div class="ct"><span class="cn">10</span> (OU) IDADE</div>
-          <div class="cv" style="gap:3px;">
-            ${splitDigits(data.patientAge || '', 3)}
-            <span style="font-size:6.5px; margin-left:3px;">
-              1-Hora<span class="check-box">&nbsp;</span>2-Dia<span class="check-box">&nbsp;</span>3-Mes<span class="check-box">&nbsp;</span>4-Ano<span class="check-box" style="font-weight:bold;color:blue;">X</span>
-            </span>
+          <div style="display:flex; align-items:center; gap:3px; margin-top:2px;">
+            <div>\${splitDigits(data.patientAge || '', 3, true)}</div>
+            <div class="single-box">\${data.patientAge ? '4' : '&nbsp;'}</div>
+            <div style="font-size:5px; line-height:1.0; font-weight:bold; margin-left:2px;">
+              1 - Hora<br>
+              2 - Dia<br>
+              3 - M&ecirc;s<br>
+              4 - Ano
+            </div>
           </div>
         </div>
-        <div class="sn-cell" style="flex:0.7;">
+        <div class="sn-cell" style="position:relative; flex:0.7;">
           <div class="ct"><span class="cn">11</span> SEXO</div>
-          <div class="fr">
-            <div class="fi">M<span class="check-box">${cv(data.patientSex,'Masculino')}</span></div>
-            <div class="fi">F<span class="check-box">${cv(data.patientSex,'Feminino')}</span></div>
-            <div class="fi">I<span class="check-box">${cv(data.patientSex,'Ignorado')}</span></div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">
+            M - Masculino<br>
+            F - Feminino<br>
+            I - Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            \${sexCode}
           </div>
         </div>
-        <div class="sn-cell" style="flex:1.5;">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
           <div class="ct"><span class="cn">12</span> GESTANTE</div>
-          <div class="fr" style="font-size:6.5px; gap:3px;">
-            <div class="fi">1-1&ordm;T<span class="check-box">${cv(cs.pregnant,'1')}</span></div>
-            <div class="fi">2-2&ordm;T<span class="check-box">${cv(cs.pregnant,'2')}</span></div>
-            <div class="fi">3-3&ordm;T<span class="check-box">${cv(cs.pregnant,'3')}</span></div>
-            <div class="fi">4-Id.Ig<span class="check-box">${cv(cs.pregnant,'4')}</span></div>
-            <div class="fi">5-Nao<span class="check-box">${cv(cs.pregnant,'5')}</span></div>
-            <div class="fi">6-N.Ap<span class="check-box">${cv(cs.pregnant,'6')}</span></div>
-            <div class="fi">9-Ig<span class="check-box">${cv(cs.pregnant,'9')}</span></div>
+          <div style="font-size:5.2px; line-height:1.1; margin-top:2px;">
+            1-1&ordm;Trimestre &nbsp;&nbsp; 2-2&ordm;Trimestre &nbsp;&nbsp; 3-3&ordm;Trimestre<br>
+            4-Idade gestacional Ignorada &nbsp;&nbsp; 5-N&atilde;o &nbsp;&nbsp; 6-N&atilde;o se aplica<br>
+            9-Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            \${pregnantCode}
           </div>
         </div>
-        <div class="sn-cell" style="flex:1.3;">
+        <div class="sn-cell" style="position:relative; flex:1.3;">
           <div class="ct"><span class="cn">13</span> RACA/COR</div>
-          <div class="fr" style="font-size:6.5px; gap:3px;">
-            <div class="fi">1-Br<span class="check-box">${data.patientRace && data.patientRace.includes('Branca') ? 'X' : '&nbsp;'}</span></div>
-            <div class="fi">2-Pr<span class="check-box">${data.patientRace && data.patientRace.includes('Preta') ? 'X' : '&nbsp;'}</span></div>
-            <div class="fi">3-Am<span class="check-box">${data.patientRace && data.patientRace.includes('Amarela') ? 'X' : '&nbsp;'}</span></div>
-            <div class="fi">4-Pa<span class="check-box">${data.patientRace && data.patientRace.includes('Parda') ? 'X' : '&nbsp;'}</span></div>
-            <div class="fi">5-In<span class="check-box">${data.patientRace && data.patientRace.includes('ndigena') ? 'X' : '&nbsp;'}</span></div>
-            <div class="fi">9-Ig<span class="check-box">${(!data.patientRace || data.patientRace.includes('Ignorado') || data.patientRace.includes('informada')) ? 'X' : '&nbsp;'}</span></div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">
+            1-Branca &nbsp;&nbsp; 2-Preta &nbsp;&nbsp; 3-Amarela<br>
+            4-Parda &nbsp;&nbsp; 5-Ind&iacute;gena &nbsp;&nbsp; 9-Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            \${raceCode}
           </div>
         </div>
       </div>
       <div class="sn-row">
-        <div class="sn-cell">
+        <div class="sn-cell" style="position:relative;">
           <div class="ct"><span class="cn">14</span> ESCOLARIDADE</div>
-          <div class="fr" style="font-size:6.5px; gap:5px;">
-            <div class="fi">0-Analfabeto<span class="check-box">${data.patientEducation && data.patientEducation.includes('Analfabeto') ? 'X':'&nbsp;'}</span></div>
-            <div class="fi">1-EF Incompl<span class="check-box">${data.patientEducation && data.patientEducation.includes('Fundamental Incompl') ? 'X':'&nbsp;'}</span></div>
-            <div class="fi">3-EF Compl<span class="check-box">${data.patientEducation && data.patientEducation.includes('Fundamental Compl') ? 'X':'&nbsp;'}</span></div>
-            <div class="fi">4-EM Incompl<span class="check-box">${data.patientEducation && data.patientEducation.includes('Medio Incompl') ? 'X':'&nbsp;'}</span></div>
-            <div class="fi">5-EM Compl<span class="check-box">${data.patientEducation && data.patientEducation.includes('Medio Compl') ? 'X':'&nbsp;'}</span></div>
-            <div class="fi">6-ES Incompl<span class="check-box">${data.patientEducation && data.patientEducation.includes('Superior Incompl') ? 'X':'&nbsp;'}</span></div>
-            <div class="fi">7-ES Compl<span class="check-box">${data.patientEducation && data.patientEducation.includes('Superior Compl') ? 'X':'&nbsp;'}</span></div>
-            <div class="fi">8-N.Aplica<span class="check-box">${data.patientEducation && data.patientEducation.includes('aplica') ? 'X':'&nbsp;'}</span></div>
-            <div class="fi">9-Ignorado<span class="check-box">${(!data.patientEducation || data.patientEducation.includes('Ignorado') || data.patientEducation.includes('informada')) ? 'X':'&nbsp;'}</span></div>
+          <div style="font-size:5px; line-height:1.2; margin-top:2px; padding-right:25px;">
+            0-Analfabeto &nbsp;&nbsp; 1-1&ordf; a 4&ordf; s&eacute;rie incompleta do EF (antigo prim&aacute;rio ou 1&ordm; grau) &nbsp;&nbsp; 2-4&ordf; s&eacute;rie completa do EF (antigo prim&aacute;rio ou 1&ordm; grau)<br>
+            3-5&ordf; &agrave; 8&ordf; s&eacute;rie incompleta do EF (antigo gin&aacute;sio ou 1&ordm; grau) &nbsp;&nbsp; 4-Ensino fundamental completo (antigo gin&aacute;sio ou 1&ordm; grau) &nbsp;&nbsp; 5-Ensino m&eacute;dio incompleto (antigo colegial ou 2&ordm; grau)<br>
+            6-Ensino m&eacute;dio completo (antigo colegial ou 2&ordm; grau) &nbsp;&nbsp; 7-Educa&ccedil;&atilde;o superior incompleta &nbsp;&nbsp; 8-Educa&ccedil;&atilde;o superior completa &nbsp;&nbsp; 9-Ignorado &nbsp;&nbsp; 10-N&atilde;o se aplica
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            \${schoolCode}
           </div>
         </div>
       </div>
       <div class="sn-row">
         <div class="sn-cell" style="flex:2.2;">
           <div class="ct"><span class="cn">15</span> NUMERO DO CARTAO SUS</div>
-          <div class="cv" style="padding-top:3px;">${splitDigits(data.patientCns || '', 15)}</div>
+          <div class="cv" style="padding-top:3px;">\${splitDigits(data.patientCns || '', 15)}</div>
         </div>
         <div class="sn-cell" style="flex:1.8;">
           <div class="ct"><span class="cn">16</span> NOME DA MAE</div>
-          <div class="cv" style="font-size:9px;">${data.patientMotherName || 'Nao informada'}</div>
+          <div class="cv" style="font-size:9px;">\${data.patientMotherName || 'Nao informada'}</div>
         </div>
       </div>
     </div>
@@ -5646,26 +5692,22 @@ window.printNotificationData = function(data) {
       <div class="sn-row">
         <div class="sn-cell" style="flex:1.5;">
           <div class="ct"><span class="cn">17</span> DATA DOS 1&ordm;S SINTOMAS DO 1&ordm; CASO SUSPEITO</div>
-          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.surtoSintomasData || ''), 8)}</div>
+          <div class="cv" style="padding-top:3px;">\${splitDigits(formatDateDigits(data.surtoSintomasData || ''), 8)}</div>
         </div>
         <div class="sn-cell" style="flex:1.0;">
           <div class="ct"><span class="cn">18</span> N&ordm; DE CASOS SUSPEITOS/EXPOSTOS</div>
-          <div class="cv" style="padding-top:3px;">${splitDigits(data.surtoNumCasos || '', 4)}</div>
+          <div class="cv" style="padding-top:3px;">\${splitDigits(data.surtoNumCasos || '', 4)}</div>
         </div>
-        <div class="sn-cell" style="flex:2.5;">
-          <div class="ct"><span class="cn">19</span> LOCAL INICIAL DE OCORRENCIA DO SURTO</div>
-          <div class="fr" style="font-size:6.5px; gap:3px; flex-wrap:wrap;">
-            <div class="fi">1-Residencia<span class="check-box">${cv(data.surtoLocal,'1')}</span></div>
-            <div class="fi">2-Hospital<span class="check-box">${cv(data.surtoLocal,'2')}</span></div>
-            <div class="fi">3-Creche/Escola<span class="check-box">${cv(data.surtoLocal,'3')}</span></div>
-            <div class="fi">4-Asilo<span class="check-box">${cv(data.surtoLocal,'4')}</span></div>
-            <div class="fi">5-Trabalho<span class="check-box">${cv(data.surtoLocal,'5')}</span></div>
-            <div class="fi">6-Restaurante<span class="check-box">${cv(data.surtoLocal,'6')}</span></div>
-            <div class="fi">7-Eventos<span class="check-box">${cv(data.surtoLocal,'7')}</span></div>
-            <div class="fi">8-Bairro<span class="check-box">${cv(data.surtoLocal,'8')}</span></div>
-            <div class="fi">9-Municipio<span class="check-box">${cv(data.surtoLocal,'9')}</span></div>
-            <div class="fi">10-Varios Mun.<span class="check-box">${cv(data.surtoLocal,'10')}</span></div>
-            <div class="fi">11-Outros<span class="check-box">${cv(data.surtoLocal,'11')}</span></div>
+        <div class="sn-cell" style="position:relative; flex:2.5;">
+          <div class="ct"><span class="cn">19</span> LOCAL INICIAL DE OCORR&Ecirc;NCIA DO SURTO</div>
+          <div style="font-size:5.5px; line-height:1.2; margin-top:2px; padding-right:32px;">
+            1 - Resid&ecirc;ncia &nbsp;&nbsp; 2 - Hospital / Unidade de Sa&uacute;de &nbsp;&nbsp; 3 - Creche / Escola &nbsp;&nbsp; 4 - Asilo<br>
+            5 - Outras Institui&ccedil;&otilde;es (alojamento, trabalho) &nbsp;&nbsp; 6 - Restaurante / Padaria &nbsp;&nbsp; 7 - Eventos<br>
+            8 - Casos Dispersos no Bairro &nbsp;&nbsp; 9 - Casos Dispersos pelo Munic&iacute;pio &nbsp;&nbsp; 10 - V&aacute;rios Munic&iacute;pios &nbsp;&nbsp; 11 - Outros
+          </div>
+          <div style="position:absolute; right:8px; top:50%; transform:translateY(-50%); display:inline-flex;">
+            <span class="digit-box" style="width:11px; height:13px; font-size:8px; border:1px solid #000; display:inline-flex; align-items:center; justify-content:center; background:#fff; font-family:monospace; font-weight:bold;">\${surtoLocalCode[0] || '&nbsp;'}</span>
+            <span class="digit-box" style="width:11px; height:13px; font-size:8px; border:1px solid #000; display:inline-flex; align-items:center; justify-content:center; background:#fff; font-family:monospace; font-weight:bold; margin-left:-1px;">\${surtoLocalCode[1] || '&nbsp;'}</span>
           </div>
         </div>
       </div>
@@ -5679,39 +5721,39 @@ window.printNotificationData = function(data) {
       <div class="sn-row">
         <div class="sn-cell" style="flex:0.35;">
           <div class="ct"><span class="cn">20</span> UF</div>
-          <div class="cv">${data.patientUf || 'PA'}</div>
+          <div class="cv" style="padding-top:3px;">\${splitDigits(data.patientUf || 'PA', 2)}</div>
         </div>
         <div class="sn-cell" style="flex:1.7;">
           <div class="ct"><span class="cn">21</span> MUNICIPIO DE RESIDENCIA</div>
-          <div class="cv">${data.patientMunicipality || 'MARABA'}</div>
+          <div class="cv">\${data.patientMunicipality || 'MARABA'}</div>
         </div>
         <div class="sn-cell" style="flex:0.9;">
           <div class="ct">CODIGO (IBGE)</div>
-          <div class="cv" style="padding-top:3px;">${splitDigits('1504208', 7)}</div>
+          <div class="cv" style="padding-top:3px;">\${splitDigits('1504208', 7)}</div>
         </div>
         <div class="sn-cell" style="flex:1.0;">
           <div class="ct"><span class="cn">22</span> DISTRITO</div>
-          <div class="cv">${data.patientDistrict || ''}</div>
+          <div class="cv">\${data.patientDistrict || ''}</div>
         </div>
       </div>
       <div class="sn-row">
         <div class="sn-cell" style="flex:1.5;">
           <div class="ct"><span class="cn">23</span> BAIRRO</div>
-          <div class="cv">${data.patientNeighborhood || 'Nao informado'}</div>
+          <div class="cv">\${data.patientNeighborhood || 'Nao informado'}</div>
         </div>
         <div class="sn-cell" style="flex:2.5;">
           <div class="ct"><span class="cn">24</span> LOGRADOURO (RUA, AVENIDA,...)</div>
-          <div class="cv">${data.patientAddress || 'Nao informado'}</div>
+          <div class="cv">\${data.patientAddress || 'Nao informado'}</div>
         </div>
       </div>
       <div class="sn-row">
         <div class="sn-cell" style="flex:0.8;">
           <div class="ct"><span class="cn">25</span> NUMERO</div>
-          <div class="cv">${data.patientNumber || 'S/N'}</div>
+          <div class="cv">\${data.patientNumber || 'S/N'}</div>
         </div>
         <div class="sn-cell" style="flex:1.6;">
           <div class="ct"><span class="cn">26</span> COMPLEMENTO (APTO., CASA,...)</div>
-          <div class="cv">${data.patientComplement || ''}</div>
+          <div class="cv">\${data.patientComplement || ''}</div>
         </div>
         <div class="sn-cell" style="flex:1.6;">
           <div class="ct"><span class="cn">27</span> GEO CAMPO 1</div>
@@ -5725,30 +5767,30 @@ window.printNotificationData = function(data) {
         </div>
         <div class="sn-cell" style="flex:1.8;">
           <div class="ct"><span class="cn">29</span> PONTO DE REFERENCIA</div>
-          <div class="cv">${data.patientRef || ''}</div>
+          <div class="cv">\${data.patientRef || ''}</div>
         </div>
         <div class="sn-cell" style="flex:1.0;">
           <div class="ct"><span class="cn">30</span> CEP</div>
-          <div class="cv" style="padding-top:3px;">${splitDigits((data.patientCep || '68500000').replace(/\D/g,''), 8)}</div>
+          <div class="cv" style="padding-top:3px;">\${formatCepDigits(data.patientCep)}</div>
         </div>
       </div>
       <div class="sn-row">
         <div class="sn-cell" style="flex:1.6;">
           <div class="ct"><span class="cn">31</span> (DDD) TELEFONE</div>
-          <div class="cv">${data.patientPhone || 'Nao informado'}</div>
+          <div class="cv" style="padding-top:3px;">\${splitDigits((data.patientPhone || '').replace(/\D/g,''), 11)}</div>
         </div>
-        <div class="sn-cell" style="flex:1.5;">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
           <div class="ct"><span class="cn">32</span> ZONA</div>
-          <div class="fr">
-            <div class="fi">1-Urbana<span class="check-box">${data.patientZone && data.patientZone.includes('Urbana') ? 'X':'&nbsp;'}</span></div>
-            <div class="fi">2-Rural<span class="check-box">${data.patientZone && data.patientZone.includes('Rural') ? 'X':'&nbsp;'}</span></div>
-            <div class="fi">3-Periurbana<span class="check-box">${data.patientZone && data.patientZone.includes('Periurbana') ? 'X':'&nbsp;'}</span></div>
-            <div class="fi">9-Ignorado<span class="check-box">${(!data.patientZone || data.patientZone.includes('Ignorado')) ? 'X':'&nbsp;'}</span></div>
+          <div style="font-size:6px; line-height:1.1; margin-top:2px;">
+            1 - Urbana &nbsp;&nbsp;&nbsp;&nbsp; 2 - Rural &nbsp;&nbsp;&nbsp;&nbsp; 3 - Periurbana &nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            \${zoneCode}
           </div>
         </div>
         <div class="sn-cell" style="flex:0.9;">
           <div class="ct"><span class="cn">33</span> PAIS (SE RESID. FORA)</div>
-          <div class="cv">${data.patientCountry || ''}</div>
+          <div class="cv">\${data.patientCountry || ''}</div>
         </div>
       </div>
     </div>
@@ -5761,13 +5803,13 @@ window.printNotificationData = function(data) {
       <div class="sn-row">
         <div class="sn-cell">
           <div class="ct">MUNICIPIO/UNIDADE DE SAUDE</div>
-          <div class="cv">${data.munNotificacao || 'MARABA'} / ${unitName}</div>
+          <div class="cv">\${data.munNotificacao || 'MARABA'} / \${unitName}</div>
         </div>
       </div>
       <div class="sn-row">
         <div class="sn-cell" style="flex:1.8;">
           <div class="ct">NOME</div>
-          <div class="cv" style="font-weight:900; font-size:10px;">${data.notificatorName || 'Profissional de Saude'}</div>
+          <div class="cv" style="font-weight:900; font-size:10px;">\${data.notificatorName || 'Profissional de Saude'}</div>
         </div>
         <div class="sn-cell" style="flex:1.0;">
           <div class="ct">FUNCAO</div>
@@ -5802,117 +5844,124 @@ window.printNotificationData = function(data) {
       <div class="sn-row">
         <div class="sn-cell" style="flex:1.3;">
           <div class="ct"><span class="cn">01</span> DATA DA COLETA DA 1A AMOSTRA DA SOROLOGIA</div>
-          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(lr.investigationDate||''), 8)}</div>
+          <div class="cv" style="padding-top:3px;">\${splitDigits(formatDateDigits(lr.investigationDate||''), 8)}</div>
         </div>
         <div class="sn-cell" style="flex:1.3;">
           <div class="ct"><span class="cn">02</span> DATA DA COLETA DA 1A AMOSTRA DE OUTRA AMOSTRA</div>
-          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(lr.investigationDate2||''), 8)}</div>
+          <div class="cv" style="padding-top:3px;">\${splitDigits(formatDateDigits(lr.investigationDate2||''), 8)}</div>
         </div>
         <div class="sn-cell" style="flex:1.4;">
           <div class="ct"><span class="cn">03</span> ESPECIFICAR TIPO DE EXAME</div>
-          <div class="cv" style="font-size:8.5px;">${lr.exameType || 'NS1 / SOROLOGIA IgM / RT-PCR'}</div>
+          <div class="cv" style="font-size:8.5px;">\${lr.exameType || 'NS1 / SOROLOGIA IgM / RT-PCR'}</div>
         </div>
       </div>
       <div class="sn-row">
-        <div class="sn-cell" style="flex:2.0;">
+        <div class="sn-cell" style="position:relative; flex:2.0;">
           <div class="ct"><span class="cn">04</span> OBITO?</div>
-          <div class="fr">
-            <div class="fi">1-Sim<span class="check-box">${cv(cs.obito,'1')}</span></div>
-            <div class="fi">2-Nao<span class="check-box">${cv(cs.obito,'2')}</span></div>
-            <div class="fi">9-Ignorado<span class="check-box">${cv(cs.obito,'9')}</span></div>
+          <div style="font-size:7px; line-height:1.1; margin-top:2px;">
+            1 - Sim &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 - N&atilde;o &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            \${cs.obito || '9'}
           </div>
         </div>
-        <div class="sn-cell" style="flex:2.0;">
+        <div class="sn-cell" style="position:relative; flex:2.0;">
           <div class="ct"><span class="cn">05</span> CONTATO COM CASO SEMELHANTE?</div>
-          <div class="fr">
-            <div class="fi">1-Sim<span class="check-box">${cv(cs.contato,'1')}</span></div>
-            <div class="fi">2-Nao<span class="check-box">${cv(cs.contato,'2')}</span></div>
-            <div class="fi">9-Ignorado<span class="check-box">${cv(cs.contato,'9')}</span></div>
+          <div style="font-size:7px; line-height:1.1; margin-top:2px;">
+            1 - Sim &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 - N&atilde;o &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            \${cs.contato || '9'}
           </div>
         </div>
       </div>
       <div class="sn-row">
-        <div class="sn-cell" style="flex:1.5;">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
           <div class="ct"><span class="cn">06</span> PRESENCA DE EXANTEMA?</div>
-          <div class="fr">
-            <div class="fi">1-Sim<span class="check-box">${cv(cs.exantema,'1')}</span></div>
-            <div class="fi">2-Nao<span class="check-box">${cv(cs.exantema,'2')}</span></div>
-            <div class="fi">9-Ignorado<span class="check-box">${cv(cs.exantema,'9')}</span></div>
+          <div style="font-size:7px; line-height:1.1; margin-top:2px;">
+            1 - Sim &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 - N&atilde;o &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            \${cs.exantema || '9'}
           </div>
         </div>
         <div class="sn-cell" style="flex:1.2;">
           <div class="ct"><span class="cn">07</span> DATA DO INICIO DO EXANTEMA</div>
-          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.exantemaDate||''), 8)}</div>
+          <div class="cv" style="padding-top:3px;">\${splitDigits(formatDateDigits(cs.exantemaDate||''), 8)}</div>
         </div>
-        <div class="sn-cell" style="flex:1.8;">
+        <div class="sn-cell" style="position:relative; flex:1.8;">
           <div class="ct"><span class="cn">08</span> PRESENCA DE PETEQUIAS OU SUFUSOES HEMORRAGICAS?</div>
-          <div class="fr">
-            <div class="fi">1-Sim<span class="check-box">${cv(cs.petequias,'1')}</span></div>
-            <div class="fi">2-Nao<span class="check-box">${cv(cs.petequias,'2')}</span></div>
-            <div class="fi">9-Ignorado<span class="check-box">${cv(cs.petequias,'9')}</span></div>
+          <div style="font-size:7px; line-height:1.1; margin-top:2px;">
+            1 - Sim &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 - N&atilde;o &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            \${cs.petequias || '9'}
           </div>
         </div>
       </div>
       <div class="sn-row">
-        <div class="sn-cell" style="flex:2.0;">
+        <div class="sn-cell" style="position:relative; flex:2.0;">
           <div class="ct"><span class="cn">09</span> FOI REALIZADO LIQUOR?</div>
-          <div class="fr">
-            <div class="fi">1-Sim<span class="check-box">${cv(cs.liquor,'1')}</span></div>
-            <div class="fi">2-Nao<span class="check-box">${cv(cs.liquor,'2')}</span></div>
-            <div class="fi">9-Ignorado<span class="check-box">${cv(cs.liquor,'9')}</span></div>
+          <div style="font-size:7px; line-height:1.1; margin-top:2px;">
+            1 - Sim &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 - N&atilde;o &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            \${cs.liquor || '9'}
           </div>
         </div>
         <div class="sn-cell" style="flex:2.0;">
           <div class="ct"><span class="cn">10</span> RESULTADO DA BACTERIOSCOPIA</div>
-          <div class="cv" style="font-size:8.5px;">${lr.bacterioscopia || 'NAO REALIZADO / NEGATIVO'}</div>
+          <div class="cv" style="font-size:8.5px;">\${lr.bacterioscopia || 'NAO REALIZADO / NEGATIVO'}</div>
         </div>
       </div>
       <div class="sn-row">
-        <div class="sn-cell" style="flex:2.5;">
+        <div class="sn-cell" style="position:relative; flex:2.5;">
           <div class="ct"><span class="cn">11</span> O PACIENTE TOMOU VACINA CONTRA AGRAVO NOTIFICADO NESTE IMPRESSO?</div>
-          <div class="fr">
-            <div class="fi">1-Sim<span class="check-box">${cv(cs.vacina,'1')}</span></div>
-            <div class="fi">2-Nao<span class="check-box">${cv(cs.vacina,'2')}</span></div>
-            <div class="fi">9-Ignorado<span class="check-box">${cv(cs.vacina,'9')}</span></div>
+          <div style="font-size:7px; line-height:1.1; margin-top:2px;">
+            1 - Sim &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 - N&atilde;o &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            \${cs.vacina || '9'}
           </div>
         </div>
         <div class="sn-cell" style="flex:1.0;">
           <div class="ct"><span class="cn">12</span> DATA DA ULTIMA DOSE TOMADA</div>
-          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.vacinaDate||''), 8)}</div>
+          <div class="cv" style="padding-top:3px;">\${splitDigits(formatDateDigits(cs.vacinaDate||''), 8)}</div>
         </div>
-        <div class="sn-cell" style="flex:1.2;">
+        <div class="sn-cell" style="position:relative; flex:1.2;">
           <div class="ct"><span class="cn">13</span> OCORREU HOSPITALIZACAO?</div>
-          <div class="fr">
-            <div class="fi">1-Sim<span class="check-box">${cv(cs.hospitalizacao,'1')}</span></div>
-            <div class="fi">2-Nao<span class="check-box">${cv(cs.hospitalizacao,'2')}</span></div>
-            <div class="fi">9-Ig<span class="check-box">${cv(cs.hospitalizacao,'9')}</span></div>
+          <div style="font-size:7px; line-height:1.1; margin-top:2px;">
+            1 - Sim &nbsp;&nbsp;&nbsp;&nbsp; 2 - N&atilde;o &nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            \${cs.hospitalizacao || '9'}
           </div>
         </div>
         <div class="sn-cell" style="flex:1.0;">
           <div class="ct"><span class="cn">14</span> DATA DA HOSPITALIZACAO</div>
-          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.hospitalizacaoDate||''), 8)}</div>
+          <div class="cv" style="padding-top:3px;">\${splitDigits(formatDateDigits(cs.hospitalizacaoDate||''), 8)}</div>
         </div>
       </div>
       <div class="sn-row">
         <div class="sn-cell" style="flex:0.35;">
           <div class="ct"><span class="cn">15</span> UF</div>
-          <div class="cv">${cs.hospitalUf || ''}</div>
+          <div class="cv" style="padding-top:3px;">\${splitDigits(cs.hospitalUf || '', 2)}</div>
         </div>
         <div class="sn-cell" style="flex:1.5;">
           <div class="ct"><span class="cn">16</span> MUNICIPIO DO HOSPITAL</div>
-          <div class="cv">${cs.hospitalMun || ''}</div>
+          <div class="cv">\${cs.hospitalMun || ''}</div>
         </div>
         <div class="sn-cell" style="flex:0.8;">
           <div class="ct">CODIGO (IBGE)</div>
-          <div class="cv" style="padding-top:3px;">${splitDigits('', 7)}</div>
+          <div class="cv" style="padding-top:3px;">\${splitDigits('', 7)}</div>
         </div>
         <div class="sn-cell" style="flex:2.0;">
           <div class="ct"><span class="cn">17</span> NOME DO HOSPITAL</div>
-          <div class="cv">${cs.hospitalName || ''}</div>
+          <div class="cv">\${cs.hospitalName || ''}</div>
         </div>
         <div class="sn-cell" style="flex:0.8;">
           <div class="ct">CODIGO</div>
-          <div class="cv" style="padding-top:3px;">${splitDigits('', 7)}</div>
+          <div class="cv" style="padding-top:3px;">\${splitDigits('', 7)}</div>
         </div>
       </div>
     </div>
@@ -5927,7 +5976,7 @@ window.printNotificationData = function(data) {
           <div class="ct"><span class="cn">18</span> HIPOTESES DIAGNOSTICAS NO MOMENTO DA NOTIFICACAO</div>
           <div class="cv" style="flex-direction:column; align-items:flex-start; gap:5px; padding:4px 0;">
             <div style="font-size:9.5px; font-weight:bold; width:100%;">
-              1a Hipotese Diagnostica - CID 10: <span style="font-weight:900; border-bottom:1px solid #000; min-width:350px; display:inline-block;">${diseaseName} (${cid10})</span>
+              1a Hipotese Diagnostica - CID 10: <span style="font-weight:900; border-bottom:1px solid #000; min-width:350px; display:inline-block;">\${diseaseName} (\${cid10})</span>
             </div>
             <div style="font-size:9.5px; font-weight:bold; width:100%;">
               2a Hipotese Diagnostica - CID 10: <span style="font-weight:900; border-bottom:1px solid #000; min-width:350px; display:inline-block;">&nbsp;</span>
@@ -5947,10 +5996,10 @@ window.printNotificationData = function(data) {
           <div class="ct"><span class="cn">19</span> LOCAL PROVAVEL DE INFECCAO (CLASSIFICACAO PROVISORIA)</div>
           <div class="fr" style="font-size:9.5px; font-weight:bold; gap:18px; padding:5px 0;">
             <div>Pais: <span style="border-bottom:1px solid #000; min-width:100px; display:inline-block;">BRASIL</span></div>
-            <div>UF: <span style="border-bottom:1px solid #000; min-width:25px; display:inline-block;">${data.patientUf || 'PA'}</span></div>
-            <div>Municipio: <span style="border-bottom:1px solid #000; min-width:100px; display:inline-block;">${data.patientMunicipality || 'MARABA'}</span></div>
-            <div>Distrito: <span style="border-bottom:1px solid #000; min-width:50px; display:inline-block;">${data.patientDistrict || '&nbsp;'}</span></div>
-            <div>Bairro: <span style="border-bottom:1px solid #000; min-width:100px; display:inline-block;">${data.patientNeighborhood || '---'}</span></div>
+            <div>UF: <span style="border-bottom:1px solid #000; min-width:25px; display:inline-block;">\${data.patientUf || 'PA'}</span></div>
+            <div>Municipio: <span style="border-bottom:1px solid #000; min-width:100px; display:inline-block;">\${data.patientMunicipality || 'MARABA'}</span></div>
+            <div>Distrito: <span style="border-bottom:1px solid #000; min-width:50px; display:inline-block;">\${data.patientDistrict || '&nbsp;'}</span></div>
+            <div>Bairro: <span style="border-bottom:1px solid #000; min-width:100px; display:inline-block;">\${data.patientNeighborhood || '---'}</span></div>
           </div>
         </div>
       </div>
@@ -5968,10 +6017,7 @@ window.printNotificationData = function(data) {
 
     printWindow.document.write(html);
     printWindow.document.close();
-};
-
-
-window.showPatientNotificationDetail = function(historyItem, patient) {
+};window.showPatientNotificationDetail = function(historyItem, patient) {
     const modal = document.getElementById('patient-notification-detail-modal');
     const body = document.getElementById('patient-notification-detail-body');
     const printBtn = document.getElementById('btn-print-patient-notification');
@@ -6331,11 +6377,25 @@ window._fillPatientForm = function(p, diseaseId) {
     }
     const raceMap     = { 'Branca':'1','Negra':'2','Preta':'2','Amarela':'3','Parda':'4','Indígena':'5' };
     const schoolMap   = {
-        'Analfabeto':'0','Ensino Fundamental Incompleto':'1','Ensino Fundamental Completo':'3',
-        'Ensino Médio Incompleto':'4','Ensino Médio Completo':'5',
-        'Ensino Superior Incompleto':'6','Ensino Superior Completo':'7','Não se aplica':'8'
+        'Analfabeto': 'Analfabeto',
+        'Ensino Fundamental 1a a 4a serie Incompleta': 'Ensino Fundamental 1a a 4a serie Incompleta',
+        'Ensino Fundamental 4a serie Completa': 'Ensino Fundamental 4a serie Completa',
+        'Ensino Fundamental 5a a 8a serie Incompleta': 'Ensino Fundamental 5a a 8a serie Incompleta',
+        'Ensino Fundamental Incompleto': 'Ensino Fundamental 1a a 4a serie Incompleta',
+        'Ensino Fundamental Completo': 'Ensino Fundamental Completo',
+        'Ensino Medio Incompleto': 'Ensino Medio Incompleto',
+        'Ensino Médio Incompleto': 'Ensino Medio Incompleto',
+        'Ensino Medio Completo': 'Ensino Medio Completo',
+        'Ensino Médio Completo': 'Ensino Medio Completo',
+        'Ensino Superior Incompleto': 'Ensino Superior Incompleto',
+        'Ensino Superior Completo': 'Ensino Superior Completo',
+        'Não se aplica': 'Nao se aplica',
+        'Nao se aplica': 'Nao se aplica',
+        'Não informada': 'Nao informada',
+        'Nao informada': 'Nao informada',
+        'Ignorado': 'Nao informada'
     };
-    const sexMap = { 'Masculino':'M', 'Feminino':'F' };
+    const sexMap = { 'Masculino':'M', 'Feminino':'F', 'M':'M', 'F':'F', 'I':'I' };
 
     const fill = (fieldId, val) => {
         const el = document.getElementById(fieldId);
@@ -6356,7 +6416,7 @@ window._fillPatientForm = function(p, diseaseId) {
     fill(`patient-mother-${diseaseId}`,   p.motherName);
     fill(`patient-sex-${diseaseId}`,      sexMap[p.sex] || 'I');
     fill(`patient-race-${diseaseId}`,     raceMap[p.race] || '9');
-    fill(`patient-schooling-${diseaseId}`,schoolMap[p.education] || '9');
+    fill(`patient-schooling-${diseaseId}`, schoolMap[p.education] || 'Nao informada');
     fill(`patient-mun-res-${diseaseId}`,  p.municipality || 'MARABÁ');
     fill(`patient-location-${diseaseId}`, p.neighborhood);
     fill(`patient-street-${diseaseId}`,   p.address ? p.address.replace(/,\s*\d+.*$/, '').trim() : '');

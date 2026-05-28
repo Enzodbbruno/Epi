@@ -4791,7 +4791,7 @@ input:checked + .toggle-slider:before {
 
 
 /* =========================================
-   FLAT DESIGN COMPONENTS ÿ v2
+   FLAT DESIGN COMPONENTS ï¿½ v2
    ========================================= */
 
 /* Card Institucional Flat */
@@ -4957,7 +4957,7 @@ input:checked + .toggle-slider:before {
     padding: 8px 0;
 }
 
-/* Badges Semÿnticos */
+/* Badges Semï¿½nticos */
 .status-badge {
     display: inline-flex;
     align-items: center;
@@ -4972,7 +4972,7 @@ input:checked + .toggle-slider:before {
 .status-badge.success { background: var(--status-success-bg); color: var(--status-success); }
 .status-badge.info    { background: var(--status-info-bg);    color: var(--status-info); }
 
-/* Botÿes Refinados */
+/* Botï¿½es Refinados */
 .btn-ghost {
     background: transparent;
     border: none;
@@ -4991,7 +4991,7 @@ input:checked + .toggle-slider:before {
     background: var(--primary-light);
 }
 
-/* Cabeÿalho de Seÿÿo de Card */
+/* Cabeï¿½alho de Seï¿½ï¿½o de Card */
 .card-header {
     padding: 18px 24px;
     border-bottom: 1px solid var(--border-color);

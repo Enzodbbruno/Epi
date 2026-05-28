@@ -127,6 +127,10 @@ const EpiAPI = (() => {
     return _request(`/patients/${id}`);
   }
 
+  async function createPatient(data) {
+    return _request('/patients', { method: 'POST', body: JSON.stringify(data) });
+  }
+
   // ── Notifications ─────────────────────────────────────
   async function createNotification(data) {
     return _request('/notifications', { method: 'POST', body: JSON.stringify(data) });
@@ -156,7 +160,7 @@ const EpiAPI = (() => {
 
   return {
     login, logout, getMe, isLoggedIn,
-    searchPatients, getPatient,
+    searchPatients, getPatient, createPatient,
     createNotification, updateNotification, getMyNotifications, getStats,
     checkServerHealth,
   };
