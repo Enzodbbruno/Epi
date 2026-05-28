@@ -1,0 +1,13 @@
+{
+  "name": "epiconecta-root",
+  "version": "1.0.0",
+  "description": "EpiConecta root proxy package for easy deployment",
+  "main": "server/index.js",
+  "scripts": {
+    "install": "npm install --prefix server",
+    "start": "node server/index.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
