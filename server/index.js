@@ -42,7 +42,10 @@ app.use(cors({
       origin.match(/^http:\/\/192\.168\.\d+\.\d+/) ||
       origin.match(/^http:\/\/10\.\d+\.\d+\.\d+/);
 
-    if (isDevelopment || isLocalhostOrPrivateIP || allowedOrigins.includes(origin)) {
+    // Permite domínios de deploy da Vercel
+    const isVercelDomain = origin.endsWith('.vercel.app');
+
+    if (isDevelopment || isLocalhostOrPrivateIP || isVercelDomain || allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
     
