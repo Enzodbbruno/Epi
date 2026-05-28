@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="EpiConecta - Sistema de Vigilância Epidemiológica e Comunicação em Saúde">
+    <meta name="theme-color" content="#00427A">
+    <title>EpiConecta - Vigilância Epidemiológica</title>
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="apple-touch-icon" href="icons/apple-icon-180x180.png">
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Fontes e Ícones -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <link rel="stylesheet" href="css/style.css?v=20260505e">
+    <link rel="stylesheet" href="css/new_theme.css?v=20260518v10">
+</head>
+
+<body>
+    <div class="app-container">
+
+        <!-- SIDEBAR - Completa com todas as funcionalidades da imagem -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="icon-brand"><i class="fas fa-shield-virus"></i></div>
+                <h1>EpiConecta</h1>
+            </div>
+            
+            <div class="sidebar-menu">
+                <!-- Categoria 1: Atendimento/Operação -->
+                <div class="menu-label">Atendimento</div>
+                <a href="#" class="menu-item nav-item active" data-screen="dashboard"><i class="fas fa-home"></i> Início</a>
+                <a href="#" class="menu-item nav-item" data-screen="case-notification"><i class="fas fa-file-medical"></i> Nova Notificação</a>
+                <a href="#" class="menu-item nav-item" data-screen="symptoms"><i class="fas fa-stethoscope"></i> Triagem Clínica</a>
+                <a href="#" class="menu-item nav-item" data-screen="patients"><i class="fas fa-user-injured"></i> Pacientes</a>
+                
+                <!-- Categoria 2: Monitoramento/Gestão -->
+                <div class="menu-label">Monitoramento</div>
+                <a href="#" class="menu-item nav-item" data-screen="notifications"><i class="fas fa-bell"></i> Notificações</a>
+                <a href="#" class="menu-item nav-item" data-screen="analytics"><i class="fas fa-chart-line"></i> Estatísticas</a>
+                
+                <!-- Categoria 3: Apoio e Sistema -->
+                <div class="menu-label">Apoio & Ferramentas</div>
+                <a href="#" class="menu-item nav-item" data-screen="chat"><i class="fas fa-comments"></i> Chat</a>
+                <a href="#" class="menu-item nav-item" data-screen="library"><i class="fas fa-book-medical"></i> Biblioteca</a>
+                <a href="#" class="menu-item nav-item" data-screen="settings"><i class="fas fa-cog"></i> Configurações</a>
+            </div>
+        </aside>
+
+        <!-- MAIN AREA -->
+        <div class="main-wrapper">
+            
+            <!-- TOPBAR (Com a Busca Centralizada) -->
+            <header class="topbar">
+                <div style="width: 200px;"></div>
+                
+                <div class="global-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="global-patient-search" placeholder="Localizar paciente por Nome, CPF ou Cartão SUS...">
+                </div>
+
+                <div class="user-profile">
+                    <div class="user-info" style="text-align: right;">
+                        <span class="name" id="user-name">Visitante</span>
+                        <span class="role">Acesso Público</span>
+                    </div>
+                    <div class="user-avatar"><img id="header-user-avatar" src="https://ui-avatars.com/api/?name=Visitante&background=EFF6FF&color=2563EB" alt="Usuário" style="width: 100%; border-radius: 50%;"></div>
+                </div>
+            </header>
+
+            <main class="content">
+
+                <!-- 1. Dashboard -->
+                <section class="screen active" id="dashboard-screen">
+                    <div class="greeting">
+                        <h2>Bom dia, Cláudia!</h2>
+                        <p>Qual procedimento vamos realizar agora?</p>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        
+                        <!-- ESQUERDA: Ações e Fila de Trabalho -->
+                        <div class="left-col">
+                            
+                            <!-- Cartões de Ação Imediata -->
+                            <div class="action-container">
+                                <div class="action-card action-primary quick-card" data-screen="case-notification">
+                                    <div class="icon-circle"><i class="fas fa-notes-medical"></i></div>
+                                    <div>
+                                        <h3>Notificar Agravo</h3>
+                                        <p>Preencher Ficha de Investigação Compulsória (SINAN)</p>
+                                    </div>
+                                </div>
+
+                                <div class="action-card action-secondary quick-card" data-screen="symptoms">
+                                    <div class="icon-circle"><i class="fas fa-clipboard-list"></i></div>
+                                    <div>
+                                        <h3>Avaliação Inicial</h3>
+                                        <p>Analisar sintomas e hipótese diagnóstica do paciente</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Fila de Trabalho / Histórico do Funcionário -->
+                            <div class="panel" id="recent-history-panel">
+                                <div id="auth-recent-history" style="display: none;">
+                                    <div class="panel-header">
+                                        <h3>Seus Últimos Atendimentos</h3>
+                                        <button class="quick-card" data-screen="patients" style="background:none; border:none; color:var(--primary); font-size:0.85rem; font-weight:600; cursor:pointer;">Ver Histórico</button>
+                                    </div>
+                                    
+                                    <table class="table-list" id="recent-alerts-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Paciente</th>
+                                                <th>Agravo Suspeito</th>
+                                                <th>Data/Hora</th>
+                                                <th>Bairro</th>
+                                                <th>Status SINAN</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="recent-alerts">
+                                            <!-- JS WILL POPULATE THIS -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div id="visitor-recent-history" style="padding: 40px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                                    <i class="fas fa-lock" style="font-size: 2.5rem; color: var(--text-light); margin-bottom: 16px;"></i>
+                                    <h3 style="margin-bottom: 8px; color: var(--text-dark);">Acesso Restrito</h3>
+                                    <p style="color: var(--text-gray); margin-bottom: 24px; font-size: 0.95rem; max-width: 300px;">Faça login com suas credenciais para visualizar seu histórico de atendimentos e notificações.</p>
+                                    <button class="action-primary" style="padding: 10px 24px; border-radius: 8px; font-weight: 600; border: none; cursor: pointer;" onclick="document.getElementById('login-modal').style.display='flex'"><i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i> Fazer Login</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DIREITA: Informações de Apoio e Alertas -->
+                        <div class="right-col">
+                            
+                            <!-- Aviso Relevante para quem atende -->
+                            <div class="widget-alert">
+                                <div class="header"><i class="fas fa-bullhorn"></i> Alerta da Coordenação</div>
+                                <p>Identificamos um aumento atípico de casos suspeitos de Dengue relatados nos bairros <strong>Cidade Nova</strong> e <strong>Laranjeiras</strong>. Reforcem a anamnese para moradores dessas regiões.</p>
+                                <span class="date">Publicado hoje, às 07:30</span>
+                            </div>
+
+                            <!-- Resumo do Próprio Profissional -->
+                            <div class="panel" id="plantao-panel">
+                                <div id="auth-plantao-stats" style="display: none;">
+                                    <div class="panel-header" style="border-bottom: none; padding-bottom: 0;">
+                                        <h3>Seu Plantão Hoje</h3>
+                                    </div>
+                                    <div class="widget-stats">
+                                        <div class="stat-row">
+                                            <span class="label"><i class="fas fa-file-medical" style="color: var(--text-gray);"></i> Fichas Preenchidas</span>
+                                            <span id="metric-active" class="value">0</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span class="label"><i class="fas fa-user-check" style="color: var(--text-gray);"></i> Triagens Realizadas</span>
+                                            <span id="metric-suspected" class="value">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="visitor-plantao-stats" style="padding: 30px 20px; text-align: center; display: flex; flex-direction: column; align-items: center;">
+                                    <i class="fas fa-chart-pie" style="font-size: 2rem; color: var(--text-light); margin-bottom: 12px;"></i>
+                                    <h4 style="margin-bottom: 8px; color: var(--text-dark);">Estatísticas</h4>
+                                    <p style="color: var(--text-gray); font-size: 0.85rem; margin: 0;">Faça login para ver sua produtividade diária.</p>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </section>
+
+
+                <!-- 2. Analytics (Estatísticas) -->
+                <section class="screen" id="analytics-screen" style="display:none;">
+                    <div class="screen-header">
+                        <button class="back-button" data-screen="dashboard"><i class="fas fa-arrow-left"></i></button>
+                        <h1>Dados Epidemiológicos</h1>
+                        <button class="icon-button"><i class="fas fa-sync"></i></button>
+                    </div>
+
+                    <div class="metrics-grid">
+                        <div class="metric-card alert">
+                            <i class="fas fa-virus"></i>
+                            <div>
+                                <h3>Casos Ativos</h3>
+                                <p class="value" id="metric-active">1.234</p>
+                                <span class="trend up">+18% esta semana</span>
+                            </div>
+                        </div>
+                        <div class="metric-card warning">
+                            <i class="fas fa-procedures"></i>
+                            <div>
+                                <h3>Internações</h3>
+                                <p class="value" id="metric-admitted">87</p>
+                                <span class="trend stable">Estável</span>
+                            </div>
+                        </div>
+                        <div class="metric-card success">
+                            <i class="fas fa-heartbeat"></i>
+                            <div>
+                                <h3>Recuperados</h3>
+                                <p class="value" id="metric-recovered">9.876</p>
+                                <span class="trend up">+7% hoje</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hospitalizations Section -->
+                    <div class="stats-extended-section hospital-stats" style="margin-top: 20px; margin-bottom: 20px;">
+                        <h2>Internações por Setor - HMM</h2>
+                        <div
+                            style="background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #f0f4f8;">
+                            <div class="vaccine-list">
+                                <div class="vaccine-item">
+                                    <div class="v-header"><span>Pronto-Socorro</span> <span>32</span></div>
+                                    <div class="progress-bar">
+                                        <div class="fill" style="width: 80%; background: var(--secondary-color);"></div>
+                                    </div>
+                                </div>
+                                <div class="vaccine-item">
+                                    <div class="v-header"><span>Clínica Médica</span> <span>25</span></div>
+                                    <div class="progress-bar">
+                                        <div class="fill" style="width: 60%; background: var(--secondary-color);"></div>
+                                    </div>
+                                </div>
+                                <div class="vaccine-item">
+                                    <div class="v-header"><span>UCE</span> <span>15</span></div>
+                                    <div class="progress-bar">
+                                        <div class="fill" style="width: 35%; background: var(--secondary-color);"></div>
+                                    </div>
+                                </div>
+                                <div class="vaccine-item">
+                                    <div class="v-header"><span>UTI</span> <span>8</span></div>
+                                    <div class="progress-bar">
+                                        <div class="fill" style="width: 20%; background: var(--secondary-color);"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h2>Internações por Setor - HRSP</h2>
+                        <div
+                            style="background: white; border-radius: 20px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #f0f4f8;">
+                            <div class="vaccine-list">
+                                <div class="vaccine-item">
+                                    <div class="v-header"><span>Clínica Médica</span> <span>18</span></div>
+                                    <div class="progress-bar">
+                                        <div class="fill" style="width: 70%; background: #4CAF50;"></div>
+                                    </div>
+                                </div>
+                                <div class="vaccine-item">
+                                    <div class="v-header"><span>UTI</span> <span>10</span></div>
+                                    <div class="progress-bar">
+                                        <div class="fill" style="width: 40%; background: #4CAF50;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- New Statistics Section -->
+                    <div class="stats-extended-section" style="margin-top: 20px; margin-bottom: 20px;">
+                        <h2>Indicadores de Saúde Pública</h2>
+                        <div class="stats-grid-2col">
+                            <div class="stat-card">
+                                <h3>Cobertura Vacinal</h3>
+                                <div class="vaccine-list">
+                                    <div class="vaccine-item">
+                                        <div class="v-header"><span>Cobertura Vacinal (Dengue)</span> <span>45%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="fill" style="width: 45%; background: var(--secondary-color);">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="vaccine-item">
+                                        <div class="v-header"><span>Cura Hanseníase</span> <span>82%</span></div>
+                                        <div class="progress-bar">
+                                            <div class="fill" style="width: 82%; background: #4CAF50;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="vaccine-item">
+                                        <div class="v-header"><span>Tratamento Leishmaniose</span> <span>90%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="fill" style="width: 90%; background: #2196F3;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="vaccine-item">
+                                        <div class="v-header"><span>Geo-helmintíases (Escolar)</span> <span>78%</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="fill" style="width: 78%; background: #FF9800;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="stat-card-grid">
+                                <div class="mini-stat">
+                                    <i class="fas fa-mosquito" style="color: #F44336;"></i>
+                                    <span class="mini-val">1.2k</span>
+                                    <span class="mini-lbl">Focos Eliminados</span>
+                                </div>
+                                <div class="mini-stat">
+                                    <i class="fas fa-user-nurse" style="color: var(--primary-color);"></i>
+                                    <span class="mini-val">48</span>
+                                    <span class="mini-lbl">Equipes em Campo</span>
+                                </div>
+                                <div class="mini-stat">
+                                    <i class="fas fa-hospital" style="color: var(--secondary-color);"></i>
+                                    <span class="mini-val">65%</span>
+                                    <span class="mini-lbl">Ocupação Leitos</span>
+                                </div>
+                                <div class="mini-stat">
+                                    <i class="fas fa-clipboard-check" style="color: #005299;"></i>
+                                    <span class="mini-val">98%</span>
+                                    <span class="mini-lbl">Notificações Fechadas</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="map-section">
+                        <h2>Lista Detalhada de Casos Ativos</h2>
+
+                        <div class="case-list-controls"
+                            style="margin-bottom: 15px; display:flex; gap: 10px; align-items: center;">
+                            <select id="case-filter-disease" class="control-select" style="flex: 1;">
+                                <option value="all">Todas as Doenças</option>
+                                <option value="dengue">ðŸ¦Ÿ Dengue</option>
+                                <option value="chikungunya">ðŸ¤’ Chikungunya</option>
+                                <option value="zika">ðŸ¦Ÿ Zika</option>
+                                <option value="leishmaniose">ðŸ¦— Leishmaniose</option>
+                                <option value="hanseniase"> Hanseníase</option>
+                                <option value="esquistossomose">ðŸŒ Esquistossomose</option>
+                            </select>
+                            <button id="apply-filter-btn" class="primary-button"
+                                style="padding: 10px 20px; border-radius: 8px;">
+                                <i class="fas fa-filter"></i> Aplicar
+                            </button>
+                        </div>
+
+                        <div id="full-case-list-container" class="full-table-container"
+                            style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                            <table class="data-table" style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="background: #f5f7fa; color: #555; text-align: left; font-size: 0.9rem;">
+                                        <th style="padding: 15px;">Paciente</th>
+                                        <th style="padding: 15px;">Bairro</th>
+                                        <th style="padding: 15px;">Doença</th>
+                                        <th style="padding: 15px;">Data Notificação</th>
+                                        <th style="padding: 15px;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="full-cases-tbody">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- 3. Triagem de Sintomas -->
+                <section class="screen" id="symptoms-screen" style="display:none;">
+                    <div class="screen-header">
+                        <button class="back-button" data-screen="dashboard"><i class="fas fa-arrow-left"></i></button>
+                        <h1>Triagem de Sintomas</h1>
+                        <button class="icon-button" id="clear-symptoms-btn"><i class="fas fa-trash"></i></button>
+                    </div>
+
+                    <p class="instruction-text">Marque os sintomas apresentados para uma análise preliminar.</p>
+
+                    <div class="triage-search-actions" style="margin: 0 auto 25px auto; max-width: 600px; width: 100%;">
+                        <label
+                            style="display: block; font-weight: 600; color: var(--primary-color); font-size: 0.95rem; text-align: left; margin-bottom: 8px;">
+                            <i class="fas fa-keyboard"></i> Busque o sintoma pelo nome
+                        </label>
+                        <div class="symptom-search-bar"
+                            style="display: flex; gap: 10px; align-items: center; background: #f0f7fb; padding: 12px 18px; border-radius: 14px; border: 2px solid var(--primary-color); box-shadow: 0 4px 12px rgba(13, 138, 188, 0.1);">
+                            <i class="fas fa-search" style="color: var(--primary-color); font-size: 1.2rem;"></i>
+                            <input type="text" id="triage-symptom-search"
+                                placeholder="Buscar sintoma digitando (ex: febre)..."
+                                style="flex: 1; border: none; outline: none; font-size: 1.1rem; padding: 8px; background: transparent; color: #333; font-weight: 500;">
+                        </div>
+                    </div>
+
+                    <div class="symptoms-grid" id="symptoms-grid">
+                        <!-- Generated by JS -->
+                    </div>
+
+                    <div class="action-bar">
+                        <button class="btn btn-primary" id="analyze-symptoms-btn">Analisar Sintomas</button>
+                    </div>
+
+                    <div id="diagnosis-results" class="diagnosis-results hidden">
+                        <h2>Resultado Preliminar</h2>
+                        <div class="disclaimer-box">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>Este é um resultado preliminar. Consulte um médico.</p>
+                        </div>
+                        <div id="results-list"></div>
+                    </div>
+                </section>
+
+                <!-- 4. Notificação de Casos -->
+                <section class="screen" id="case-notification-screen" style="display:none;">
+                    <div class="notification-header">
+                        <button class="back-button-header" data-screen="dashboard">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <div class="notification-header-content">
+                            <h1>Notificação de Doenças Tropicais Negligenciadas</h1>
+                            <p>Município de Marabá - Pará</p>
+                        </div>
+                    </div>
+
+                    <!-- Search Disease Input -->
+                    <div class="disease-search-wrapper"
+                        style="margin: 25px auto 30px auto; max-width: 600px; width: 100%;">
+                        <div class="disease-search-container"
+                            style="display: flex; gap: 10px; align-items: center; background: #f0f7fb; padding: 12px 18px; border-radius: 14px; border: 2px solid var(--primary-color); box-shadow: 0 6px 16px rgba(13, 138, 188, 0.15); transition: all 0.3s ease;">
+                            <i class="fas fa-search" style="color: var(--primary-color); font-size: 1.2rem;"></i>
+                            <input type="text" id="disease-search-input"
+                                placeholder="Pesquisar doença (ex: Dengue, Zika)..."
+                                style="flex: 1; border: none; outline: none; font-size: 1.1rem; padding: 8px; background: transparent; color: #333; font-weight: 500;">
+                        </div>
+                    </div>
+
+                    <!-- Desktop: Tabs -->
+                    <div class="disease-tabs-container desktop-only">
+                        <div class="disease-tabs" id="disease-tabs">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Mobile: Dropdown -->
+                    <div class="disease-dropdown-container mobile-only" id="disease-dropdown-container">
+                        <!-- Populated by JavaScript -->
+                    </div>
+
+                    <div class="notification-form-container">
+                        <div class="notification-form-card">
+                            <!-- Forms will be generated dynamically by JavaScript -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. Notificações (Lista) -->
+                <section class="screen" id="notifications-screen" style="display:none;">
+                    <div class="screen-header">
+                        <button class="back-button" data-screen="dashboard"><i class="fas fa-arrow-left"></i></button>
+                        <h1>Notificações</h1>
+                        <button class="icon-button" id="filter-notifications-btn"><i class="fas fa-filter"></i></button>
+                    </div>
+
+                    <div class="notifications-list" id="notifications-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </section>
+
+                <!-- 6. Chat Profissional -->
+                <section class="screen" id="chat-screen" style="display:none;">
+                    <div class="screen-header">
+                        <button class="back-button" data-screen="dashboard"><i class="fas fa-arrow-left"></i></button>
+                        <h1>Chat Profissional</h1>
+                        <button class="icon-button" id="new-chat-btn"><i class="fas fa-plus"></i></button>
+                    </div>
+
+                    <div class="chat-container">
+                        <div class="chat-rooms" id="chat-rooms">
+                            <!-- Populated by JS -->
+                        </div>
+
+                        <div class="chat-messages hidden" id="chat-messages">
+                            <div class="chat-header">
+                                <button class="back-to-rooms"><i class="fas fa-arrow-left"></i></button>
+                                <h3 id="current-chat-name">Equipe de Vigilância</h3>
+                            </div>
+                            <div class="messages-container" id="messages-container"></div>
+                            <div class="message-input-bar">
+                                <input type="text" id="message-input" placeholder="Digite sua mensagem...">
+                                <button class="send-btn"><i class="fas fa-paper-plane"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 7. Biblioteca Digital -->
+                <section class="screen library-screen-shell" id="library-screen">
+                    <div class="dash-hero-container library-hero">
+                        <div class="library-hero-top">
+                            <button class="back-button library-back-button" data-screen="dashboard"><i
+                                    class="fas fa-arrow-left"></i></button>
+                            <div class="library-hero-icon-wrap">
+                                <i class="fas fa-book-medical library-hero-icon"></i>
+                            </div>
+                        </div>
+                        <h1 class="library-hero-title">Biblioteca Digital</h1>
+                        <p class="library-hero-subtitle">Acesso a Manuais e Protocolos Clínicos</p>
+                    </div>
+
+                    <div class="library-content-shell">
+                        <div class="search-bar-container library-search-shell">
+                            <i class="fas fa-search library-search-icon"></i>
+                            <input type="text" id="library-search" class="search-input library-search-input"
+                                placeholder="Buscar protocolos...">
+                        </div>
+
+                        <div class="documents-list library-documents-list" id="documents-list">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 8. Configurações -->
+                <section class="screen" id="settings-screen" style="display:none;">
+                    <div class="screen-header">
+                        <button class="back-button" data-screen="dashboard"><i class="fas fa-arrow-left"></i></button>
+                        <h1>Configurações</h1>
+                    </div>
+
+                    <div class="settings-list">
+                        <div class="setting-group">
+                            <h3>Conta</h3>
+                            <div class="setting-item">
+                                <i class="fas fa-user"></i>
+                                <div>Perfil</div>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                            <div class="setting-item">
+                                <i class="fas fa-shield-alt"></i>
+                                <div>Privacidade</div>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </div>
+
+                        <div class="setting-group">
+                            <h3>Notificações</h3>
+                            <div class="setting-item toggle-item">
+                                <i class="fas fa-bell"></i>
+                                <div>Push Notifications</div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked id="push-notifications-toggle">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button class="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i> Sair
+                        </button>
+                    </div>
+                </section>
+
+                <!-- 9. Pacientes (Preserved from previous implementation) -->
+                <section id="patients-screen" class="screen" style="display: none;">
+                    <div class="patient-app-header">
+                        <div class="header-left">
+                            <button class="back-button" data-screen="dashboard">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <h1>Prontuário Eletrônico</h1>
+                        </div>
+                    </div>
+
+                    <div class="patient-content">
+                        <!-- Área de Busca -->
+                        <div class="patient-search-bar">
+                            <div class="search-input-wrapper">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" id="patient-search-input"
+                                    placeholder="Buscar por nome, CPF, CNS ou data de nascimento..." autocomplete="off">
+                                <button id="patient-search-btn" class="search-btn">
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                            <div class="search-suggestions">
+                                <span class="suggestion-tag">Ex: 123.456.789-00</span>
+                                <span class="suggestion-tag">Ex: Maria da Silva</span>
+                                <span class="suggestion-tag">Ex: 15/05/1990</span>
+                            </div>
+                        </div>
+
+                        <!-- Área de Resultados e Recentes -->
+                        <div class="patient-list-container">
+                            <!-- Acessados Recentemente -->
+                            <div class="patient-recent-section" id="patient-recents">
+                                <h2 class="section-title"><i class="fas fa-history"></i> ltimos Acessados</h2>
+                                <div class="patient-recent-grid" id="recent-patients-list">
+                                    <!-- Populated by JS -->
+                                </div>
+                            </div>
+
+                            <!-- Resultados da Busca -->
+                            <div class="patient-results-section" id="patient-results" style="display: none;">
+                                <h2 class="section-title">Resultados da Busca</h2>
+                                <div class="patient-results-grid" id="results-list">
+                                    <!-- Populated by JS -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Visualização Detalhada do Paciente (Overlay) -->
+                        <div class="patient-detail-overlay" id="patient-profile-view" style="display: none;">
+                            <div class="patient-detail-card">
+                                <div class="detail-header">
+                                    <button class="close-detail-btn" id="back-to-search-btn">
+                                        <i class="fas fa-arrow-left"></i>
+                                    </button>
+                                    <h2 id="p-name">Nome do Paciente</h2>
+                                </div>
+
+                                <div class="patient-profile-header">
+                                    <div class="profile-photo-container">
+                                        <img id="p-photo" src="" alt="Foto do Paciente">
+                                        <div class="photo-overlay">
+                                            <i class="fas fa-camera"></i>
+                                        </div>
+                                    </div>
+                                    <div class="profile-info">
+                                        <div class="patient-badges" id="p-badges">
+                                            <!-- Badges dinâmicos -->
+                                        </div>
+                                        <div class="patient-meta-grid">
+                                            <div class="meta-item">
+                                                <span class="label">Idade</span>
+                                                <span class="value" id="p-age">42 anos</span>
+                                            </div>
+                                            <div class="meta-item">
+                                                <span class="label">Sexo</span>
+                                                <span class="value" id="p-sex">Feminino</span>
+                                            </div>
+                                            <div class="meta-item">
+                                                <span class="label">Tipo Sanguíneo</span>
+                                                <span class="value" id="p-blood">O+</span>
+                                            </div>
+                                            <div class="meta-item">
+                                                <span class="label">CNS</span>
+                                                <span class="value" id="p-cns">123 4567 8901 2345</span>
+                                            </div>
+                                            <div class="meta-item">
+                                                <span class="label">CPF</span>
+                                                <span class="value" id="p-cpf">123.456.789-00</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Abas -->
+                                <div class="patient-tabs">
+                                    <button class="p-tab active" data-tab="p-summary">Resumo</button>
+                                    <button class="p-tab" data-tab="p-history">Histórico</button>
+                                    <button class="p-tab" data-tab="p-notifications">Notificações</button>
+                                    <button class="p-tab" data-tab="p-vaccines">Vacinas</button>
+                                    <button class="p-tab" data-tab="p-exams">Exames</button>
+                                </div>
+
+                                <!-- Conteúdo das Abas -->
+                                <div class="p-tab-content active" id="p-summary">
+                                    <!-- Alergias -->
+                                    <div class="p-alert-box critical" id="p-allergies-box">
+                                        <h4><i class="fas fa-exclamation-triangle"></i> Alergias Conhecidas</h4>
+                                        <ul id="p-allergies-list"></ul>
+                                    </div>
+
+                                    <!-- Condições Crônicas -->
+                                    <div class="p-section-title">Condições Crônicas</div>
+                                    <div class="p-conditions-grid" id="p-conditions-list">
+                                        <!-- Cards dinâmicos -->
+                                    </div>
+
+                                    <!-- Sinais Vitais Recentes -->
+                                    <div class="p-section-title">Sinais Vitais (ltima Consulta)</div>
+                                    <div class="vitals-grid">
+                                        <div class="vital-card">
+                                            <div class="icon"><i class="fas fa-heartbeat"></i></div>
+                                            <div class="data">
+                                                <span id="v-bp" class="val">118/76</span>
+                                                <span class="unit">mmHg</span>
+                                            </div>
+                                            <div class="lbl">Pressão Arterial</div>
+                                        </div>
+                                        <div class="vital-card">
+                                            <div class="icon"><i class="fas fa-weight"></i></div>
+                                            <div class="data">
+                                                <span id="v-weight" class="val">68</span>
+                                                <span class="unit">kg</span>
+                                            </div>
+                                            <div class="lbl">Peso</div>
+                                        </div>
+                                        <div class="vital-card">
+                                            <div class="icon"><i class="fas fa-thermometer-half"></i></div>
+                                            <div class="data">
+                                                <span id="v-temp" class="val">36.4</span>
+                                                <span class="unit">°C</span>
+                                            </div>
+                                            <div class="lbl">Temperatura</div>
+                                        </div>
+                                        <div class="vital-card">
+                                            <div class="icon"><i class="fas fa-lungs"></i></div>
+                                            <div class="data">
+                                                <span id="v-o2" class="val">98</span>
+                                                <span class="unit">%</span>
+                                            </div>
+                                            <div class="lbl">Saturação O</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="p-tab-content" id="p-history" style="display: none;">
+                                    <div class="timeline" id="p-timeline">
+                                        <!-- Timeline items populated by JS -->
+                                    </div>
+                                </div>
+
+                                <div class="p-tab-content" id="p-notifications" style="display: none;">
+                                    <div class="notifications-list" id="p-notifications-list"
+                                        style="display: flex; flex-direction: column; gap: 12px; padding: 10px;">
+                                        <!-- Notifications populated by JS -->
+                                    </div>
+                                </div>
+
+                                <div class="p-tab-content" id="p-vaccines" style="display: none;">
+                                    <div class="vaccine-list" id="p-vaccines-list">
+                                        <!-- Vaccines populated by JS -->
+                                    </div>
+                                </div>
+
+                                <div class="p-tab-content" id="p-exams" style="display: none;">
+                                    <div class="exams-list" id="p-exams-list">
+                                        <!-- Exams populated by JS -->
+                                    </div>
+                                </div>
+
+                                <!-- Botões de Ação -->
+                                <div class="patient-actions">
+                                    <button class="btn btn-primary">Nova Consulta</button>
+                                    <button class="btn btn-outline">Editar Prontuário</button>
+                                    <button class="btn btn-outline danger">Notificar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- Bottom Nav (Mobile) -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-screen="dashboard"><i
+                    class="fas fa-home"></i><span>Início</span></button>
+            <button class="nav-item" data-screen="case-notification"><i
+                    class="fas fa-file-medical"></i><span>Notificar</span></button>
+            <button class="nav-item" data-screen="chat"><i class="fas fa-comment-medical"></i><span>Chat</span></button>
+            <button class="nav-item" data-screen="library"><i
+                    class="fas fa-book-medical"></i><span>Biblioteca</span></button>
+            <button class="nav-item" data-screen="patients"><i
+                    class="fas fa-user-injured"></i><span>Pacientes</span></button>
+        </nav>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loading-overlay">
+            <div class="loading-spinner"></div>
+            <p>Carregando...</p>
+        </div>
+
+        <!-- Voice Search/Listening Overlay -->
+        <div class="listening-overlay overlay-base overlay-hidden" id="listening-overlay">
+            <div class="mic-pulse listening-mic-pulse">
+                <i class="fas fa-microphone"></i>
+            </div>
+            <h2 class="listening-title">Ouvindo...</h2>
+            <p id="listening-text" class="listening-text">Fale o
+                sintoma desejado</p>
+            <button id="cancel-listening-btn" class="btn-overlay-cancel">Cancelar</button>
+        </div>
+
+        <!-- Modal de Busca de Sintomas (Botão Notificar Caso) -->
+        <div class="modal modal-base" id="symptom-search-modal">
+            <div class="modal-content modal-content-symptom">
+                <div class="modal-header modal-header-standard">
+                    <h2 class="modal-title"><i class="fas fa-search-plus modal-title-icon"></i>Pesquisar Sintomas</h2>
+                    <button class="close-modal-btn"
+                        onclick="document.getElementById('symptom-search-modal').style.display='none'"><i
+                            class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body modal-body-standard">
+                    <div class="modal-search-row">
+                        <input type="text" id="modal-symptom-input" placeholder="Digite o sintoma..."
+                            class="modal-search-input">
+                        <button id="modal-mic-btn" class="btn btn-primary btn-icon-square"><i
+                                class="fas fa-microphone"></i></button>
+                    </div>
+                    <div id="modal-symptoms-results" class="modal-results-list">
+                        <!-- Results injected here -->
+                    </div>
+                </div>
+                <div class="modal-footer modal-footer-standard">
+                    <button onclick="document.getElementById('symptom-search-modal').style.display='none'"
+                        class="btn btn-outline">Cancelar</button>
+                    <button id="confirm-symptoms-btn" class="btn btn-primary">Adicionar
+                        Selecionados</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="js/api.js?v=20260518c"></script>
+    <script src="js/app.js?v=20260518f"></script>
+
+    <!-- Failsafe Triage Symptom Filter Override -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const triageSearch = document.getElementById('triage-symptom-search');
+            if (triageSearch) {
+                triageSearch.addEventListener('input', function (e) {
+                    const q = e.target.value.toLowerCase().trim();
+                    const grid = document.getElementById('symptoms-grid');
+                    if (!grid) return;
+
+                    const chips = grid.querySelectorAll('.symptom-chip');
+                    chips.forEach(chip => {
+                        if (chip.textContent.toLowerCase().includes(q)) {
+                            chip.style.display = '';
+                        } else {
+                            chip.style.display = 'none';
+                        }
+                    });
+
+                    const categories = grid.querySelectorAll('.symptom-category');
+                    categories.forEach(cat => {
+                        const visibleChips = Array.from(cat.querySelectorAll('.symptom-chip')).filter(c => c.style.display !== 'none');
+                        if (visibleChips.length > 0) {
+                            cat.style.display = 'block';
+                        } else {
+                            cat.style.display = 'none';
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+
+    <!-- Modal de Login -->
+    <div class="modal modal-base modal-dark" id="login-modal">
+        <div class="modal-content modal-content-login-split">
+            <!-- Left Side: Info & Brand -->
+            <div class="login-split-left">
+                <div class="login-brand-tag">
+                    <i class="fas fa-shield-virus"></i> EpiConecta
+                </div>
+                <div class="login-left-icon">
+                    <i class="fas fa-user-lock"></i>
+                </div>
+                <h2 class="modal-title-main">Acesso Restrito</h2>
+                <p class="modal-text-main">Faça login para utilizar as funcionalidades exclusivas de profissionais de saúde.</p>
+                
+                <div class="modal-info-box">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <span class="info-title">Acesso de Demonstração</span>
+                        <span class="info-creds">CPF: <strong>000.000.000-00</strong></span>
+                        <span class="info-creds">Senha: <strong>EpiConecta@2025!</strong></span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Middle Divider -->
+            <div class="login-split-divider"></div>
+            
+            <!-- Right Side: Form -->
+            <div class="login-split-right">
+                <div class="form-group modal-form-group">
+                    <label for="login-name" class="modal-label">CPF do Profissional</label>
+                    <div class="input-with-icon">
+                        <i class="far fa-id-card"></i>
+                        <input type="text" id="login-name" placeholder="Ex: 000.000.000-00" class="modal-input-full">
+                    </div>
+                </div>
+                <div class="form-group modal-form-group modal-form-group-lg">
+                    <label for="login-password" class="modal-label">Senha</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="login-password" placeholder="Digite sua senha..." class="modal-input-full">
+                    </div>
+                </div>
+                
+                <div class="login-action-buttons">
+                    <button id="btn-do-login" class="btn btn-primary modal-btn-full">
+                        <i class="fas fa-sign-in-alt"></i> Entrar no Sistema
+                    </button>
+                    <button id="btn-cancel-login" class="btn btn-secondary modal-btn-full modal-btn-secondary">
+                        Voltar ao Início
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modais de Notificação e Área de Impressão -->
+    <div id="print-area" class="print-area-hidden"></div>
+
+    <!-- Modal Sucesso Notificação -->
+    <div id="notification-success-modal" class="modal-base modal-success">
+        <div class="modal-content modal-content-success">
+            <div class="modal-success-icon-wrap">
+                <i class="fas fa-check-circle modal-success-icon"></i>
+            </div>
+            <h2 class="modal-title-main">Notificação Realizada!</h2>
+            <p class="modal-text-main">A notificação foi salva com sucesso no sistema e vinculada ao paciente.</p>
+            <button id="btn-print-notification" class="btn btn-primary modal-btn-full modal-btn-gap"><i
+                    class="fas fa-print"></i> Gerar PDF / Imprimir</button>
+            <button id="btn-close-notification-success"
+                class="btn btn-secondary modal-btn-full modal-btn-secondary">Concluir</button>
+        </div>
+    </div>
+
+    <!-- Modal Detalhes Notificação (Paciente) -->
+    <div id="patient-notification-detail-modal" class="modal-base modal-detail">
+        <div class="modal-content modal-content-detail">
+            <div class="modal-detail-header">
+                <h3 class="modal-detail-title"><i class="fas fa-file-medical"></i> Detalhes da Notificação</h3>
+                <button onclick="document.getElementById('patient-notification-detail-modal').style.display='none'"
+                    class="modal-detail-close"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="patient-notification-detail-body" class="modal-detail-body">
+                <!-- Populated by JS -->
+            </div>
+            <div class="modal-detail-footer" style="display: flex; gap: 10px; justify-content: flex-end; width: 100%;">
+                <button id="btn-print-patient-notification" class="btn btn-primary modal-detail-btn"><i
+                        class="fas fa-print"></i> Gerar PDF</button>
+                <button id="btn-edit-patient-notification" class="btn btn-outline modal-detail-btn" style="display: none; background: #e3f2fd; color: #0d8abc; border-color: #0d8abc;"><i
+                        class="fas fa-edit"></i> Editar Ficha</button>
+                <button onclick="document.getElementById('patient-notification-detail-modal').style.display='none'"
+                    class="btn btn-secondary modal-detail-btn modal-btn-secondary-soft">Fechar</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
