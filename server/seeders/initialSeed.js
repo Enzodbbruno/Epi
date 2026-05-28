@@ -13,7 +13,7 @@ async function seed() {
     return;
   }
 
-  const passwordHash = await bcrypt.hash(process.env.ADMIN_PASSWORD || 'EpiConecta@2025!', 12);
+  const passwordHash = await bcrypt.hash(process.env.ADMIN_PASSWORD || '2026', 12);
   const cpfRaw = process.env.ADMIN_CPF || '000.000.000-00';
 
   db.prepare(`
