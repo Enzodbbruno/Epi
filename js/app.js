@@ -3447,7 +3447,7 @@ const CaseNotificationModule = {
              <div class="sinan-section-title"><i class="fas fa-file-alt"></i> Dados Gerais (Campos 1-7)</div>
              <div class="sinan-grid-4">
                  <div class="form-group">
-                     <label>1 - Tipo de Notificacao</label>
+                     <label>1 - Tipo de Notificação</label>
                      <select id="tipo-notificacao-${id}">
                          <option value="1">1-Negativa</option>
                          <option value="2" selected>2-Individual</option>
@@ -3456,11 +3456,11 @@ const CaseNotificationModule = {
                      </select>
                  </div>
                  <div class="form-group span-2">
-                     <label>2 - Agravo / Doenca</label>
+                     <label>2 - Agravo/Doença</label>
                      <input type="text" id="agravo-nome-${id}" value="${disease.name}" readonly style="background:#f0f0f0; font-weight:bold;">
                  </div>
                  <div class="form-group">
-                     <label>3 - Data da Notificacao</label>
+                     <label>3 - Data da Notificação</label>
                      <input type="date" id="data-notificacao-${id}" value="${new Date().toISOString().substring(0,10)}">
                  </div>
                  <div class="form-group" style="max-width:80px;">
@@ -3468,11 +3468,11 @@ const CaseNotificationModule = {
                      <input type="text" id="uf-notificacao-${id}" value="PA" maxlength="2">
                  </div>
                  <div class="form-group span-2">
-                     <label>5 - Municipio de Notificacao</label>
+                     <label>5 - Município de Notificação</label>
                      <input type="text" id="mun-notificacao-${id}" value="MARABA">
                  </div>
                  <div class="form-group span-3">
-                     <label>6 - Unidade de Saude (Notificadora)</label>
+                     <label>6 - Unidade de Saúde (ou Outra Fonte Notificadora)</label>
                      <select id="health-unit-${id}" required>
                          <option value="ubs_hiroshi">UBS Hiroshi Matsuda (CNES: 2301389)</option>
                          <option value="outra">Outra / Rede Particular</option>
@@ -3498,7 +3498,7 @@ const CaseNotificationModule = {
                      <input type="date" id="patient-birth-${id}">
                  </div>
                  <div class="form-group">
-                     <label>10 - Idade (anos)</label>
+                     <label>10 - (ou) Idade</label>
                      <input type="number" id="patient-age-${id}" min="0" placeholder="Ex: 35">
                  </div>
                  <div class="form-group">
@@ -3522,7 +3522,7 @@ const CaseNotificationModule = {
                      </select>
                  </div>
                  <div class="form-group">
-                     <label>13 - Raca/Cor</label>
+                     <label>13 - Raça/Cor</label>
                      <select id="patient-race-${id}">
                          <option value="Branca">1-Branca</option>
                          <option value="Preta">2-Preta</option>
@@ -3549,11 +3549,11 @@ const CaseNotificationModule = {
                       </select>
                  </div>
                  <div class="form-group span-2">
-                     <label>15 - No do Cartao SUS</label>
+                     <label>15 - Número do Cartão SUS</label>
                      <input type="text" id="patient-sus-${id}" placeholder="000 0000 0000 0000" maxlength="18">
                  </div>
                  <div class="form-group span-2">
-                     <label>16 - Nome da Mae</label>
+                     <label>16 - Nome da Mãe</label>
                      <input type="text" id="patient-mother-${id}" placeholder="Nome completo da mae">
                  </div>
                  <div class="form-group span-2">
@@ -3572,15 +3572,15 @@ const CaseNotificationModule = {
              <div class="sinan-section-title"><i class="fas fa-users"></i> Notificacao de Surto (Campos 17-19)</div>
              <div class="sinan-grid-4">
                  <div class="form-group span-2">
-                     <label>17 - Data dos 1os Sintomas do 1 Caso Suspeito</label>
+                     <label>17 - Data dos 1ºs Sintomas do 1º Caso Suspeito</label>
                      <input type="date" id="surto-casos-data-${id}">
                  </div>
                  <div class="form-group">
-                     <label>18 - No de Casos Suspeitos/Expostos</label>
+                     <label>18 - Nº de Casos Suspeitos/Expostos</label>
                      <input type="number" id="surto-casos-num-${id}" min="0" placeholder="0">
                  </div>
                  <div class="form-group span-4">
-                     <label>19 - Local Inicial de Ocorrencia do Surto</label>
+                     <label>19 - Local Inicial de Ocorrência do Surto</label>
                      <select id="surto-local-${id}">
                          <option value="">- Selecione -</option>
                          <option value="1">1-Residencia</option>
@@ -3604,11 +3604,11 @@ const CaseNotificationModule = {
              <div class="sinan-section-title"><i class="fas fa-home"></i> Dados de Residencia (Campos 20-33)</div>
              <div class="sinan-grid-4">
                  <div class="form-group" style="max-width:80px;">
-                     <label>20 - UF Res.</label>
+                     <label>20 - UF</label>
                      <input type="text" id="patient-uf-res-${id}" value="PA" maxlength="2">
                  </div>
                  <div class="form-group span-2">
-                     <label>21 - Municipio de Residencia</label>
+                     <label>21 - Município de Residência</label>
                      <input type="text" id="patient-mun-res-${id}" value="MARABA">
                  </div>
                  <div class="form-group">
@@ -3624,11 +3624,11 @@ const CaseNotificationModule = {
                      <input type="text" id="patient-street-${id}" placeholder="Ex: Rua das Flores">
                  </div>
                  <div class="form-group">
-                     <label>25 - Numero</label>
+                     <label>25 - Número</label>
                      <input type="text" id="patient-number-${id}" placeholder="No ou S/N">
                  </div>
                  <div class="form-group span-2">
-                     <label>26 - Complemento</label>
+                     <label>26 - Complemento (Apto., Casa...)</label>
                      <input type="text" id="patient-comp-${id}" placeholder="Apto, Bloco...">
                  </div>
                  <div class="form-group">
@@ -3640,7 +3640,7 @@ const CaseNotificationModule = {
                      <input type="text" id="patient-geo2-${id}">
                  </div>
                  <div class="form-group span-2">
-                     <label>29 - Ponto de Referencia</label>
+                     <label>29 - Ponto de Referência</label>
                      <input type="text" id="patient-ref-${id}" placeholder="Proximo a praca...">
                  </div>
                  <div class="form-group">
@@ -3668,7 +3668,7 @@ const CaseNotificationModule = {
                      </select>
                  </div>
                  <div class="form-group">
-                     <label>33 - Pais (se fora do Brasil)</label>
+                     <label>33 - País (se residir fora do Brasil)</label>
                      <input type="text" id="patient-country-${id}" placeholder="Ex: Argentina">
                  </div>
              </div>
@@ -3679,11 +3679,11 @@ const CaseNotificationModule = {
              <div class="sinan-section-title"><i class="fas fa-stethoscope"></i> Dados Clinicos e Laboratoriais</div>
              <div class="sinan-grid-4">
                  <div class="form-group span-2">
-                     <label>01 - Data Coleta 1a Amostra Sorologia</label>
+                     <label>01 - Data da Coleta da 1ª Amostra da Sorologia</label>
                      <input type="date" id="inv-date-${id}">
                  </div>
                  <div class="form-group span-2">
-                     <label>02 - Data Coleta 2a Amostra</label>
+                     <label>02 - Data da Coleta da 1ª Amostra de Outra Amostra</label>
                      <input type="date" id="inv-date2-${id}">
                  </div>
                  <div class="form-group span-4">
@@ -3778,7 +3778,7 @@ const CaseNotificationModule = {
              <div class="sinan-section-title"><i class="fas fa-clipboard-list"></i> Dados Complementares (Pag. 2 da Ficha SINAN)</div>
              <div class="sinan-grid-4">
                  <div class="form-group span-2">
-                     <label>04 - Obito?</label>
+                     <label>04 - Óbito?</label>
                      <select id="comp-obito-${id}">
                          <option value="1">1-Sim</option>
                          <option value="2" selected>2-Nao</option>
@@ -3786,7 +3786,7 @@ const CaseNotificationModule = {
                      </select>
                  </div>
                  <div class="form-group span-2">
-                     <label>05 - Contato com caso semelhante?</label>
+                     <label>05 - Contato com Caso Semelhante?</label>
                      <select id="comp-contato-${id}">
                          <option value="1">1-Sim</option>
                          <option value="2" selected>2-Nao</option>
@@ -3794,7 +3794,7 @@ const CaseNotificationModule = {
                      </select>
                  </div>
                  <div class="form-group span-2">
-                     <label>06 - Presenca de exantema?</label>
+                     <label>06 - Presença de Exantema?</label>
                      <select id="comp-exantema-${id}">
                          <option value="1">1-Sim</option>
                          <option value="2" selected>2-Nao</option>
@@ -3802,11 +3802,11 @@ const CaseNotificationModule = {
                      </select>
                  </div>
                  <div class="form-group span-2">
-                     <label>07 - Data do inicio do exantema</label>
+                     <label>07 - Data do Início do Exantema</label>
                      <input type="date" id="comp-exantema-date-${id}">
                  </div>
                  <div class="form-group span-2">
-                     <label>08 - Presenca de petequias ou sufusoes hemorragicas?</label>
+                     <label>08 - Presença de Petéquias ou Sufusões Hemorrágicas?</label>
                      <select id="comp-petequias-${id}">
                          <option value="1">1-Sim</option>
                          <option value="2" selected>2-Nao</option>
@@ -3814,7 +3814,7 @@ const CaseNotificationModule = {
                      </select>
                  </div>
                  <div class="form-group span-2">
-                     <label>09 - Foi realizado liquor?</label>
+                     <label>09 - Foi Realizado Líquor?</label>
                      <select id="comp-liquor-${id}">
                          <option value="1">1-Sim</option>
                          <option value="2" selected>2-Nao</option>
@@ -3834,7 +3834,7 @@ const CaseNotificationModule = {
                      <input type="date" id="comp-vacina-date-${id}">
                  </div>
                  <div class="form-group span-2">
-                     <label>13 - Ocorreu hospitalizacao?</label>
+                     <label>13 - Ocorreu Hospitalização?</label>
                      <select id="comp-hospitalizacao-${id}">
                          <option value="1">1-Sim</option>
                          <option value="2" selected>2-Nao</option>
@@ -3842,7 +3842,7 @@ const CaseNotificationModule = {
                      </select>
                  </div>
                  <div class="form-group span-2">
-                     <label>14 - Data da hospitalizacao</label>
+                     <label>14 - Data da Hospitalização</label>
                      <input type="date" id="comp-hosp-date-${id}">
                  </div>
                  <div class="form-group" style="max-width:80px;">
@@ -3850,7 +3850,7 @@ const CaseNotificationModule = {
                      <input type="text" id="comp-hospital-uf-${id}" placeholder="PA" maxlength="2">
                  </div>
                  <div class="form-group span-2">
-                     <label>16 - Municipio do Hospital</label>
+                     <label>16 - Município do Hospital</label>
                      <input type="text" id="comp-hospital-mun-${id}" placeholder="Maraba">
                  </div>
                  <div class="form-group span-4">
@@ -4064,7 +4064,7 @@ const CaseNotificationModule = {
       if (results.length === 0) {
         html += `
           <div style="padding:10px 16px;color:#888;font-size:0.88rem;border-bottom:1px solid #f0f0f0;">
-            <i class="fas fa-info-circle"></i> Nenhum paciente encontrado para "<strong>\${term.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</strong>"
+            <i class="fas fa-info-circle"></i> Nenhum paciente encontrado para "<strong>${term.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</strong>"
           </div>`;
       } else {
         html += results.map(p => {
@@ -4073,7 +4073,7 @@ const CaseNotificationModule = {
             let birth;
             if (typeof p.birthDate === 'string' && p.birthDate.includes('/')) {
               const parts = p.birthDate.split('/');
-              birth = new Date(`\${parts[2]}-\${parts[1]}-\${parts[0]}`);
+              birth = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
             } else {
               birth = new Date(p.birthDate);
             }
@@ -4084,15 +4084,15 @@ const CaseNotificationModule = {
             }
           }
           const sexText = p.sex === 'M' ? 'M' : (p.sex === 'F' ? 'F' : 'I');
-          const photo = `https://ui-avatars.com/api/?name=\${encodeURIComponent(p.name)}&background=e0f2f1&color=00796b&bold=true`;
+          const photo = `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=e0f2f1&color=00796b&bold=true`;
 
           return `
-            <div class="autocomplete-item" data-id="\${p.id}" data-local="\${p._local ? 'true' : 'false'}"
+            <div class="autocomplete-item" data-id="${p.id}" data-local="${p._local ? 'true' : 'false'}"
               style="padding:10px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid #f0f0f0;">
-              <img src="\${photo}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;" alt="">
+              <img src="${photo}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;" alt="">
               <div>
-                <div style="font-weight:600;font-size:0.9rem;color:#1a1a2e;">\${p.name}</div>
-                <div style="font-size:0.77rem;color:#888;">CNS: \${p.cns} \${ageText ? '&bull; ' + ageText : ''} &bull; \${sexText} \${p._local ? '<span style="color:#00796b; font-weight:bold;">(Local)</span>' : ''}</div>
+                <div style="font-weight:600;font-size:0.9rem;color:#1a1a2e;">${p.name}</div>
+                <div style="font-size:0.77rem;color:#888;">CNS: ${p.cns} ${ageText ? '&bull; ' + ageText : ''} &bull; ${sexText} ${p._local ? '<span style="color:#00796b; font-weight:bold;">(Local)</span>' : ''}</div>
               </div>
             </div>`;
         }).join('');
@@ -5451,7 +5451,15 @@ window.printNotificationData = function(data) {
     const pregnantCode = (sexCode === 'M') ? '6' : (cs.pregnant || '9');
 
     // Race code mapping
-    const raceCode = { 'Branca':'1', 'Preta':'2', 'Amarela':'3', 'Parda':'4', 'Indigena':'5', 'Indígena':'5', '1':'1', '2':'2', '3':'3', '4':'4', '5':'5', '9':'9' }[data.patientRace] || '9';
+    let raceCode = '9';
+    if (data.patientRace) {
+        const rStr = String(data.patientRace).toLowerCase().trim();
+        if (rStr.includes('branca') || rStr === 'br' || rStr === '1') raceCode = '1';
+        else if (rStr.includes('preta') || rStr === 'pr' || rStr.includes('negra') || rStr === '2') raceCode = '2';
+        else if (rStr.includes('amarela') || rStr === 'am' || rStr === '3') raceCode = '3';
+        else if (rStr.includes('parda') || rStr === 'pa' || rStr === '4') raceCode = '4';
+        else if (rStr.includes('indigena') || rStr.includes('indígena') || rStr === 'in' || rStr === '5') raceCode = '5';
+    }
 
     // Schooling code mapping
     const schoolMap = {
@@ -5467,7 +5475,21 @@ window.printNotificationData = function(data) {
       'Nao informada': '9', 'Não informada': '9', 'Ignorado': '9',
       'Nao se aplica': '10', 'Não se aplica': '10'
     };
-    const schoolCode = schoolMap[data.patientEducation] || '9';
+    let schoolCode = '9';
+    if (data.patientEducation) {
+        const cleanSchool = String(data.patientEducation).toLowerCase().trim();
+        if (cleanSchool.includes('analfabeto') || cleanSchool.startsWith('0')) schoolCode = '0';
+        else if (cleanSchool.includes('1a a 4a') || cleanSchool.includes('1ª a 4ª') || cleanSchool.startsWith('1-') || cleanSchool.startsWith('1 ')) schoolCode = '1';
+        else if (cleanSchool.includes('4a serie completa') || cleanSchool.includes('4ª série completa') || cleanSchool.startsWith('2-') || cleanSchool.startsWith('2 ')) schoolCode = '2';
+        else if (cleanSchool.includes('5a a 8a') || cleanSchool.includes('5ª à 8ª') || cleanSchool.startsWith('3-') || cleanSchool.startsWith('3 ')) schoolCode = '3';
+        else if (cleanSchool.includes('fundamental completo') || cleanSchool.startsWith('4-') || cleanSchool.startsWith('4 ')) schoolCode = '4';
+        else if (cleanSchool.includes('medio incompleto') || cleanSchool.includes('médio incompleto') || cleanSchool.startsWith('5-') || cleanSchool.startsWith('5 ')) schoolCode = '5';
+        else if (cleanSchool.includes('medio completo') || cleanSchool.includes('médio completo') || cleanSchool.startsWith('6-') || cleanSchool.startsWith('6 ')) schoolCode = '6';
+        else if (cleanSchool.includes('superior incompleto') || cleanSchool.startsWith('7-') || cleanSchool.startsWith('7 ')) schoolCode = '7';
+        else if (cleanSchool.includes('superior completo') || cleanSchool.startsWith('8-') || cleanSchool.startsWith('8 ')) schoolCode = '8';
+        else if (cleanSchool.includes('nao se aplica') || cleanSchool.includes('não se aplica') || cleanSchool.startsWith('10')) schoolCode = '10';
+        else if (cleanSchool.includes('nao informada') || cleanSchool.includes('não informada') || cleanSchool.startsWith('9')) schoolCode = '9';
+    }
 
     // Surto local double digit code
     const surtoLocalCode = data.surtoLocal ? String(data.surtoLocal).padStart(2, '0') : '';
@@ -5479,7 +5501,7 @@ window.printNotificationData = function(data) {
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Ficha SINAN - \${data.patientName || 'Paciente'}</title>
+<title>Ficha SINAN - ${data.patientName || 'Paciente'}</title>
 <style>
   @media screen { body { background:#f0f0f0; margin:0; padding:20px; display:flex; flex-direction:column; align-items:center; font-family:Arial,Helvetica,sans-serif; } .sinan-page { background:#fff; width:210mm; padding:8mm 10mm; box-sizing:border-box; margin-bottom:25px; box-shadow:0 4px 15px rgba(0,0,0,0.15); border:1px solid #ccc; } }
   @media print { body { margin:0; padding:0; background:#fff; font-family:Arial,Helvetica,sans-serif; -webkit-print-color-adjust:exact; print-color-adjust:exact; } .sinan-page { width:210mm; min-height:297mm; padding:8mm 10mm; box-sizing:border-box; page-break-after:always; background:#fff; } .no-print { display:none !important; } }
@@ -5538,7 +5560,7 @@ window.printNotificationData = function(data) {
     </div>
     <div class="sn-header-right">
       <span class="sn-num-label">N&ordm;</span>
-      <div class="sn-num-box">\${data.sinan_number || '---.---'}</div>
+      <div class="sn-num-box">${data.sinan_number || '---.---'}</div>
     </div>
   </div>
 
@@ -5553,46 +5575,46 @@ window.printNotificationData = function(data) {
             1 - Negativa &nbsp;&nbsp;&nbsp;&nbsp; 2 - Individual &nbsp;&nbsp;&nbsp;&nbsp; 3 - Surto &nbsp;&nbsp;&nbsp;&nbsp; 4 - Inqu&eacute;rito Tracoma
           </div>
           <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
-            \${tipoNotif}
+            ${tipoNotif}
           </div>
         </div>
       </div>
       <div class="sn-row">
         <div class="sn-cell" style="flex:2.5;">
           <div class="ct"><span class="cn">2</span> AGRAVO/DOEN&Ccedil;A</div>
-          <div class="cv" style="font-size:11px; font-weight:900;">\${diseaseName}</div>
+          <div class="cv" style="font-size:11px; font-weight:900;">${diseaseName}</div>
         </div>
         <div class="sn-cell" style="flex:1.0;">
           <div class="ct"><span class="cn">3</span> DATA DA NOTIFICA&Ccedil;&Atilde;O</div>
-          <div class="cv" style="padding-top:3px;">\${splitDigits(formatDateDigits(data.dataNotificacao), 8)}</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.dataNotificacao), 8)}</div>
         </div>
       </div>
       <div class="sn-row">
         <div class="sn-cell" style="flex:0.4;">
           <div class="ct"><span class="cn">4</span> UF</div>
-          <div class="cv" style="padding-top:3px;">\${splitDigits(data.ufNotificacao || 'PA', 2)}</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.ufNotificacao || 'PA', 2)}</div>
         </div>
         <div class="sn-cell" style="flex:1.8;">
           <div class="ct"><span class="cn">5</span> MUNICIPIO DE NOTIFICACAO</div>
-          <div class="cv">\${data.munNotificacao || 'MARABA'}</div>
+          <div class="cv">${data.munNotificacao || 'MARABA'}</div>
         </div>
         <div class="sn-cell" style="flex:0.8;">
           <div class="ct">CODIGO (IBGE)</div>
-          <div class="cv" style="padding-top:3px;">\${splitDigits('1504208', 7)}</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('1504208', 7)}</div>
         </div>
       </div>
       <div class="sn-row">
         <div class="sn-cell" style="flex:2.2;">
           <div class="ct"><span class="cn">6</span> UNIDADE DE SAUDE (OU OUTRA FONTE NOTIFICADORA)</div>
-          <div class="cv">\${unitName}</div>
+          <div class="cv">${unitName}</div>
         </div>
         <div class="sn-cell" style="flex:0.8;">
           <div class="ct">CODIGO</div>
-          <div class="cv" style="padding-top:3px;">\${splitDigits(cnesCode, 7)}</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cnesCode, 7)}</div>
         </div>
         <div class="sn-cell" style="flex:1.0;">
           <div class="ct"><span class="cn">7</span> DATA DOS PRIMEIROS SINTOMAS</div>
-          <div class="cv" style="padding-top:3px;">\${splitDigits(formatDateDigits(data.symptomsDate), 8)}</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.symptomsDate), 8)}</div>
         </div>
       </div>
     </div>
@@ -5605,19 +5627,19 @@ window.printNotificationData = function(data) {
       <div class="sn-row">
         <div class="sn-cell" style="flex:3.0;">
           <div class="ct"><span class="cn">8</span> NOME DO PACIENTE</div>
-          <div class="cv" style="font-size:10px; font-weight:900;">\${data.patientName || 'Nao informado'}</div>
+          <div class="cv" style="font-size:10px; font-weight:900;">${data.patientName || 'Nao informado'}</div>
         </div>
         <div class="sn-cell" style="flex:1.0;">
           <div class="ct"><span class="cn">9</span> DATA DE NASCIMENTO</div>
-          <div class="cv" style="padding-top:3px;">\${splitDigits(formatDateDigits(data.patientBirthDate), 8)}</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.patientBirthDate), 8)}</div>
         </div>
       </div>
       <div class="sn-row">
         <div class="sn-cell" style="flex:0.9;">
           <div class="ct"><span class="cn">10</span> (OU) IDADE</div>
           <div style="display:flex; align-items:center; gap:3px; margin-top:2px;">
-            <div>\${splitDigits(data.patientAge || '', 3, true)}</div>
-            <div class="single-box">\${data.patientAge ? '4' : '&nbsp;'}</div>
+            <div>${splitDigits(data.patientAge || '', 3, true)}</div>
+            <div class="single-box">${data.patientAge ? '4' : '&nbsp;'}</div>
             <div style="font-size:5px; line-height:1.0; font-weight:bold; margin-left:2px;">
               1 - Hora<br>
               2 - Dia<br>
@@ -5634,7 +5656,7 @@ window.printNotificationData = function(data) {
             I - Ignorado
           </div>
           <div class="single-box" style="position:absolute; right:8px; top:4px;">
-            \${sexCode}
+            ${sexCode}
           </div>
         </div>
         <div class="sn-cell" style="position:relative; flex:1.5;">
@@ -5645,7 +5667,7 @@ window.printNotificationData = function(data) {
             9-Ignorado
           </div>
           <div class="single-box" style="position:absolute; right:8px; top:4px;">
-            \${pregnantCode}
+            ${pregnantCode}
           </div>
         </div>
         <div class="sn-cell" style="position:relative; flex:1.3;">
@@ -5655,7 +5677,7 @@ window.printNotificationData = function(data) {
             4-Parda &nbsp;&nbsp; 5-Ind&iacute;gena &nbsp;&nbsp; 9-Ignorado
           </div>
           <div class="single-box" style="position:absolute; right:8px; top:4px;">
-            \${raceCode}
+            ${raceCode}
           </div>
         </div>
       </div>
@@ -5668,18 +5690,18 @@ window.printNotificationData = function(data) {
             6-Ensino m&eacute;dio completo (antigo colegial ou 2&ordm; grau) &nbsp;&nbsp; 7-Educa&ccedil;&atilde;o superior incompleta &nbsp;&nbsp; 8-Educa&ccedil;&atilde;o superior completa &nbsp;&nbsp; 9-Ignorado &nbsp;&nbsp; 10-N&atilde;o se aplica
           </div>
           <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
-            \${schoolCode}
+            ${schoolCode}
           </div>
         </div>
       </div>
       <div class="sn-row">
         <div class="sn-cell" style="flex:2.2;">
           <div class="ct"><span class="cn">15</span> NUMERO DO CARTAO SUS</div>
-          <div class="cv" style="padding-top:3px;">\${splitDigits(data.patientCns || '', 15)}</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.patientCns || '', 15)}</div>
         </div>
         <div class="sn-cell" style="flex:1.8;">
           <div class="ct"><span class="cn">16</span> NOME DA MAE</div>
-          <div class="cv" style="font-size:9px;">\${data.patientMotherName || 'Nao informada'}</div>
+          <div class="cv" style="font-size:9px;">${data.patientMotherName || 'Nao informada'}</div>
         </div>
       </div>
     </div>
@@ -5692,11 +5714,11 @@ window.printNotificationData = function(data) {
       <div class="sn-row">
         <div class="sn-cell" style="flex:1.5;">
           <div class="ct"><span class="cn">17</span> DATA DOS 1&ordm;S SINTOMAS DO 1&ordm; CASO SUSPEITO</div>
-          <div class="cv" style="padding-top:3px;">\${splitDigits(formatDateDigits(data.surtoSintomasData || ''), 8)}</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.surtoSintomasData || ''), 8)}</div>
         </div>
         <div class="sn-cell" style="flex:1.0;">
           <div class="ct"><span class="cn">18</span> N&ordm; DE CASOS SUSPEITOS/EXPOSTOS</div>
-          <div class="cv" style="padding-top:3px;">\${splitDigits(data.surtoNumCasos || '', 4)}</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.surtoNumCasos || '', 4)}</div>
         </div>
         <div class="sn-cell" style="position:relative; flex:2.5;">
           <div class="ct"><span class="cn">19</span> LOCAL INICIAL DE OCORR&Ecirc;NCIA DO SURTO</div>
@@ -5706,8 +5728,8 @@ window.printNotificationData = function(data) {
             8 - Casos Dispersos no Bairro &nbsp;&nbsp; 9 - Casos Dispersos pelo Munic&iacute;pio &nbsp;&nbsp; 10 - V&aacute;rios Munic&iacute;pios &nbsp;&nbsp; 11 - Outros
           </div>
           <div style="position:absolute; right:8px; top:50%; transform:translateY(-50%); display:inline-flex;">
-            <span class="digit-box" style="width:11px; height:13px; font-size:8px; border:1px solid #000; display:inline-flex; align-items:center; justify-content:center; background:#fff; font-family:monospace; font-weight:bold;">\${surtoLocalCode[0] || '&nbsp;'}</span>
-            <span class="digit-box" style="width:11px; height:13px; font-size:8px; border:1px solid #000; display:inline-flex; align-items:center; justify-content:center; background:#fff; font-family:monospace; font-weight:bold; margin-left:-1px;">\${surtoLocalCode[1] || '&nbsp;'}</span>
+            <span class="digit-box" style="width:11px; height:13px; font-size:8px; border:1px solid #000; display:inline-flex; align-items:center; justify-content:center; background:#fff; font-family:monospace; font-weight:bold;">${surtoLocalCode[0] || '&nbsp;'}</span>
+            <span class="digit-box" style="width:11px; height:13px; font-size:8px; border:1px solid #000; display:inline-flex; align-items:center; justify-content:center; background:#fff; font-family:monospace; font-weight:bold; margin-left:-1px;">${surtoLocalCode[1] || '&nbsp;'}</span>
           </div>
         </div>
       </div>
@@ -5721,39 +5743,39 @@ window.printNotificationData = function(data) {
       <div class="sn-row">
         <div class="sn-cell" style="flex:0.35;">
           <div class="ct"><span class="cn">20</span> UF</div>
-          <div class="cv" style="padding-top:3px;">\${splitDigits(data.patientUf || 'PA', 2)}</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.patientUf || 'PA', 2)}</div>
         </div>
         <div class="sn-cell" style="flex:1.7;">
           <div class="ct"><span class="cn">21</span> MUNICIPIO DE RESIDENCIA</div>
-          <div class="cv">\${data.patientMunicipality || 'MARABA'}</div>
+          <div class="cv">${data.patientMunicipality || 'MARABA'}</div>
         </div>
         <div class="sn-cell" style="flex:0.9;">
           <div class="ct">CODIGO (IBGE)</div>
-          <div class="cv" style="padding-top:3px;">\${splitDigits('1504208', 7)}</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('1504208', 7)}</div>
         </div>
         <div class="sn-cell" style="flex:1.0;">
           <div class="ct"><span class="cn">22</span> DISTRITO</div>
-          <div class="cv">\${data.patientDistrict || ''}</div>
+          <div class="cv">${data.patientDistrict || ''}</div>
         </div>
       </div>
       <div class="sn-row">
         <div class="sn-cell" style="flex:1.5;">
           <div class="ct"><span class="cn">23</span> BAIRRO</div>
-          <div class="cv">\${data.patientNeighborhood || 'Nao informado'}</div>
+          <div class="cv">${data.patientNeighborhood || 'Nao informado'}</div>
         </div>
         <div class="sn-cell" style="flex:2.5;">
           <div class="ct"><span class="cn">24</span> LOGRADOURO (RUA, AVENIDA,...)</div>
-          <div class="cv">\${data.patientAddress || 'Nao informado'}</div>
+          <div class="cv">${data.patientAddress || 'Nao informado'}</div>
         </div>
       </div>
       <div class="sn-row">
         <div class="sn-cell" style="flex:0.8;">
           <div class="ct"><span class="cn">25</span> NUMERO</div>
-          <div class="cv">\${data.patientNumber || 'S/N'}</div>
+          <div class="cv">${data.patientNumber || 'S/N'}</div>
         </div>
         <div class="sn-cell" style="flex:1.6;">
           <div class="ct"><span class="cn">26</span> COMPLEMENTO (APTO., CASA,...)</div>
-          <div class="cv">\${data.patientComplement || ''}</div>
+          <div class="cv">${data.patientComplement || ''}</div>
         </div>
         <div class="sn-cell" style="flex:1.6;">
           <div class="ct"><span class="cn">27</span> GEO CAMPO 1</div>
@@ -5767,17 +5789,17 @@ window.printNotificationData = function(data) {
         </div>
         <div class="sn-cell" style="flex:1.8;">
           <div class="ct"><span class="cn">29</span> PONTO DE REFERENCIA</div>
-          <div class="cv">\${data.patientRef || ''}</div>
+          <div class="cv">${data.patientRef || ''}</div>
         </div>
         <div class="sn-cell" style="flex:1.0;">
           <div class="ct"><span class="cn">30</span> CEP</div>
-          <div class="cv" style="padding-top:3px;">\${formatCepDigits(data.patientCep)}</div>
+          <div class="cv" style="padding-top:3px;">${formatCepDigits(data.patientCep)}</div>
         </div>
       </div>
       <div class="sn-row">
         <div class="sn-cell" style="flex:1.6;">
           <div class="ct"><span class="cn">31</span> (DDD) TELEFONE</div>
-          <div class="cv" style="padding-top:3px;">\${splitDigits((data.patientPhone || '').replace(/\D/g,''), 11)}</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits((data.patientPhone || '').replace(/\D/g,''), 11)}</div>
         </div>
         <div class="sn-cell" style="position:relative; flex:1.5;">
           <div class="ct"><span class="cn">32</span> ZONA</div>
@@ -5785,12 +5807,12 @@ window.printNotificationData = function(data) {
             1 - Urbana &nbsp;&nbsp;&nbsp;&nbsp; 2 - Rural &nbsp;&nbsp;&nbsp;&nbsp; 3 - Periurbana &nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
           </div>
           <div class="single-box" style="position:absolute; right:8px; top:4px;">
-            \${zoneCode}
+            ${zoneCode}
           </div>
         </div>
         <div class="sn-cell" style="flex:0.9;">
           <div class="ct"><span class="cn">33</span> PAIS (SE RESID. FORA)</div>
-          <div class="cv">\${data.patientCountry || ''}</div>
+          <div class="cv">${data.patientCountry || ''}</div>
         </div>
       </div>
     </div>
@@ -5803,13 +5825,13 @@ window.printNotificationData = function(data) {
       <div class="sn-row">
         <div class="sn-cell">
           <div class="ct">MUNICIPIO/UNIDADE DE SAUDE</div>
-          <div class="cv">\${data.munNotificacao || 'MARABA'} / \${unitName}</div>
+          <div class="cv">${data.munNotificacao || 'MARABA'} / ${unitName}</div>
         </div>
       </div>
       <div class="sn-row">
         <div class="sn-cell" style="flex:1.8;">
           <div class="ct">NOME</div>
-          <div class="cv" style="font-weight:900; font-size:10px;">\${data.notificatorName || 'Profissional de Saude'}</div>
+          <div class="cv" style="font-weight:900; font-size:10px;">${data.notificatorName || 'Profissional de Saude'}</div>
         </div>
         <div class="sn-cell" style="flex:1.0;">
           <div class="ct">FUNCAO</div>
@@ -5844,15 +5866,15 @@ window.printNotificationData = function(data) {
       <div class="sn-row">
         <div class="sn-cell" style="flex:1.3;">
           <div class="ct"><span class="cn">01</span> DATA DA COLETA DA 1A AMOSTRA DA SOROLOGIA</div>
-          <div class="cv" style="padding-top:3px;">\${splitDigits(formatDateDigits(lr.investigationDate||''), 8)}</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(lr.investigationDate||''), 8)}</div>
         </div>
         <div class="sn-cell" style="flex:1.3;">
           <div class="ct"><span class="cn">02</span> DATA DA COLETA DA 1A AMOSTRA DE OUTRA AMOSTRA</div>
-          <div class="cv" style="padding-top:3px;">\${splitDigits(formatDateDigits(lr.investigationDate2||''), 8)}</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(lr.investigationDate2||''), 8)}</div>
         </div>
         <div class="sn-cell" style="flex:1.4;">
           <div class="ct"><span class="cn">03</span> ESPECIFICAR TIPO DE EXAME</div>
-          <div class="cv" style="font-size:8.5px;">\${lr.exameType || 'NS1 / SOROLOGIA IgM / RT-PCR'}</div>
+          <div class="cv" style="font-size:8.5px;">${lr.exameType || 'NS1 / SOROLOGIA IgM / RT-PCR'}</div>
         </div>
       </div>
       <div class="sn-row">
@@ -5862,7 +5884,7 @@ window.printNotificationData = function(data) {
             1 - Sim &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 - N&atilde;o &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
           </div>
           <div class="single-box" style="position:absolute; right:8px; top:4px;">
-            \${cs.obito || '9'}
+            ${cs.obito || '9'}
           </div>
         </div>
         <div class="sn-cell" style="position:relative; flex:2.0;">
@@ -5871,7 +5893,7 @@ window.printNotificationData = function(data) {
             1 - Sim &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 - N&atilde;o &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
           </div>
           <div class="single-box" style="position:absolute; right:8px; top:4px;">
-            \${cs.contato || '9'}
+            ${cs.contato || '9'}
           </div>
         </div>
       </div>
@@ -5882,12 +5904,12 @@ window.printNotificationData = function(data) {
             1 - Sim &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 - N&atilde;o &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
           </div>
           <div class="single-box" style="position:absolute; right:8px; top:4px;">
-            \${cs.exantema || '9'}
+            ${cs.exantema || '9'}
           </div>
         </div>
         <div class="sn-cell" style="flex:1.2;">
           <div class="ct"><span class="cn">07</span> DATA DO INICIO DO EXANTEMA</div>
-          <div class="cv" style="padding-top:3px;">\${splitDigits(formatDateDigits(cs.exantemaDate||''), 8)}</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.exantemaDate||''), 8)}</div>
         </div>
         <div class="sn-cell" style="position:relative; flex:1.8;">
           <div class="ct"><span class="cn">08</span> PRESENCA DE PETEQUIAS OU SUFUSOES HEMORRAGICAS?</div>
@@ -5895,7 +5917,7 @@ window.printNotificationData = function(data) {
             1 - Sim &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 - N&atilde;o &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
           </div>
           <div class="single-box" style="position:absolute; right:8px; top:4px;">
-            \${cs.petequias || '9'}
+            ${cs.petequias || '9'}
           </div>
         </div>
       </div>
@@ -5906,12 +5928,12 @@ window.printNotificationData = function(data) {
             1 - Sim &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 - N&atilde;o &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
           </div>
           <div class="single-box" style="position:absolute; right:8px; top:4px;">
-            \${cs.liquor || '9'}
+            ${cs.liquor || '9'}
           </div>
         </div>
         <div class="sn-cell" style="flex:2.0;">
           <div class="ct"><span class="cn">10</span> RESULTADO DA BACTERIOSCOPIA</div>
-          <div class="cv" style="font-size:8.5px;">\${lr.bacterioscopia || 'NAO REALIZADO / NEGATIVO'}</div>
+          <div class="cv" style="font-size:8.5px;">${lr.bacterioscopia || 'NAO REALIZADO / NEGATIVO'}</div>
         </div>
       </div>
       <div class="sn-row">
@@ -5921,12 +5943,12 @@ window.printNotificationData = function(data) {
             1 - Sim &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 - N&atilde;o &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
           </div>
           <div class="single-box" style="position:absolute; right:8px; top:4px;">
-            \${cs.vacina || '9'}
+            ${cs.vacina || '9'}
           </div>
         </div>
         <div class="sn-cell" style="flex:1.0;">
           <div class="ct"><span class="cn">12</span> DATA DA ULTIMA DOSE TOMADA</div>
-          <div class="cv" style="padding-top:3px;">\${splitDigits(formatDateDigits(cs.vacinaDate||''), 8)}</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.vacinaDate||''), 8)}</div>
         </div>
         <div class="sn-cell" style="position:relative; flex:1.2;">
           <div class="ct"><span class="cn">13</span> OCORREU HOSPITALIZACAO?</div>
@@ -5934,34 +5956,34 @@ window.printNotificationData = function(data) {
             1 - Sim &nbsp;&nbsp;&nbsp;&nbsp; 2 - N&atilde;o &nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
           </div>
           <div class="single-box" style="position:absolute; right:8px; top:4px;">
-            \${cs.hospitalizacao || '9'}
+            ${cs.hospitalizacao || '9'}
           </div>
         </div>
         <div class="sn-cell" style="flex:1.0;">
           <div class="ct"><span class="cn">14</span> DATA DA HOSPITALIZACAO</div>
-          <div class="cv" style="padding-top:3px;">\${splitDigits(formatDateDigits(cs.hospitalizacaoDate||''), 8)}</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.hospitalizacaoDate||''), 8)}</div>
         </div>
       </div>
       <div class="sn-row">
         <div class="sn-cell" style="flex:0.35;">
           <div class="ct"><span class="cn">15</span> UF</div>
-          <div class="cv" style="padding-top:3px;">\${splitDigits(cs.hospitalUf || '', 2)}</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.hospitalUf || '', 2)}</div>
         </div>
         <div class="sn-cell" style="flex:1.5;">
           <div class="ct"><span class="cn">16</span> MUNICIPIO DO HOSPITAL</div>
-          <div class="cv">\${cs.hospitalMun || ''}</div>
+          <div class="cv">${cs.hospitalMun || ''}</div>
         </div>
         <div class="sn-cell" style="flex:0.8;">
           <div class="ct">CODIGO (IBGE)</div>
-          <div class="cv" style="padding-top:3px;">\${splitDigits('', 7)}</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('', 7)}</div>
         </div>
         <div class="sn-cell" style="flex:2.0;">
           <div class="ct"><span class="cn">17</span> NOME DO HOSPITAL</div>
-          <div class="cv">\${cs.hospitalName || ''}</div>
+          <div class="cv">${cs.hospitalName || ''}</div>
         </div>
         <div class="sn-cell" style="flex:0.8;">
           <div class="ct">CODIGO</div>
-          <div class="cv" style="padding-top:3px;">\${splitDigits('', 7)}</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('', 7)}</div>
         </div>
       </div>
     </div>
@@ -5976,7 +5998,7 @@ window.printNotificationData = function(data) {
           <div class="ct"><span class="cn">18</span> HIPOTESES DIAGNOSTICAS NO MOMENTO DA NOTIFICACAO</div>
           <div class="cv" style="flex-direction:column; align-items:flex-start; gap:5px; padding:4px 0;">
             <div style="font-size:9.5px; font-weight:bold; width:100%;">
-              1a Hipotese Diagnostica - CID 10: <span style="font-weight:900; border-bottom:1px solid #000; min-width:350px; display:inline-block;">\${diseaseName} (\${cid10})</span>
+              1a Hipotese Diagnostica - CID 10: <span style="font-weight:900; border-bottom:1px solid #000; min-width:350px; display:inline-block;">${diseaseName} (${cid10})</span>
             </div>
             <div style="font-size:9.5px; font-weight:bold; width:100%;">
               2a Hipotese Diagnostica - CID 10: <span style="font-weight:900; border-bottom:1px solid #000; min-width:350px; display:inline-block;">&nbsp;</span>
@@ -5996,10 +6018,10 @@ window.printNotificationData = function(data) {
           <div class="ct"><span class="cn">19</span> LOCAL PROVAVEL DE INFECCAO (CLASSIFICACAO PROVISORIA)</div>
           <div class="fr" style="font-size:9.5px; font-weight:bold; gap:18px; padding:5px 0;">
             <div>Pais: <span style="border-bottom:1px solid #000; min-width:100px; display:inline-block;">BRASIL</span></div>
-            <div>UF: <span style="border-bottom:1px solid #000; min-width:25px; display:inline-block;">\${data.patientUf || 'PA'}</span></div>
-            <div>Municipio: <span style="border-bottom:1px solid #000; min-width:100px; display:inline-block;">\${data.patientMunicipality || 'MARABA'}</span></div>
-            <div>Distrito: <span style="border-bottom:1px solid #000; min-width:50px; display:inline-block;">\${data.patientDistrict || '&nbsp;'}</span></div>
-            <div>Bairro: <span style="border-bottom:1px solid #000; min-width:100px; display:inline-block;">\${data.patientNeighborhood || '---'}</span></div>
+            <div>UF: <span style="border-bottom:1px solid #000; min-width:25px; display:inline-block;">${data.patientUf || 'PA'}</span></div>
+            <div>Municipio: <span style="border-bottom:1px solid #000; min-width:100px; display:inline-block;">${data.patientMunicipality || 'MARABA'}</span></div>
+            <div>Distrito: <span style="border-bottom:1px solid #000; min-width:50px; display:inline-block;">${data.patientDistrict || '&nbsp;'}</span></div>
+            <div>Bairro: <span style="border-bottom:1px solid #000; min-width:100px; display:inline-block;">${data.patientNeighborhood || '---'}</span></div>
           </div>
         </div>
       </div>
@@ -6375,7 +6397,14 @@ window._fillPatientForm = function(p, diseaseId) {
     if (wrapperForm) {
         wrapperForm.dataset.selectedPatientId = p.id;
     }
-    const raceMap     = { 'Branca':'1','Negra':'2','Preta':'2','Amarela':'3','Parda':'4','Indígena':'5' };
+    const raceMap = {
+        'Branca': 'Branca', '1-Branca': 'Branca', '1': 'Branca', 'br': 'Branca',
+        'Preta': 'Preta', '2-Preta': 'Preta', '2': 'Preta', 'pr': 'Preta', 'Negra': 'Preta',
+        'Amarela': 'Amarela', '3-Amarela': 'Amarela', '3': 'Amarela', 'am': 'Amarela',
+        'Parda': 'Parda', '4-Parda': 'Parda', '4': 'Parda', 'pa': 'Parda',
+        'Indigena': 'Indigena', 'Indígena': 'Indigena', '5-Indigena': 'Indigena', '5-Indígena': 'Indigena', '5': 'Indigena', 'in': 'Indigena',
+        'Nao informada': 'Nao informada', 'Não informada': 'Nao informada', '9-Ignorado': 'Nao informada', '9': 'Nao informada', 'ig': 'Nao informada'
+    };
     const schoolMap   = {
         'Analfabeto': 'Analfabeto',
         'Ensino Fundamental 1a a 4a serie Incompleta': 'Ensino Fundamental 1a a 4a serie Incompleta',
@@ -6396,6 +6425,12 @@ window._fillPatientForm = function(p, diseaseId) {
         'Ignorado': 'Nao informada'
     };
     const sexMap = { 'Masculino':'M', 'Feminino':'F', 'M':'M', 'F':'F', 'I':'I' };
+    const zoneMap = {
+        'Urbana': 'Urbana', '1-Urbana': 'Urbana', '1': 'Urbana',
+        'Rural': 'Rural', '2-Rural': 'Rural', '2': 'Rural',
+        'Periurbana': 'Periurbana', '3-Periurbana': 'Periurbana', '3': 'Periurbana',
+        'Ignorado': 'Ignorado', '9-Ignorado': 'Ignorado', '9': 'Ignorado'
+    };
 
     const fill = (fieldId, val) => {
         const el = document.getElementById(fieldId);
@@ -6415,13 +6450,18 @@ window._fillPatientForm = function(p, diseaseId) {
     fill(`patient-sus-${diseaseId}`,      p.cns);
     fill(`patient-mother-${diseaseId}`,   p.motherName);
     fill(`patient-sex-${diseaseId}`,      sexMap[p.sex] || 'I');
-    fill(`patient-race-${diseaseId}`,     raceMap[p.race] || '9');
+    fill(`patient-race-${diseaseId}`,     raceMap[p.race] || 'Nao informada');
     fill(`patient-schooling-${diseaseId}`, schoolMap[p.education] || 'Nao informada');
+    fill(`patient-uf-res-${diseaseId}`,   p.uf || 'PA');
     fill(`patient-mun-res-${diseaseId}`,  p.municipality || 'MARABÁ');
+    fill(`patient-distrito-${diseaseId}`, p.district || '');
     fill(`patient-location-${diseaseId}`, p.neighborhood);
     fill(`patient-street-${diseaseId}`,   p.address ? p.address.replace(/,\s*\d+.*$/, '').trim() : '');
     fill(`patient-number-${diseaseId}`,   p.address ? (p.address.match(/,\s*(\d+)/) || [])[1] || '' : '');
+    fill(`patient-cep-${diseaseId}`,      p.cep || '');
     fill(`patient-phone-${diseaseId}`,    p.phone);
+    fill(`patient-zone-${diseaseId}`,     zoneMap[p.zone] || 'Urbana');
+    fill(`patient-country-${diseaseId}`,  p.country || 'BRASIL');
 
     // Data de nascimento: converte DD/MM/YYYY → YYYY-MM-DD
     if (p.birthDate) {
