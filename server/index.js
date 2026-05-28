@@ -115,7 +115,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // ── Fallback API Route for Unmatched Routes ───────────
-app.use('/api/*', (req, res) => {
+app.use('/api/{*splat}', (req, res) => {
   res.status(404).json({
     error: `Rota da API não encontrada no Express: ${req.method} ${req.url}`,
     debug: {
