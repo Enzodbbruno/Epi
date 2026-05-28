@@ -15,8 +15,8 @@ const EpiAPI = (() => {
                       
     const isLocal = loc.hostname === 'localhost' || loc.hostname === '127.0.0.1' || !loc.hostname || isLocalIP;
 
-    // If we are hosted on Render, the backend serves the frontend from the same origin
-    if (loc.hostname.endsWith('.onrender.com')) {
+    // If we are hosted on Render or Vercel, the backend serves the frontend from the same origin
+    if (loc.hostname.endsWith('.onrender.com') || loc.hostname.endsWith('.vercel.app')) {
       return `${loc.origin}/api/v1`;
     }
 

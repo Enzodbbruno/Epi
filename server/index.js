@@ -89,21 +89,29 @@ app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
 // ── Boot ──────────────────────────────────────────────
 async function bootstrap() {
   try {
-    runMigrations();
+    await runMigrations();
     await seed();
-    app.listen(PORT, () => {
-      console.log('');
-      console.log('  ╔═══════════════════════════════════════╗');
-      console.log('  ║        EpiConecta  Backend v1.0       ║');
-      console.log(`  ║  Servidor rodando em http://localhost:${PORT}  ║`);
-      console.log('  ║  Banco: SQLite (data/epiconecta.db)   ║');
-      console.log('  ╚═══════════════════════════════════════╝');
-      console.log('');
-    });
+    if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+      app.listen(PORT, () => {
+        console.log('');
+        console.log('  ╔═══════════════════════════════════════╗');
+        console.log('  ║        EpiConecta  Backend v1.0       ║');
+        console.log(`  ║  Servidor rodando em http://localhost:${PORT}  ║`);
+        console.log('  ║  Banco: PostgreSQL                    ║');
+        console.log('  ╚═══════════════════════════════════════╝');
+        console.log('');
+      });
+    } else {
+      console.log('[EpiConecta Serverless] Iniciado no Vercel.');
+    }
   } catch (err) {
     console.error('[FATAL] Falha ao iniciar o servidor:', err);
-    process.exit(1);
+    if (!process.env.VERCEL) {
+      process.exit(1);
+    }
   }
 }
 
 bootstrap();
+
+module.exports = app;

@@ -8,12 +8,12 @@ class NotificationService {
   /**
    * Create a new SINAN notification.
    */
-  create({ data, userId, ip, userAgent }) {
-    const patient = PatientRepo.findById(data.patientId);
+  async create({ data, userId, ip, userAgent }) {
+    const patient = await PatientRepo.findById(data.patientId);
     if (!patient) throw new Error('Paciente não encontrado.');
 
     const id = uuid();
-    NotifRepo.create({
+    await NotifRepo.create({
       id,
       patientId:     data.patientId,
       disease:       data.disease,
@@ -26,7 +26,7 @@ class NotificationService {
       observations:  data.observations || null,
     });
 
-    AuditRepo.log({
+    await AuditRepo.log({
       userId,
       action: 'CREATE',
       resource: 'notifications',
@@ -41,8 +41,8 @@ class NotificationService {
   /**
    * Update an existing SINAN notification.
    */
-  update({ id, data, userId, ip, userAgent }) {
-    const notification = NotifRepo.findById(id);
+  async update({ id, data, userId, ip, userAgent }) {
+    const notification = await NotifRepo.findById(id);
     if (!notification) throw new Error('Notificação não encontrada.');
 
     // Validar se o usuário logado é o proprietário
@@ -50,7 +50,7 @@ class NotificationService {
       throw new Error('Apenas o profissional que criou esta notificação pode editá-la.');
     }
 
-    NotifRepo.update(id, {
+    await NotifRepo.update(id, {
       disease:       data.disease,
       healthUnit:    data.healthUnit,
       symptomsDate:  data.symptomsDate,
@@ -60,7 +60,7 @@ class NotificationService {
       observations:  data.observations || null,
     });
 
-    AuditRepo.log({
+    await AuditRepo.log({
       userId,
       action: 'UPDATE',
       resource: 'notifications',
@@ -75,25 +75,25 @@ class NotificationService {
   /**
    * List recent notifications (for dashboard/admin).
    */
-  listRecent({ limit = 50, userId, ip, userAgent }) {
-    AuditRepo.log({ userId, action: 'LIST', resource: 'notifications', ip, userAgent });
-    return NotifRepo.listRecent({ limit });
+  async listRecent({ limit = 50, userId, ip, userAgent }) {
+    await AuditRepo.log({ userId, action: 'LIST', resource: 'notifications', ip, userAgent });
+    return await NotifRepo.listRecent({ limit });
   }
 
   /**
    * List notifications of the logged-in user.
    */
-  listMine({ userId, ip, userAgent }) {
-    return NotifRepo.findByNotificator(userId);
+  async listMine({ userId, ip, userAgent }) {
+    return await NotifRepo.findByNotificator(userId);
   }
 
   /**
    * Get analytics data for dashboard.
    */
-  getStats() {
+  async getStats() {
     return {
-      byDisease: NotifRepo.countByDisease(),
-      byStatus:  NotifRepo.countByStatus(),
+      byDisease: await NotifRepo.countByDisease(),
+      byStatus:  await NotifRepo.countByStatus(),
     };
   }
 }

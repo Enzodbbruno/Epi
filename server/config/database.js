@@ -1,32 +1,21 @@
 'use strict';
 require('dotenv').config();
-const Database = require('better-sqlite3');
-const path     = require('path');
-const fs       = require('fs');
+const { Pool } = require('pg');
 
-let dbPath = path.resolve(__dirname, '..', process.env.DB_PATH || './data/epiconecta.db');
-let dbDir  = path.dirname(dbPath);
+const connectionString = process.env.DATABASE_URL;
 
-try {
-  if (!fs.existsSync(dbDir)) {
-    fs.mkdirSync(dbDir, { recursive: true });
-  }
-} catch (err) {
-  console.warn(`[EpiConecta Warning] Falha ao criar diretório '${dbDir}' (${err.message}). Usando fallback local.`);
-  const fallbackDir = path.resolve(__dirname, '..', 'data');
-  try {
-    if (!fs.existsSync(fallbackDir)) {
-      fs.mkdirSync(fallbackDir, { recursive: true });
-    }
-  } catch (e) {}
-  dbPath = path.join(fallbackDir, 'epiconecta.db');
+if (!connectionString) {
+  console.warn('[EpiConecta Warning] A variável de ambiente DATABASE_URL não está configurada!');
 }
 
-/** @type {import('better-sqlite3').Database} */
-const db = new Database(dbPath, { verbose: process.env.NODE_ENV === 'development' ? console.log : null });
+const isProduction = process.env.NODE_ENV === 'production';
 
-// WAL mode para melhor concorrência
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
+const pool = new Pool({
+  connectionString: connectionString,
+  ssl: isProduction ? { rejectUnauthorized: false } : false
+});
 
-module.exports = db;
+module.exports = {
+  query: (text, params) => pool.query(text, params),
+  pool
+};

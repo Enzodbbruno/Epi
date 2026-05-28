@@ -16,7 +16,7 @@ class AuthService {
     if (!cpf || !password) throw new Error('CPF e senha são obrigatórios.');
 
     const cpfHash = hashIndex(cpf);
-    const user = UserRepo.findByCpfHash(cpfHash);
+    const user = await UserRepo.findByCpfHash(cpfHash);
 
     if (!user) {
       // Security: same delay even for non-existent users (prevents timing attacks)
@@ -28,7 +28,7 @@ class AuthService {
 
     const passwordMatch = await bcrypt.compare(password, user.password_hash);
     if (!passwordMatch) {
-      AuditRepo.log({ userId: user.id, action: 'LOGIN_FAILED', resource: 'users', resourceId: user.id, ip, userAgent });
+      await AuditRepo.log({ userId: user.id, action: 'LOGIN_FAILED', resource: 'users', resourceId: user.id, ip, userAgent });
       throw new Error('Credenciais inválidas.');
     }
 
@@ -39,10 +39,10 @@ class AuthService {
 
     // Armazena HASH do refresh token (não o token em si)
     const refreshHash = await bcrypt.hash(refreshToken, 10);
-    UserRepo.updateRefreshToken(user.id, refreshHash);
-    UserRepo.updateLastLogin(user.id);
+    await UserRepo.updateRefreshToken(user.id, refreshHash);
+    await UserRepo.updateLastLogin(user.id);
 
-    AuditRepo.log({ userId: user.id, action: 'LOGIN', resource: 'users', resourceId: user.id, ip, userAgent });
+    await AuditRepo.log({ userId: user.id, action: 'LOGIN', resource: 'users', resourceId: user.id, ip, userAgent });
 
     return {
       accessToken,
@@ -67,7 +67,7 @@ class AuthService {
       throw new Error('Refresh token inválido ou expirado.');
     }
 
-    const user = UserRepo.findById(payload.sub);
+    const user = await UserRepo.findById(payload.sub);
     if (!user || !user.refresh_token_hash) throw new Error('Sessão encerrada. Faça login novamente.');
 
     const match = await bcrypt.compare(refreshToken, user.refresh_token_hash);
@@ -79,7 +79,7 @@ class AuthService {
       { expiresIn: authCfg.accessExpires }
     );
 
-    AuditRepo.log({ userId: user.id, action: 'TOKEN_REFRESH', resource: 'users', ip, userAgent });
+    await AuditRepo.log({ userId: user.id, action: 'TOKEN_REFRESH', resource: 'users', ip, userAgent });
 
     return { accessToken: newAccessToken };
   }
@@ -88,8 +88,8 @@ class AuthService {
    * Revoke refresh token (logout).
    */
   async logout({ userId, ip, userAgent }) {
-    UserRepo.revokeRefreshToken(userId);
-    AuditRepo.log({ userId, action: 'LOGOUT', resource: 'users', resourceId: userId, ip, userAgent });
+    await UserRepo.revokeRefreshToken(userId);
+    await AuditRepo.log({ userId, action: 'LOGOUT', resource: 'users', resourceId: userId, ip, userAgent });
   }
 
   /**
@@ -97,16 +97,16 @@ class AuthService {
    */
   async createUser({ name, cpf, cns, role, healthCenter, password, createdBy, ip, userAgent }) {
     const cpfHash      = hashIndex(cpf);
-    const existing     = UserRepo.findByCpfHash(cpfHash);
+    const existing     = await UserRepo.findByCpfHash(cpfHash);
     if (existing) throw new Error('CPF já cadastrado no sistema.');
 
     const { encrypt } = require('../config/crypto');
     const passwordHash = await bcrypt.hash(password, 12);
 
     const id = uuid();
-    UserRepo.create({ id, name, cpfHash, cpfEncrypted: encrypt(cpf), cns, role, healthCenter, passwordHash });
+    await UserRepo.create({ id, name, cpfHash, cpfEncrypted: encrypt(cpf), cns, role, healthCenter, passwordHash });
 
-    AuditRepo.log({ userId: createdBy, action: 'CREATE', resource: 'users', resourceId: id, details: { name, role }, ip, userAgent });
+    await AuditRepo.log({ userId: createdBy, action: 'CREATE', resource: 'users', resourceId: id, details: { name, role }, ip, userAgent });
     return { id, name, role };
   }
 }

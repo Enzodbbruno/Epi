@@ -2,42 +2,43 @@
 const db = require('../config/database');
 
 class UserRepository {
-  findById(id) {
-    return db.prepare('SELECT * FROM users WHERE id = ? AND is_active = 1').get(id);
+  async findById(id) {
+    const res = await db.query('SELECT * FROM users WHERE id = $1 AND is_active = 1', [id]);
+    return res.rows[0];
   }
 
-  findByCpfHash(cpfHash) {
-    return db.prepare('SELECT * FROM users WHERE cpf_hash = ? AND is_active = 1').get(cpfHash);
+  async findByCpfHash(cpfHash) {
+    const res = await db.query('SELECT * FROM users WHERE cpf_hash = $1 AND is_active = 1', [cpfHash]);
+    return res.rows[0];
   }
 
-  findByName(name) {
-    return db.prepare("SELECT * FROM users WHERE name LIKE ? AND is_active = 1").all(`%${name}%`);
+  async findByName(name) {
+    const res = await db.query('SELECT * FROM users WHERE name ILIKE $1 AND is_active = 1', [`%${name}%`]);
+    return res.rows;
   }
 
-  create({ id, name, cpfHash, cpfEncrypted, cns, role, healthCenter, passwordHash }) {
-    return db.prepare(`
+  async create({ id, name, cpfHash, cpfEncrypted, cns, role, healthCenter, passwordHash }) {
+    await db.query(`
       INSERT INTO users (id, name, cpf_hash, cpf_encrypted, cns, role, health_center, password_hash)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(id, name, cpfHash, cpfEncrypted, cns, role, healthCenter, passwordHash);
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    `, [id, name, cpfHash, cpfEncrypted, cns, role, healthCenter, passwordHash]);
   }
 
-  updateRefreshToken(id, tokenHash) {
-    db.prepare("UPDATE users SET refresh_token_hash = ?, updated_at = datetime('now') WHERE id = ?")
-      .run(tokenHash, id);
+  async updateRefreshToken(id, tokenHash) {
+    await db.query("UPDATE users SET refresh_token_hash = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2", [tokenHash, id]);
   }
 
-  updateLastLogin(id) {
-    db.prepare("UPDATE users SET last_login = datetime('now'), updated_at = datetime('now') WHERE id = ?")
-      .run(id);
+  async updateLastLogin(id) {
+    await db.query("UPDATE users SET last_login = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = $1", [id]);
   }
 
-  revokeRefreshToken(id) {
-    db.prepare("UPDATE users SET refresh_token_hash = NULL, updated_at = datetime('now') WHERE id = ?")
-      .run(id);
+  async revokeRefreshToken(id) {
+    await db.query("UPDATE users SET refresh_token_hash = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = $1", [id]);
   }
 
-  listAll() {
-    return db.prepare('SELECT id, name, role, health_center, is_active, last_login, created_at FROM users').all();
+  async listAll() {
+    const res = await db.query('SELECT id, name, role, health_center, is_active, last_login, created_at FROM users');
+    return res.rows;
   }
 }
 

@@ -10,18 +10,18 @@ class PatientService {
    * Search patients by name, CNS, or CPF.
    * CPF is passed as plain text, hashed here for lookup.
    */
-  search({ q, userId, ip, userAgent }) {
+  async search({ q, userId, ip, userAgent }) {
     const term = q ? q.trim() : '';
     if (term.length < 2) {
-      const rows = PatientRepo.listRecent(10);
+      const rows = await PatientRepo.listRecent(10);
       return rows.map(r => this._sanitize(r));
     }
 
     const cpfHash = hashIndex(term); // will only match if q is a valid CPF
 
-    const rows = PatientRepo.search({ term, cpfHash });
+    const rows = await PatientRepo.search({ term, cpfHash });
 
-    AuditRepo.log({ userId, action: 'SEARCH', resource: 'patients', details: { query: term.substring(0, 4) + '***' }, ip, userAgent });
+    await AuditRepo.log({ userId, action: 'SEARCH', resource: 'patients', details: { query: term.substring(0, 4) + '***' }, ip, userAgent });
 
     return rows.map(r => this._sanitize(r));
   }
@@ -29,16 +29,16 @@ class PatientService {
   /**
    * Get full patient record by ID.
    */
-  getById({ id, userId, ip, userAgent }) {
-    const row = PatientRepo.findById(id);
+  async getById({ id, userId, ip, userAgent }) {
+    const row = await PatientRepo.findById(id);
     if (!row) throw new Error('Paciente não encontrado.');
 
-    AuditRepo.log({ userId, action: 'READ', resource: 'patients', resourceId: id, ip, userAgent });
+    await AuditRepo.log({ userId, action: 'READ', resource: 'patients', resourceId: id, ip, userAgent });
 
     const patient = this._sanitizeFull(row);
 
     // Buscar as notificações associadas ao paciente
-    const notifications = NotifRepo.findByPatient(id);
+    const notifications = await NotifRepo.findByPatient(id);
 
     // Mapear notificações para o formato de histórico esperado no frontend
     const notifHistory = notifications.map(n => {
@@ -83,13 +83,13 @@ class PatientService {
   /**
    * Create a new patient record.
    */
-  create({ data, userId, ip, userAgent }) {
+  async create({ data, userId, ip, userAgent }) {
     const cpfHash = hashIndex(data.cpf);
-    const existing = PatientRepo.findByCpfHash(cpfHash);
+    const existing = await PatientRepo.findByCpfHash(cpfHash);
     if (existing) throw new Error('Paciente com este CPF já está cadastrado.');
 
     const id = uuid();
-    PatientRepo.create({
+    await PatientRepo.create({
       id,
       name:         data.name,
       cpfHash,
@@ -113,7 +113,7 @@ class PatientService {
       createdBy:    userId,
     });
 
-    AuditRepo.log({ userId, action: 'CREATE', resource: 'patients', resourceId: id, details: { name: data.name }, ip, userAgent });
+    await AuditRepo.log({ userId, action: 'CREATE', resource: 'patients', resourceId: id, details: { name: data.name }, ip, userAgent });
     return { id };
   }
 
