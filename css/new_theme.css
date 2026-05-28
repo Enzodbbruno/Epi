@@ -701,6 +701,8 @@ body {
 /* Custom premium style for all form elements in form-groups */
 .form-group input {
     width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
     height: 52px !important;
     padding: 14px 16px !important;
     border: 2px solid var(--border-color) !important;
@@ -720,6 +722,8 @@ body {
 
 .form-group select {
     width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
     height: 52px !important;
     padding: 14px 16px !important;
     border: 2px solid var(--border-color) !important;
@@ -760,6 +764,8 @@ body {
 
 .form-group textarea {
     width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
     padding: 14px 16px !important;
     border: 2px solid var(--border-color) !important;
     border-radius: 12px !important;
@@ -768,6 +774,16 @@ body {
     background-color: #f9fafb !important;
     color: var(--text-dark) !important;
     transition: all 0.2s ease !important;
+}
+
+/* Specific normalize rule for date inputs on mobile browsers */
+input[type="date"] {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
 }
 
 .form-group textarea:focus {
