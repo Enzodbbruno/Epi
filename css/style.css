@@ -2975,9 +2975,9 @@ body {
     padding: 20px;
     background: white;
     border-bottom: 1px solid #e5e7eb;
-    position: sticky;
-    top: 0;
+    position: relative;
     z-index: 10;
+    margin-bottom: 20px;
 }
 
 .screen-header h1 {
@@ -5161,14 +5161,14 @@ body {
 }
 
 .screen-header {
-    position: sticky;
-    top: 76px;
+    position: relative;
     z-index: 12;
     background: rgba(243, 245, 248, 0.92);
     backdrop-filter: blur(2px);
     border: 1px solid #e4e7ec;
     border-radius: 10px;
     padding: 10px 12px;
+    margin-bottom: 20px;
 }
 
 .dash-header h1,
@@ -5407,10 +5407,6 @@ button:focus-visible,
 
     #dashboard-screen {
         padding: 16px 4px !important;
-    }
-
-    .screen-header {
-        top: 70px;
     }
 }
 

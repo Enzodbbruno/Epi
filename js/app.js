@@ -459,6 +459,14 @@ const AuthModule = {
         if (headerBtn) headerBtn.textContent = 'Login';
         if (homeBtn) homeBtn.style.display = 'inline-flex';
     }
+
+    // Refresh state-dependent modules upon login status change
+    if (typeof PatientModule !== 'undefined' && typeof PatientModule.renderRecents === 'function') {
+        PatientModule.renderRecents();
+    }
+    if (typeof window.triggerDashboardReload === 'function') {
+        window.triggerDashboardReload();
+    }
   }
 
 };
@@ -2783,7 +2791,7 @@ const PatientModule = {
         card.onclick = async () => {
           try {
             const fullPatient = await EpiAPI.getPatient(p.id);
-            this.openProfile(fullPatient);
+            PatientModule.openProfile(fullPatient);
           } catch (err) {
             if (window.App) App.showToast('Erro ao carregar prontuário do servidor.', 'error');
           }
@@ -4954,6 +4962,8 @@ const App = {
           if (searchBar) searchBar.style.display = 'block';
           if (recents) recents.style.display = 'block';
           if (results) results.style.display = 'none';
+          
+          PatientModule.renderRecents();
         }
         break;
     }
@@ -6314,6 +6324,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                         
                         const tr = document.createElement('tr');
+                        tr.style.cursor = 'pointer';
                         tr.innerHTML = `
                             <td><strong>${n.patient_name || 'Paciente'}</strong></td>
                             <td>${diseaseLabel}</td>
@@ -6321,6 +6332,54 @@ document.addEventListener('DOMContentLoaded', () => {
                             <td>${n.patient_neighborhood || 'Centro'}</td>
                             <td>${statusBadge}</td>
                         `;
+                        tr.addEventListener('click', async () => {
+                            try {
+                                if (window.App && App.showLoading) App.showLoading();
+                                const fullPatient = await EpiAPI.getPatient(n.patient_id);
+                                if (window.App && App.hideLoading) App.hideLoading();
+
+                                if (typeof PatientModule !== 'undefined') {
+                                    PatientModule.openProfile(fullPatient);
+                                    if (window.App && App.showScreen) {
+                                        App.showScreen('patients');
+                                    }
+
+                                    const mappedPatient = PatientModule.currentPatient;
+                                    if (mappedPatient && mappedPatient.history) {
+                                        let historyItem = mappedPatient.history.find(h => h.notificationData && h.notificationData.id === n.id);
+                                        if (!historyItem) {
+                                            const diseaseLabel = diseaseNames[n.disease.toLowerCase()] || n.disease;
+                                            historyItem = {
+                                                title: `Notificação - ${diseaseLabel}`,
+                                                date: dateStr,
+                                                desc: `Local: ${n.health_unit || n.healthUnit || ''}.`,
+                                                notificationData: {
+                                                    id: n.id,
+                                                    disease: n.disease,
+                                                    healthUnit: n.health_unit || n.healthUnit,
+                                                    symptomsDate: n.symptoms_date || n.symptomsDate,
+                                                    mainSymptoms: n.symptoms ? (typeof n.symptoms === 'string' ? JSON.parse(n.symptoms).join(', ') : n.symptoms.join(', ')) : '',
+                                                    clinicalSigns: typeof n.clinical_signs === 'string' ? JSON.parse(n.clinical_signs || '{}') : (n.clinical_signs || {}),
+                                                    labResults: typeof n.lab_results === 'string' ? JSON.parse(n.lab_results || '{}') : (n.lab_results || {}),
+                                                    observations: n.observations,
+                                                    notificatorName: n.notificator_name || n.notificatorName,
+                                                    notificatorId: n.notificator_id || n.notificatorId
+                                                }
+                                            };
+                                        }
+                                        if (typeof window.showPatientNotificationDetail === 'function') {
+                                            window.showPatientNotificationDetail(historyItem, mappedPatient);
+                                        }
+                                    }
+                                }
+                            } catch (err) {
+                                if (window.App && App.hideLoading) App.hideLoading();
+                                console.error('Erro ao abrir detalhe da notificação:', err);
+                                if (window.App && App.showToast) {
+                                    App.showToast('Erro ao carregar prontuário do servidor.', 'error');
+                                }
+                            }
+                        });
                         tbody.appendChild(tr);
                     });
                 }
