@@ -3451,7 +3451,7 @@ const CaseNotificationModule = {
                  <input type="text" id="patient-search-id-${id}" placeholder="CPF, CNS ou Nome completo..." autocomplete="off"
                    style="width: 100%; padding: 12px 16px; border: 1.5px solid var(--border-color); border-radius: 10px; box-sizing: border-box; font-size: 0.95rem; background: white; outline: none; transition: border-color 0.2s;"
                    onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border-color)'">
-                 <div id="patient-dropdown-${id}" style="display:none; position:absolute; top:100%; left:0; right:0; background:white; border:1px solid var(--border-color); border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.1); z-index:999; max-height:220px; overflow-y:auto;"></div>
+                 <div id="patient-dropdown-${id}" class="patient-autocomplete-dropdown" style="display:none;"></div>
                </div>
                <button type="button" id="patient-search-btn-${id}" class="btn" style="height: 48px; width: 48px; min-width: 48px; padding: 0; background: var(--primary); color: white; border: none; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: var(--shadow-cta);"
                  onmouseenter="this.style.background='var(--primary-hover)'; this.style.transform='translateY(-1px)'" onmouseleave="this.style.background='var(--primary)'; this.style.transform='translateY(0)'">
@@ -3482,11 +3482,11 @@ const CaseNotificationModule = {
                      <label>3 - Data da Notificação</label>
                      <input type="date" id="data-notificacao-${id}" value="${new Date().toISOString().substring(0,10)}">
                  </div>
-                 <div class="form-group" style="max-width:80px;">
+                 <div class="form-group">
                      <label>4 - UF</label>
                      <input type="text" id="uf-notificacao-${id}" value="PA" maxlength="2">
                  </div>
-                 <div class="form-group span-2">
+                 <div class="form-group span-3">
                      <label>5 - Município de Notificação</label>
                      <input type="text" id="mun-notificacao-${id}" value="MARABA">
                  </div>
@@ -4115,12 +4115,11 @@ const CaseNotificationModule = {
           const photo = `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=e0f2f1&color=00796b&bold=true`;
 
           return `
-            <div class="autocomplete-item" data-id="${p.id}" data-local="${p._local ? 'true' : 'false'}"
-              style="padding:10px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid #f0f0f0;">
-              <img src="${photo}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;" alt="">
+            <div class="autocomplete-item" data-id="${p.id}" data-local="${p._local ? 'true' : 'false'}">
+              <img src="${photo}" alt="">
               <div>
-                <div style="font-weight:600;font-size:0.9rem;color:#1a1a2e;">${p.name}</div>
-                <div style="font-size:0.77rem;color:#888;">CNS: ${p.cns} ${ageText ? '&bull; ' + ageText : ''} &bull; ${sexText} ${p._local ? '<span style="color:#00796b; font-weight:bold;">(Local)</span>' : ''}</div>
+                <div class="name">${p.name}</div>
+                <div class="details">CNS: ${p.cns} ${ageText ? '&bull; ' + ageText : ''} &bull; ${sexText} ${p._local ? '<span style="color:#00796b; font-weight:bold;">(Local)</span>' : ''}</div>
               </div>
             </div>`;
         }).join('');
@@ -4128,12 +4127,11 @@ const CaseNotificationModule = {
 
       // Add "register new patient" button in both cases
       html += `
-        <div class="autocomplete-new-patient"
-          style="padding:12px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;color:#00796b;font-weight:700;font-size:0.9rem;background:#e8f5e9;border-top:1px solid #f0f0f0;">
-          <i class="fas fa-user-plus" style="font-size:1.1rem;"></i>
+        <div class="autocomplete-new-patient">
+          <i class="fas fa-user-plus"></i>
           <div>
-            <div>+ Cadastrar como novo paciente com este nome</div>
-            <div style="font-size:0.75rem;font-weight:400;color:#555;">Preencha os dados abaixo e clique em Gravar</div>
+            <div class="title">+ Cadastrar como novo paciente com este nome</div>
+            <div class="subtitle">Preencha os dados abaixo e clique em Gravar</div>
           </div>
         </div>`;
 
