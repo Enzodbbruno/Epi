@@ -146,10 +146,12 @@ body {
     top: 0;
     z-index: 10;
     flex-shrink: 0;
+    gap: 20px !important;
 }
 
 .global-search {
     flex: 1;
+    min-width: 120px !important;
     max-width: 500px;
     position: relative;
 }
@@ -330,6 +332,7 @@ body {
 
 @media (max-width: 1024px) {
     .dashboard-grid { grid-template-columns: 1fr; }
+    .topbar-spacer { display: none !important; }
 }
 .topbar-spacer {
     display: block;
