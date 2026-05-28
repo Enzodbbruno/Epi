@@ -6,6 +6,13 @@
 const EpiAPI = (() => {
   const getApiBase = () => {
     const loc = window.location;
+    
+    // Se estivermos em produção (ex: Vercel) e houver uma URL configurada no window.EPI_CONFIG, usa ela.
+    const isLocal = loc.hostname === 'localhost' || loc.hostname === '127.0.0.1' || !loc.hostname;
+    if (!isLocal && window.EPI_CONFIG && window.EPI_CONFIG.API_URL) {
+      return window.EPI_CONFIG.API_URL;
+    }
+
     // Se estiver rodando com uma porta de desenvolvimento (ex: Live Server 5500 ou similar)
     // direciona para a porta 3001 no mesmo host (útil para celulares na mesma rede)
     if (loc.port && loc.port !== '3001') {
