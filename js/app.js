@@ -302,7 +302,22 @@ const AuthModule = {
     const btnLogin = document.getElementById('btn-do-login');
     const btnCancel = document.getElementById('btn-cancel-login');
     const headerBtn = document.getElementById('header-login-btn');
+    const btnTogglePassword = document.getElementById('btn-toggle-password');
     
+    if (btnTogglePassword) {
+      btnTogglePassword.addEventListener('click', () => {
+        const passInput = document.getElementById('login-password');
+        const icon = document.getElementById('icon-toggle-password');
+        if (passInput) {
+          const isPassword = passInput.type === 'password';
+          passInput.type = isPassword ? 'text' : 'password';
+          if (icon) {
+            icon.className = isPassword ? 'far fa-eye-slash' : 'far fa-eye';
+          }
+        }
+      });
+    }
+
     if (btnLogin) {
        btnLogin.addEventListener('click', () => this.handleLogin());
     }
@@ -2942,21 +2957,37 @@ const PatientModule = {
             notifications.forEach((n, index) => {
                 const item = document.createElement('div');
                 item.className = 'patient-card-item';
-                item.style.marginBottom = '10px';
-                item.style.padding = '15px';
-                item.style.border = '1px solid #eee';
+                item.style.marginBottom = '12px';
+                item.style.padding = '14px 16px';
+                item.style.border = '1px solid #e0e0e0';
                 item.style.borderRadius = '8px';
                 item.style.display = 'flex';
-                item.style.justifyContent = 'space-between';
-                item.style.alignItems = 'center';
+                item.style.flexDirection = 'column';
+                item.style.gap = '8px';
                 item.style.backgroundColor = 'white';
                 
+                const notifData = n.notificationData || {};
+                const isEdited = n.isEdited || notifData.isEdited;
+                const updatedByName = n.updatedByName || notifData.updatedByName;
+                const updatedAt = n.updatedAt || notifData.updatedAt;
+
                 item.innerHTML = `
-                    <div class="p-item-info">
-                        <h4 style="color: var(--primary-color); margin: 0 0 5px 0;">${n.title}</h4>
-                        <p style="margin: 0; font-size: 0.9rem; color: #555;"><i class="far fa-calendar-alt"></i> ${n.date}</p>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+                        <div class="p-item-info">
+                            <h4 style="color: var(--primary-color); margin: 0 0 5px 0; display: flex; align-items: center; gap: 8px;">
+                                ${n.title}
+                                ${isEdited ? `<span style="background: #fff3cd; color: #856404; border: 1px solid #ffeeba; font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; font-weight: bold; font-family: sans-serif;"><i class="fas fa-edit"></i> Alterada</span>` : ''}
+                            </h4>
+                            <p style="margin: 0; font-size: 0.88rem; color: #555;"><i class="far fa-calendar-alt"></i> Data Notificação: ${n.date}</p>
+                        </div>
+                        <button class="btn btn-outline btn-sm btn-view-notif" style="padding: 6px 12px; font-size: 0.85rem; cursor: pointer; flex-shrink: 0;">Ver mais</button>
                     </div>
-                    <button class="btn btn-outline btn-sm btn-view-notif" style="padding: 6px 12px; font-size: 0.85rem; cursor: pointer;">Ver mais</button>
+                    ${isEdited ? `
+                        <div class="alert-notif-edited" style="padding: 8px 12px; background-color: #fff8e1; border-left: 4px solid #ffb300; border-radius: 4px; font-size: 0.83rem; color: #8f6b00; display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                            <i class="fas fa-exclamation-triangle" style="color: #ffa000; font-size: 1rem;"></i>
+                            <span><strong>Alerta de Alteração:</strong> Modificada por <strong>${updatedByName || 'Profissional'}</strong> em <strong>${updatedAt || n.date}</strong></span>
+                        </div>
+                    ` : ''}
                 `;
                 item.querySelector('.btn-view-notif').addEventListener('click', () => {
                     if (typeof window.showPatientNotificationDetail === 'function') {
@@ -3252,6 +3283,7 @@ const CaseNotificationModule = {
     'cisticercose': { name: 'Cisticercose', icon: 'fa-bug', category: 'helmintíase' },
     'dengue': { name: 'Dengue', icon: 'fa-mosquito', category: 'vetor' },
     'chagas': { name: 'Doença de Chagas', icon: 'fa-home', category: 'vetor' },
+    'malaria': { name: 'Malária', icon: 'fa-mosquito', category: 'vetor' },
     'escabiose': { name: 'Escabiose', icon: 'fa-bug', category: 'outra' },
     'esquistossomose': { name: 'Esquistossomose', icon: 'fa-eye', category: 'helmintíase' },
     'estrongiloidiase': { name: 'Estrongiloidíase', icon: 'fa-bug', category: 'helmintíase' },
@@ -3456,6 +3488,2115 @@ const CaseNotificationModule = {
       formDiv.id = `form-${id}`;
       if (id !== 'dengue') formDiv.style.display = 'none';
 
+      let block7Html = '';
+      if (id === 'dengue' || id === 'chikungunya') {
+        block7Html = `
+          <!-- BLOCO 7: DADOS CLÍNICOS E LABORATORIAIS (SINAN DENGUE E FEBRE DE CHIKUNGUNYA) -->
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-stethoscope"></i> Dados Clínicos e Investigação (Campos 31-34)</div>
+             <div class="sinan-grid-4">
+                  <div class="form-group">
+                      <label>31 - Data da Investigação</label>
+                      <input type="date" id="dengue-data-investigacao-${id}">
+                  </div>
+                  <div class="form-group span-3">
+                      <label>32 - Ocupação</label>
+                      <input type="text" id="dengue-ocupacao-${id}" placeholder="Ocupação do paciente">
+                  </div>
+             </div>
+
+             <!-- Campo 33: Sinais Clínicos -->
+             <div style="margin-top: 15px;">
+                 <label style="font-weight: bold; color: var(--primary); font-size: 0.85rem; text-transform: uppercase;">
+                     33 - Sinais Clínicos (1-Sim | 2-Não)
+                 </label>
+                 <div class="sinan-grid-4" style="margin-top: 8px; background: rgba(0,0,0,0.02); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                     <div class="form-group"><label>Febre</label><select id="dengue-sint-febre-${id}"><option value="1">1 - Sim</option><option value="2">2 - Não</option></select></div>
+                     <div class="form-group"><label>Mialgia</label><select id="dengue-sint-mialgia-${id}"><option value="1">1 - Sim</option><option value="2">2 - Não</option></select></div>
+                     <div class="form-group"><label>Cefaleia</label><select id="dengue-sint-cefaleia-${id}"><option value="1">1 - Sim</option><option value="2">2 - Não</option></select></div>
+                     <div class="form-group"><label>Exantema</label><select id="dengue-sint-exantema-${id}"><option value="1">1 - Sim</option><option value="2">2 - Não</option></select></div>
+                     <div class="form-group"><label>Vômito</label><select id="dengue-sint-vomito-${id}"><option value="1">1 - Sim</option><option value="2">2 - Não</option></select></div>
+                     <div class="form-group"><label>Náuseas</label><select id="dengue-sint-nauseas-${id}"><option value="1">1 - Sim</option><option value="2">2 - Não</option></select></div>
+                     <div class="form-group"><label>Dor nas Costas</label><select id="dengue-sint-costas-${id}"><option value="1">1 - Sim</option><option value="2">2 - Não</option></select></div>
+                     <div class="form-group"><label>Conjuntivite</label><select id="dengue-sint-conjuntivite-${id}"><option value="1">1 - Sim</option><option value="2">2 - Não</option></select></div>
+                     <div class="form-group"><label>Artrite</label><select id="dengue-sint-artrite-${id}"><option value="1">1 - Sim</option><option value="2">2 - Não</option></select></div>
+                     <div class="form-group"><label>Artralgia Intensa</label><select id="dengue-sint-artralgia-${id}"><option value="1">1 - Sim</option><option value="2">2 - Não</option></select></div>
+                     <div class="form-group"><label>Petéquias</label><select id="dengue-sint-petequias-${id}"><option value="1">1 - Sim</option><option value="2">2 - Não</option></select></div>
+                     <div class="form-group"><label>Leucopenia</label><select id="dengue-sint-leucopenia-${id}"><option value="1">1 - Sim</option><option value="2">2 - Não</option></select></div>
+                     <div class="form-group"><label>Prova do Laço Positiva</label><select id="dengue-sint-laco-${id}"><option value="1">1 - Sim</option><option value="2">2 - Não</option></select></div>
+                     <div class="form-group"><label>Dor Retroorbital</label><select id="dengue-sint-retroorbital-${id}"><option value="1">1 - Sim</option><option value="2">2 - Não</option></select></div>
+                 </div>
+             </div>
+
+             <!-- Campo 34: Doenças pré-existentes -->
+             <div style="margin-top: 15px;">
+                 <label style="font-weight: bold; color: var(--primary); font-size: 0.85rem; text-transform: uppercase;">
+                     34 - Doenças Pré-existentes (1-Sim | 2-Não | 9-Ignorado)
+                 </label>
+                 <div class="sinan-grid-4" style="margin-top: 8px; background: rgba(0,0,0,0.02); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                     <div class="form-group"><label>Diabetes</label><select id="dengue-comorb-diabetes-${id}"><option value="1">1 - Sim</option><option value="2">2 - Não</option><option value="9" selected>9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>Hepatopatias</label><select id="dengue-comorb-hepatopatias-${id}"><option value="1">1 - Sim</option><option value="2">2 - Não</option><option value="9" selected>9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>Hipertensão Arterial</label><select id="dengue-comorb-hipertensao-${id}"><option value="1">1 - Sim</option><option value="2">2 - Não</option><option value="9" selected>9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>Doenças Auto-imunes</label><select id="dengue-comorb-autoimunes-${id}"><option value="1">1 - Sim</option><option value="2">2 - Não</option><option value="9" selected>9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>Doenças Hematológicas</label><select id="dengue-comorb-hematologicas-${id}"><option value="1">1 - Sim</option><option value="2">2 - Não</option><option value="9" selected>9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>Doença Renal Crônica</label><select id="dengue-comorb-renal-${id}"><option value="1">1 - Sim</option><option value="2">2 - Não</option><option value="9" selected>9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>Doença Ácido-Péptica</label><select id="dengue-comorb-peptica-${id}"><option value="1">1 - Sim</option><option value="2">2 - Não</option><option value="9" selected>9 - Ignorado</option></select></div>
+                 </div>
+             </div>
+          </div>
+
+          <!-- DADOS LABORATORIAIS -->
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-vial"></i> Dados Laboratoriais (Campos 35-49)</div>
+             
+             <!-- Chikungunya Lab -->
+             <div style="font-weight: bold; color: var(--primary); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 8px;">
+                 Sorologia (IgM) Chikungunya & Exame PRNT
+             </div>
+             <div class="sinan-grid-4">
+                  <div class="form-group">
+                      <label>35 - Data Coleta 1ª Amostra (S1)</label>
+                      <input type="date" id="chik-s1-date-${id}">
+                  </div>
+                  <div class="form-group">
+                      <label>36 - Data Coleta 2ª Amostra (S2)</label>
+                      <input type="date" id="chik-s2-date-${id}">
+                  </div>
+                  <div class="form-group">
+                      <label>37 - Data Coleta Exame PRNT</label>
+                      <input type="date" id="chik-prnt-date-${id}">
+                  </div>
+                  <div class="form-group span-4">
+                      <label>38 - Resultados Sorologia Chikungunya / PRNT</label>
+                      <div class="sinan-grid-3" style="gap: 10px;">
+                          <div>
+                              <span style="font-size: 0.75rem; color: var(--text-gray);">Resultado S1:</span>
+                              <select id="chik-s1-res-${id}">
+                                  <option value="1">1 - Reagente</option>
+                                  <option value="2">2 - Não Reagente</option>
+                                  <option value="3">3 - Inconclusivo</option>
+                                  <option value="4" selected>4 - Não Realizado</option>
+                              </select>
+                          </div>
+                          <div>
+                              <span style="font-size: 0.75rem; color: var(--text-gray);">Resultado S2:</span>
+                              <select id="chik-s2-res-${id}">
+                                  <option value="1">1 - Reagente</option>
+                                  <option value="2">2 - Não Reagente</option>
+                                  <option value="3">3 - Inconclusivo</option>
+                                  <option value="4" selected>4 - Não Realizado</option>
+                              </select>
+                          </div>
+                          <div>
+                              <span style="font-size: 0.75rem; color: var(--text-gray);">Resultado PRNT:</span>
+                              <select id="chik-prnt-res-${id}">
+                                  <option value="1">1 - Reagente</option>
+                                  <option value="2">2 - Não Reagente</option>
+                                  <option value="3">3 - Inconclusivo</option>
+                                  <option value="4" selected>4 - Não Realizado</option>
+                              </select>
+                          </div>
+                      </div>
+                  </div>
+             </div>
+
+             <!-- Dengue Lab -->
+             <div style="font-weight: bold; color: var(--primary); font-size: 0.85rem; text-transform: uppercase; margin-top: 15px; margin-bottom: 8px;">
+                 Sorologia (IgM) Dengue & Exames Virológicos
+             </div>
+             <div class="sinan-grid-4">
+                  <div class="form-group">
+                      <label>39 - Data Coleta (IgM Dengue)</label>
+                      <input type="date" id="dengue-igm-date-${id}">
+                  </div>
+                  <div class="form-group">
+                      <label>40 - Resultado IgM Dengue</label>
+                      <select id="dengue-igm-res-${id}">
+                          <option value="1">1 - Positivo</option>
+                          <option value="2">2 - Negativo</option>
+                          <option value="3">3 - Inconclusivo</option>
+                          <option value="4" selected>4 - Não Realizado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>41 - Data Coleta Exame NS1</label>
+                      <input type="date" id="dengue-ns1-date-${id}">
+                  </div>
+                  <div class="form-group">
+                      <label>42 - Resultado Exame NS1</label>
+                      <select id="dengue-ns1-res-${id}">
+                          <option value="1">1 - Positivo</option>
+                          <option value="2">2 - Negativo</option>
+                          <option value="3">3 - Inconclusivo</option>
+                          <option value="4" selected>4 - Não Realizado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>43 - Data Coleta Isolamento Viral</label>
+                      <input type="date" id="dengue-isolamento-date-${id}">
+                  </div>
+                  <div class="form-group">
+                      <label>44 - Resultado Isolamento Viral</label>
+                      <select id="dengue-isolamento-res-${id}">
+                          <option value="1">1 - Positivo</option>
+                          <option value="2">2 - Negativo</option>
+                          <option value="3">3 - Inconclusivo</option>
+                          <option value="4" selected>4 - Não Realizado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>45 - Data Coleta RT-PCR</label>
+                      <input type="date" id="dengue-pcr-date-${id}">
+                  </div>
+                  <div class="form-group">
+                      <label>46 - Resultado RT-PCR</label>
+                      <select id="dengue-pcr-res-${id}">
+                          <option value="1">1 - Positivo</option>
+                          <option value="2">2 - Negativo</option>
+                          <option value="3">3 - Inconclusivo</option>
+                          <option value="4" selected>4 - Não Realizado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>47 - Sorotipo Identificado</label>
+                      <select id="dengue-sorotipo-${id}">
+                          <option value="" selected>Selecione o sorotipo...</option>
+                          <option value="1">1 - DENV 1</option>
+                          <option value="2">2 - DENV 2</option>
+                          <option value="3">3 - DENV 3</option>
+                          <option value="4">4 - DENV 4</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>48 - Data Coleta Histopatologia</label>
+                      <input type="date" id="dengue-histo-date-${id}">
+                  </div>
+                  <div class="form-group">
+                      <label>48 - Resultado Histopatologia</label>
+                      <select id="dengue-histo-res-${id}">
+                          <option value="1">1 - Compatível</option>
+                          <option value="2">2 - Incompatível</option>
+                          <option value="3">3 - Inconclusivo</option>
+                          <option value="4" selected>4 - Não Realizado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>49 - Data Coleta Imunohistoquímica</label>
+                      <input type="date" id="dengue-imuno-date-${id}">
+                  </div>
+                  <div class="form-group">
+                      <label>49 - Resultado Imunohistoquímica</label>
+                      <select id="dengue-imuno-res-${id}">
+                          <option value="1">1 - Positivo</option>
+                          <option value="2">2 - Negativo</option>
+                          <option value="3">3 - Inconclusivo</option>
+                          <option value="4" selected>4 - Não Realizado</option>
+                      </select>
+                  </div>
+             </div>
+          </div>
+
+          <!-- HOSPITALIZAÇÃO E LOCAL PROVÁVEL -->
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-hospital"></i> Hospitalização e Local Provável de Infecção (Campos 50-61)</div>
+             <div class="sinan-grid-4">
+                  <div class="form-group">
+                      <label>50 - Ocorreu Hospitalização?</label>
+                      <select id="dengue-hospitalizacao-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2" selected>2 - Não</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>51 - Data da Internação</label>
+                      <input type="date" id="dengue-data-internacao-${id}">
+                  </div>
+                  <div class="form-group">
+                      <label>52 - UF Hospital</label>
+                      <input type="text" id="dengue-hospital-uf-${id}" maxlength="2" placeholder="PA">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>53 - Município do Hospital</label>
+                      <input type="text" id="dengue-hospital-mun-${id}" placeholder="Município">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>54 - Nome do Hospital</label>
+                      <input type="text" id="dengue-hospital-nome-${id}" placeholder="Nome do Hospital">
+                  </div>
+                  <div class="form-group">
+                      <label>55 - Telefone Hospital</label>
+                      <input type="text" id="dengue-hospital-fone-${id}" placeholder="(00) 00000-0000">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>56 - Caso autóctone do município de residência?</label>
+                      <select id="dengue-autoctone-${id}">
+                          <option value="1" selected>1 - Sim</option>
+                          <option value="2">2 - Não</option>
+                          <option value="3">3 - Indeterminado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>57 - UF Infecção</label>
+                      <input type="text" id="dengue-uf-infeccao-${id}" maxlength="2" placeholder="PA">
+                  </div>
+                  <div class="form-group">
+                      <label>58 - País Infecção</label>
+                      <input type="text" id="dengue-pais-infeccao-${id}" value="Brasil">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>59 - Município de Infecção</label>
+                      <input type="text" id="dengue-mun-infeccao-${id}" placeholder="Município">
+                  </div>
+                  <div class="form-group">
+                      <label>60 - Distrito</label>
+                      <input type="text" id="dengue-dist-infeccao-${id}" placeholder="Distrito">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>61 - Bairro</label>
+                      <input type="text" id="dengue-bairro-infeccao-${id}" placeholder="Bairro">
+                  </div>
+             </div>
+          </div>
+
+          <!-- CONCLUSÃO DO CASO -->
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-check-circle"></i> Conclusão do Caso (Campos 62-67)</div>
+             <div class="sinan-grid-4">
+                  <div class="form-group span-2">
+                      <label>62 - Classificação Final</label>
+                      <select id="dengue-classificacao-${id}">
+                          <option value="5">5 - Descartado</option>
+                          <option value="10" ${id === 'dengue' ? 'selected' : ''}>10 - Dengue</option>
+                          <option value="11">11 - Dengue com Sinais de Alarme</option>
+                          <option value="12">12 - Dengue Grave</option>
+                          <option value="13" ${id === 'chikungunya' ? 'selected' : ''}>13 - Chikungunya</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>63 - Critério de Confirmação/Descarte</label>
+                      <select id="dengue-criterio-${id}">
+                          <option value="1" selected>1 - Laboratório</option>
+                          <option value="2">2 - Clínico-Epidemiológico</option>
+                          <option value="3">3 - Em investigação</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>64 - Apresentação Clínica (Chikungunya)</label>
+                      <select id="dengue-apresentacao-chik-${id}">
+                          <option value="1" selected>1 - Aguda</option>
+                          <option value="2">2 - Crônica</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>65 - Evolução do Caso</label>
+                      <select id="dengue-evolucao-${id}">
+                          <option value="1" selected>1 - Cura</option>
+                          <option value="2">2 - Óbito pelo agravo</option>
+                          <option value="3">3 - Óbito por outras causas</option>
+                          <option value="4">4 - Óbito em investigação</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>66 - Data do Óbito</label>
+                      <input type="date" id="dengue-data-obito-${id}">
+                  </div>
+                  <div class="form-group">
+                      <label>67 - Data do Encerramento</label>
+                      <input type="date" id="dengue-data-encerramento-${id}" value="${new Date().toISOString().substring(0,10)}">
+                  </div>
+             </div>
+          </div>
+
+          <!-- SINAIS DE ALARME E DENGUE GRAVE -->
+          <div class="sinan-section" style="border-left: 4px solid #ef4444;">
+             <div class="sinan-section-title" style="color: #dc2626;"><i class="fas fa-exclamation-triangle"></i> Dengue com Sinais de Alarme e Dengue Grave (Campos 68-71)</div>
+             
+             <!-- Campo 68: Dengue com Sinais de Alarme -->
+             <div style="margin-top: 10px;">
+                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                     <label style="font-weight: bold; color: #dc2626; font-size: 0.85rem; text-transform: uppercase;">
+                         68 - Dengue com Sinais de Alarme (1-Sim | 2-Não | 9-Ignorado)
+                     </label>
+                     <div style="display: flex; align-items: center; gap: 8px;">
+                         <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-dark);">69 - Data Início Sinais de Alarme:</span>
+                         <input type="date" id="dengue-sinais-alarme-date-${id}" style="padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-color);">
+                     </div>
+                 </div>
+                 <div class="sinan-grid-3" style="margin-top: 8px; background: rgba(239, 68, 68, 0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.2);">
+                     <div class="form-group"><label>Vômitos Persistentes</label><select id="dengue-alarme-vomitos-${id}"><option value="1">1 - Sim</option><option value="2" selected>2 - Não</option><option value="9">9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>Dor Abdominal Intensa e Contínua</label><select id="dengue-alarme-dor-abdo-${id}"><option value="1">1 - Sim</option><option value="2" selected>2 - Não</option><option value="9">9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>Letargia ou Irritabilidade</label><select id="dengue-alarme-letargia-${id}"><option value="1">1 - Sim</option><option value="2" selected>2 - Não</option><option value="9">9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>Sangramento de Mucosa/Outras Hemorragias</label><select id="dengue-alarme-sangramento-${id}"><option value="1">1 - Sim</option><option value="2" selected>2 - Não</option><option value="9">9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>Aumento Progressivo do Hematócrito</label><select id="dengue-alarme-hematocrito-${id}"><option value="1">1 - Sim</option><option value="2" selected>2 - Não</option><option value="9">9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>Hepatomegalia >= 2cm</label><select id="dengue-alarme-hepatomegalia-${id}"><option value="1">1 - Sim</option><option value="2" selected>2 - Não</option><option value="9">9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>Acúmulo de Líquidos</label><select id="dengue-alarme-acumulo-liq-${id}"><option value="1">1 - Sim</option><option value="2" selected>2 - Não</option><option value="9">9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>Hipotensão Postural e/ou Lipotímia</label><select id="dengue-alarme-hipotensao-${id}"><option value="1">1 - Sim</option><option value="2" selected>2 - Não</option><option value="9">9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>Queda Abrupta de Plaquetas</label><select id="dengue-alarme-plaquetas-${id}"><option value="1">1 - Sim</option><option value="2" selected>2 - Não</option><option value="9">9 - Ignorado</option></select></div>
+                 </div>
+             </div>
+
+             <!-- Campo 70: Dengue Grave -->
+             <div style="margin-top: 20px;">
+                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                     <label style="font-weight: bold; color: #b91c1c; font-size: 0.85rem; text-transform: uppercase;">
+                         70 - Dengue Grave (1-Sim | 2-Não | 9-Ignorado)
+                     </label>
+                     <div style="display: flex; align-items: center; gap: 8px;">
+                         <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-dark);">71 - Data Início Sinais de Gravidade:</span>
+                         <input type="date" id="dengue-sinais-grave-date-${id}" style="padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-color);">
+                     </div>
+                 </div>
+
+                 <!-- Extravasamento Grave de Plasma -->
+                 <div style="margin-top: 8px; font-weight: bold; font-size: 0.78rem; color: #b91c1c;">a) Extravasamento Grave de Plasma:</div>
+                 <div class="sinan-grid-3" style="margin-top: 4px; background: rgba(185, 28, 28, 0.05); padding: 10px; border-radius: 8px;">
+                     <div class="form-group"><label>Pulso Débil ou Indetectável</label><select id="dengue-grave-pulso-${id}"><option value="1">1 - Sim</option><option value="2" selected>2 - Não</option><option value="9">9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>PA Convergente <= 20 mmHg</label><select id="dengue-grave-pa-${id}"><option value="1">1 - Sim</option><option value="2" selected>2 - Não</option><option value="9">9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>Tempo Enchimento Capilar >= 3s</label><select id="dengue-grave-capilar-${id}"><option value="1">1 - Sim</option><option value="2" selected>2 - Não</option><option value="9">9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>Acúmulo Líquidos c/ Insuf. Respiratória</label><select id="dengue-grave-acumulo-resp-${id}"><option value="1">1 - Sim</option><option value="2" selected>2 - Não</option><option value="9">9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>Taquicardia</label><select id="dengue-grave-taquicardia-${id}"><option value="1">1 - Sim</option><option value="2" selected>2 - Não</option><option value="9">9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>Extremidades Frias</label><select id="dengue-grave-extremidades-${id}"><option value="1">1 - Sim</option><option value="2" selected>2 - Não</option><option value="9">9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>Hipotensão Arterial em Fase Tardia</label><select id="dengue-grave-hipotensao-tardia-${id}"><option value="1">1 - Sim</option><option value="2" selected>2 - Não</option><option value="9">9 - Ignorado</option></select></div>
+                 </div>
+
+                 <!-- Sangramento Grave -->
+                 <div style="margin-top: 10px; font-weight: bold; font-size: 0.78rem; color: #b91c1c;">b) Sangramento Grave:</div>
+                 <div class="sinan-grid-4" style="margin-top: 4px; background: rgba(185, 28, 28, 0.05); padding: 10px; border-radius: 8px;">
+                     <div class="form-group"><label>Hematêmese</label><select id="dengue-grave-hematemese-${id}"><option value="1">1 - Sim</option><option value="2" selected>2 - Não</option><option value="9">9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>Melena</label><select id="dengue-grave-melena-${id}"><option value="1">1 - Sim</option><option value="2" selected>2 - Não</option><option value="9">9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>Metrorragia Volumosa</label><select id="dengue-grave-metrorragia-${id}"><option value="1">1 - Sim</option><option value="2" selected>2 - Não</option><option value="9">9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>Sangramento do SNC</label><select id="dengue-grave-snc-${id}"><option value="1">1 - Sim</option><option value="2" selected>2 - Não</option><option value="9">9 - Ignorado</option></select></div>
+                 </div>
+
+                 <!-- Comprometimento Grave de Órgãos -->
+                 <div style="margin-top: 10px; font-weight: bold; font-size: 0.78rem; color: #b91c1c;">c) Comprometimento Grave de Órgãos:</div>
+                 <div class="sinan-grid-4" style="margin-top: 4px; background: rgba(185, 28, 28, 0.05); padding: 10px; border-radius: 8px;">
+                     <div class="form-group"><label>AST/ALT > 1.000</label><select id="dengue-grave-ast-alt-${id}"><option value="1">1 - Sim</option><option value="2" selected>2 - Não</option><option value="9">9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>Miocardite</label><select id="dengue-grave-miocardite-${id}"><option value="1">1 - Sim</option><option value="2" selected>2 - Não</option><option value="9">9 - Ignorado</option></select></div>
+                     <div class="form-group"><label>Alteração da Consciência</label><select id="dengue-grave-consciencia-${id}"><option value="1">1 - Sim</option><option value="2" selected>2 - Não</option><option value="9">9 - Ignorado</option></select></div>
+                     <div class="form-group span-4"><label>Outros Órgãos (Especificar)</label><input type="text" id="dengue-grave-outros-orgaos-${id}" placeholder="Especificar comprometimento..."></div>
+                 </div>
+             </div>
+          </div>
+
+          <!-- INFORMAÇÕES COMPLEMENTARES E INVESTIGADOR -->
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-user-edit"></i> Informações Complementares e Investigador</div>
+             <div class="sinan-grid-4">
+                  <div class="form-group span-4">
+                      <label>Observações Adicionais</label>
+                      <textarea id="dengue-obs-${id}" rows="3" placeholder="Informações complementares e observações da investigação..."></textarea>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>Município/Unidade de Saúde</label>
+                      <input type="text" id="dengue-inv-unidade-${id}" placeholder="Nome da Unidade de Saúde">
+                  </div>
+                  <div class="form-group">
+                      <label>Nome do Investigador</label>
+                      <input type="text" id="dengue-inv-nome-${id}" placeholder="Nome do investigador">
+                  </div>
+                  <div class="form-group">
+                      <label>Função / Cargo</label>
+                      <input type="text" id="dengue-inv-funcao-${id}" placeholder="Ex: Enfermeiro / Médico">
+                  </div>
+             </div>
+          </div>
+        `;
+      } else if (id === 'tracoma') {
+        block7Html = `
+          <!-- BLOCO 7: DADOS COMPLEMENTARES TRACOMA -->
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-clipboard-list"></i> Boletim de Inquérito de Tracoma (Campos 7-9)</div>
+             <div class="sinan-grid-4">
+                  <div class="form-group span-2">
+                      <label>7 - Inquérito</label>
+                      <select id="tracoma-inquerito-${id}">
+                          <option value="1" selected>1 - Escolar</option>
+                          <option value="2">2 - Domiciliar</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>8 - Nº de Pessoas Examinadas</label>
+                      <input type="number" id="tracoma-examinadas-${id}" min="0" placeholder="0">
+                  </div>
+                  <div class="form-group">
+                      <label>9 - Nº de Casos Positivos</label>
+                      <input type="number" id="tracoma-positivos-${id}" min="0" placeholder="0">
+                  </div>
+             </div>
+          </div>
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-list"></i> Casos Positivos Registrados no Inquérito</div>
+             <p style="font-size: 0.8rem; color: var(--text-gray); margin-top: 4px; margin-bottom: 12px; line-height: 1.4;">Preencha a tabela abaixo com as iniciais, localidade e achados clínicos de cada caso positivo detectado no inquérito.</p>
+             <div style="overflow-x: auto; margin-top: 10px;">
+                 <table class="tabela-sinan-casos" id="tracoma-cases-table-${id}" style="width: 100%; border-collapse: collapse; min-width: 900px;">
+                     <thead>
+                         <tr style="background: var(--primary-soft); text-align: left; font-size: 0.8rem; text-transform: uppercase;">
+                             <th style="padding: 8px; border: 1px solid var(--border-color); color: var(--primary); font-weight: bold;">Iniciais/Nome</th>
+                             <th style="padding: 8px; border: 1px solid var(--border-color); width: 45px; color: var(--primary); font-weight: bold;">UF</th>
+                             <th style="padding: 8px; border: 1px solid var(--border-color); color: var(--primary); font-weight: bold;">Município</th>
+                             <th style="padding: 8px; border: 1px solid var(--border-color); color: var(--primary); font-weight: bold;">Distrito</th>
+                             <th style="padding: 8px; border: 1px solid var(--border-color); color: var(--primary); font-weight: bold;">Bairro</th>
+                             <th style="padding: 8px; border: 1px solid var(--border-color); width: 100px; color: var(--primary); font-weight: bold;">Zona</th>
+                             <th style="padding: 8px; border: 1px solid var(--border-color); width: 100px; color: var(--primary); font-weight: bold;">Sexo</th>
+                             <th style="padding: 8px; border: 1px solid var(--border-color); width: 60px; color: var(--primary); font-weight: bold;">Idade</th>
+                             <th style="padding: 8px; border: 1px solid var(--border-color); width: 110px; color: var(--primary); font-weight: bold;">Forma Clínica</th>
+                             <th style="padding: 8px; border: 1px solid var(--border-color); width: 95px; color: var(--primary); font-weight: bold;">Cirurgia</th>
+                             <th style="padding: 8px; border: 1px solid var(--border-color); width: 45px; color: var(--primary); font-weight: bold;">Ação</th>
+                         </tr>
+                     </thead>
+                     <tbody>
+                     </tbody>
+                 </table>
+             </div>
+             <button type="button" class="btn btn-outline" id="btn-add-tracoma-case-${id}" style="margin-top: 10px; display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 16px;">
+                 <i class="fas fa-plus"></i> Adicionar Caso ao Boletim
+             </button>
+          </div>
+        `;
+      } else if (id === 'hanseniase') {
+        block7Html = `
+          <!-- BLOCO 7: DADOS COMPLEMENTARES HANSENIASE -->
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-diagnoses"></i> Dados Complementares do Caso - Hanseníase (Campos 31-43)</div>
+             <div class="sinan-grid-4">
+                  <div class="form-group span-2">
+                      <label>31 - Nº do Prontuário</label>
+                      <input type="text" id="hanseniase-prontuario-${id}" placeholder="Nº Prontuário">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>32 - Ocupação</label>
+                      <input type="text" id="hanseniase-ocupacao-${id}" placeholder="Ex: Agricultor">
+                  </div>
+                  <div class="form-group">
+                      <label>33 - Nº de Lesões Cutâneas</label>
+                      <input type="number" id="hanseniase-lesoes-${id}" min="0" placeholder="Ex: 3">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>34 - Forma Clínica</label>
+                      <select id="hanseniase-forma-${id}">
+                          <option value="1">1 - I (Indeterminada)</option>
+                          <option value="2">2 - T (Tuberculóide)</option>
+                          <option value="3">3 - D (Dimorfa)</option>
+                          <option value="4">4 - V (Virchowiana)</option>
+                          <option value="5" selected>5 - Não classificado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>35 - Classificação Operacional</label>
+                      <select id="hanseniase-class-oper-${id}">
+                          <option value="1" selected>1 - PB (Paucibacilar)</option>
+                          <option value="2">2 - MB (Multibacilar)</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>36 - Nº de Nervos Afetados</label>
+                      <input type="number" id="hanseniase-nervos-${id}" min="0" placeholder="0">
+                  </div>
+                  <div class="form-group span-3">
+                      <label>37 - Avaliação do Grau de Incapacidade Física no Diagnóstico</label>
+                      <select id="hanseniase-incapacidade-${id}">
+                          <option value="0" selected>0 - Grau Zero</option>
+                          <option value="1">1 - Grau I</option>
+                          <option value="2">2 - Grau II</option>
+                          <option value="3">3 - Não Avaliado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>38 - Modo de Entrada</label>
+                      <select id="hanseniase-modo-entrada-${id}">
+                          <option value="1" selected>1 - Caso Novo</option>
+                          <option value="2">2 - Transferência do mesmo município (outra unidade)</option>
+                          <option value="3">3 - Transferência de Outro Município (mesma UF)</option>
+                          <option value="4">4 - Transferência de Outro Estado</option>
+                          <option value="5">5 - Transferência de Outro País</option>
+                          <option value="6">6 - Recidiva</option>
+                          <option value="7">7 - Outros Reingressos</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>39 - Modo de Detecção do Caso Novo</label>
+                      <select id="hanseniase-modo-deteccao-${id}">
+                          <option value="1" selected>1 - Encaminhamento</option>
+                          <option value="2">2 - Demanda Espontânea</option>
+                          <option value="3">3 - Exame de Coletividade</option>
+                          <option value="4">4 - Exame de Contatos</option>
+                          <option value="5">5 - Outros Modos</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>40 - Baciloscopia</label>
+                      <select id="hanseniase-baciloscopia-${id}">
+                          <option value="1">1 - Positiva</option>
+                          <option value="2">2 - Negativa</option>
+                          <option value="3" selected>3 - Não realizada</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>41 - Data do Início do Tratamento</label>
+                      <input type="date" id="hanseniase-inicio-tratamento-${id}">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>42 - Esquema Terapêutico Inicial</label>
+                      <select id="hanseniase-esquema-${id}">
+                          <option value="1" selected>1 - PQT/PB/6 doses</option>
+                          <option value="2">2 - PQT/MB/12 doses</option>
+                          <option value="3">3 - Outros Esquemas Substitutos</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>43 - Número de Contatos Registrados</label>
+                      <input type="number" id="hanseniase-contatos-${id}" min="0" placeholder="0">
+                  </div>
+             </div>
+          </div>
+        `;
+      } else if (id === 'esquistossomose') {
+        block7Html = `
+          <!-- BLOCO 7: DADOS COMPLEMENTARES ESQUISTOSSOMOSE -->
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-clipboard-list"></i> Dados Complementares do Caso - Esquistossomose (Campos 31-43)</div>
+             <div class="sinan-grid-4">
+                  <div class="form-group">
+                      <label>31 - Data da Investigação</label>
+                      <input type="date" id="esquisto-data-investigacao-${id}">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>32 - Ocupação</label>
+                      <input type="text" id="esquisto-ocupacao-${id}" placeholder="Ex: Agricultor">
+                  </div>
+                  <div class="form-group">
+                      <label>33 - Data da Coproscopia</label>
+                      <input type="date" id="esquisto-data-copro-${id}">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>34 - Análise Quantitativa</label>
+                      <select id="esquisto-analise-quant-${id}">
+                          <option value="0" selected>0 - 0 (zero)</option>
+                          <option value="1">1 - 1 (um) ou mais ovos</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>35 - Análise Qualitativa</label>
+                      <select id="esquisto-analise-qual-${id}">
+                          <option value="1">1 - Positivo</option>
+                          <option value="2">2 - Negativo</option>
+                          <option value="3" selected>3 - Não realizado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>36 - Outros Exames (Qualitativo)</label>
+                      <select id="esquisto-outros-qual-${id}">
+                          <option value="1">1 - Positivo</option>
+                          <option value="2">2 - Negativo</option>
+                          <option value="3" selected>3 - Não realizado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>37 - Outros Exames (Especificar)</label>
+                      <input type="text" id="esquisto-outros-especificar-${id}" placeholder="Ex: Biópsia retal">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>38 - Fez Tratamento?</label>
+                      <select id="esquisto-fez-tratamento-${id}">
+                          <option value="1">1 - Sim - Praziquantel</option>
+                          <option value="2">2 - Sim - Oxaminiquine</option>
+                          <option value="3">3 - Não</option>
+                          <option value="9" selected>9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>39 - Data do Tratamento</label>
+                      <input type="date" id="esquisto-data-tratamento-${id}">
+                  </div>
+                  <div class="form-group span-3">
+                      <label>40 - Caso não tenha feito tratamento, qual o motivo?</label>
+                      <select id="esquisto-motivo-nao-tratamento-${id}">
+                          <option value="1">1 - Contra Indicação</option>
+                          <option value="2">2 - Recusa</option>
+                          <option value="3">3 - Ausente</option>
+                          <option value="9" selected>9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>41 - Cura: 1ª amostra</label>
+                      <select id="esquisto-cura-1amostra-${id}">
+                          <option value="0">0 - 0 (zero)</option>
+                          <option value="1">1 - 1 ou mais ovos</option>
+                          <option value="2" selected>2 - Não realizado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>41 - Cura: 2ª amostra</label>
+                      <select id="esquisto-cura-2amostra-${id}">
+                          <option value="0">0 - 0 (zero)</option>
+                          <option value="1">1 - 1 ou mais ovos</option>
+                          <option value="2" selected>2 - Não realizado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>41 - Cura: 3ª amostra</label>
+                      <select id="esquisto-cura-3amostra-${id}">
+                          <option value="0">0 - 0 (zero)</option>
+                          <option value="1">1 - 1 ou mais ovos</option>
+                          <option value="2" selected>2 - Não realizado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>42 - Data Result. 3ª amostra</label>
+                      <input type="date" id="esquisto-cura-data-3amostra-${id}">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>43 - Especificar Forma Clínica</label>
+                      <select id="esquisto-forma-clinica-${id}">
+                          <option value="1" selected>1 - Intestinal</option>
+                          <option value="2">2 - Hepato Intestinal</option>
+                          <option value="3">3 - Hepato Esplênica</option>
+                          <option value="4">4 - Aguda</option>
+                          <option value="5">5 - Outra (especificar)</option>
+                      </select>
+                  </div>
+             </div>
+          </div>
+
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-map-marker-alt"></i> Conclusão e Local de Infecção (Campos 44-55)</div>
+             <div class="sinan-grid-4">
+                  <div class="form-group span-2">
+                      <label>44 - Autóctone do município de residência?</label>
+                      <select id="esquisto-autoctone-${id}">
+                          <option value="1" selected>1 - Sim</option>
+                          <option value="2">2 - Não</option>
+                          <option value="3">3 - Indeterminado</option>
+                      </select>
+                  </div>
+                  <div class="form-group" style="max-width:80px;">
+                      <label>45 - UF Infecção</label>
+                      <input type="text" id="esquisto-infeccao-uf-${id}" value="PA" maxlength="2">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>46 - País de Infecção</label>
+                      <input type="text" id="esquisto-infeccao-pais-${id}" value="BRASIL">
+                  </div>
+                  <div class="form-group span-3">
+                      <label>47 - Município de Infecção</label>
+                      <input type="text" id="esquisto-infeccao-mun-${id}" value="MARABA">
+                  </div>
+                  <div class="form-group">
+                      <label>48 - Distrito</label>
+                      <input type="text" id="esquisto-infeccao-dist-${id}">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>49 - Bairro</label>
+                      <input type="text" id="esquisto-infeccao-bairro-${id}">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>50 - Nome da Propriedade (Área Rural)</label>
+                      <input type="text" id="esquisto-infeccao-propriedade-${id}">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>51 - Nome da Coleção Hídrica</label>
+                      <input type="text" id="esquisto-infeccao-hidrica-${id}" placeholder="Ex: Rio Tocantins">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>52 - Doença Relacionada ao Trabalho</label>
+                      <select id="esquisto-trabalho-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2" selected>2 - Não</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>53 - Evolução do Caso</label>
+                      <select id="esquisto-evolucao-${id}">
+                          <option value="1" selected>1 - Cura</option>
+                          <option value="2">2 - Não Cura</option>
+                          <option value="3">3 - Óbito por esquistossomose</option>
+                          <option value="4">4 - Óbito por outras causas</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>54 - Data do Óbito</label>
+                      <input type="date" id="esquisto-data-obito-${id}">
+                  </div>
+                  <div class="form-group">
+                      <label>55 - Data do Encerramento</label>
+                      <input type="date" id="esquisto-data-encerramento-${id}" value="${new Date().toISOString().substring(0,10)}">
+                  </div>
+             </div>
+          </div>
+        `;
+      } else if (id === 'malaria') {
+        block7Html = `
+          <!-- BLOCO 7: DADOS COMPLEMENTARES MALARIA -->
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-microscope"></i> Dados Complementares do Caso - Malária (Campos 31-41)</div>
+             <div class="sinan-grid-4">
+                  <div class="form-group">
+                      <label>31 - Data da Investigação</label>
+                      <input type="date" id="malaria-data-investigacao-${id}">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>32 - Ocupação</label>
+                      <input type="text" id="malaria-ocupacao-${id}" placeholder="Ex: Agricultor">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>33 - Principal Atividade nos Últimos 15 Dias</label>
+                      <select id="malaria-atividade-${id}">
+                          <option value="1">1 - Agricultura</option>
+                          <option value="2">2 - Pecuária</option>
+                          <option value="3">3 - Doméstica</option>
+                          <option value="4">4 - Turismo</option>
+                          <option value="5">5 - Garimpagem</option>
+                          <option value="6">6 - Exploração vegetal</option>
+                          <option value="7">7 - Caça/pesca</option>
+                          <option value="8">8 - const.estrad.barragens</option>
+                          <option value="9">9 - Mineração</option>
+                          <option value="10">10 - Viajante</option>
+                          <option value="11">11 - Outros</option>
+                          <option value="12">12 - Motorista</option>
+                          <option value="99" selected>99 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>34 - Tipo de Lâmina</label>
+                      <select id="malaria-tipo-lamina-${id}">
+                          <option value="1" selected>1 - BP (Busca Passiva)</option>
+                          <option value="2">2 - BA (Busca Ativa)</option>
+                          <option value="3">3 - LVC (Lâmina de Verificação de Cura)</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>35 - Presença de Sintomas</label>
+                      <select id="malaria-sintomas-${id}">
+                          <option value="1" selected>1 - Com sintomas</option>
+                          <option value="2">2 - Sem sintomas</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>36 - Data do Exame</label>
+                      <input type="date" id="malaria-data-exame-${id}">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>37 - Resultado do Exame</label>
+                      <select id="malaria-resultado-exame-${id}">
+                          <option value="1" selected>1 - Negativo</option>
+                          <option value="2">2 - F (P. falciparum)</option>
+                          <option value="3">3 - F+FG (P. falciparum + Formas Gametocitárias)</option>
+                          <option value="4">4 - V (P. vivax)</option>
+                          <option value="5">5 - F+V (P. falciparum + P. vivax)</option>
+                          <option value="6">6 - V+FG (P. vivax + Formas Gametocitárias de P. falciparum)</option>
+                          <option value="7">7 - FG (Gametócito falciparum isolado)</option>
+                          <option value="8">8 - M (P. malariae)</option>
+                          <option value="9">9 - F+M (P. falciparum + P. malariae)</option>
+                          <option value="10">10 - O (Outras espécies)</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>38 - Parasitos por mm³</label>
+                      <input type="number" id="malaria-parasitos-${id}" min="0" placeholder="Ex: 500">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>39 - Parasitemia em "cruzes"</label>
+                      <select id="malaria-parasitemia-cruzes-${id}">
+                          <option value="1" selected>1 - &lt; +/2 (menor que meia cruz)</option>
+                          <option value="2">2 - +/2 (meia cruz)</option>
+                          <option value="3">3 - + (uma cruz)</option>
+                          <option value="4">4 - ++ (duas cruzes)</option>
+                          <option value="5">5 - +++ (três cruzes)</option>
+                          <option value="6">6 - ++++ (quatro cruzes)</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-3">
+                      <label>40 - Esquema de Tratamento Utilizado</label>
+                      <select id="malaria-esquema-tratamento-${id}">
+                          <option value="1" selected>1 - Infecções por Pv com Cloroquina em 3 dias e Primaquina em 7 dias</option>
+                          <option value="2">2 - Infecções por Pf com Quinina em 3 dias + Doxiciclina em 5 dias + primaquina no 6º dia</option>
+                          <option value="3">3 - Infecções mistas por Pv + Pf com Mefloquina em dose única e primaquina em 7 dias</option>
+                          <option value="4">4 - Infecções por Pm com cloroquina em 3 dias</option>
+                          <option value="5">5 - Infecções por Pv em crianças apresentando vômitos, com artesunato retal 4d e Primaquina 7d</option>
+                          <option value="6">6 - Infecções por Pf com Mefloquina em dose única e primaquina no segundo dia</option>
+                          <option value="7">7 - Infecções por Pf com Quinina em 7 dias</option>
+                          <option value="8">8 - Infecções por Pf de crianças com artesunato retal 4d, Mefloquina no 3ºd e Primaquina no 5ºd</option>
+                          <option value="9">9 - Infecções mistas por Pv + Pf com Quinina 3d, doxiciclina 5d e Primaquina 7d</option>
+                          <option value="10">10 - Prevenção de recaída da malária por Pv com Cloroquina semanal por 3 meses</option>
+                          <option value="11">11 - Malária grave e complicada</option>
+                          <option value="12">12 - Infecções por Pf com Artemeter+Lumefantrina em 3 dias</option>
+                          <option value="99">99 - Outro esquema utilizado (por médico)</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>41 - Data Início do Tratamento</label>
+                      <input type="date" id="malaria-data-inicio-trat-${id}">
+                  </div>
+             </div>
+          </div>
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-map-marker-alt"></i> Conclusão e Local Provável da Infecção (Campos 42-50)</div>
+             <div class="sinan-grid-4">
+                  <div class="form-group">
+                      <label>42 - Classificação Final</label>
+                      <select id="malaria-classificacao-final-${id}">
+                          <option value="1" selected>1 - Confirmado</option>
+                          <option value="2">2 - Descartado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>43 - Caso é autóctone do município de residência?</label>
+                      <select id="malaria-autoctone-${id}">
+                          <option value="1" selected>1 - Sim</option>
+                          <option value="2">2 - Não</option>
+                          <option value="3">3 - Indeterminado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>44 - UF provável de infecção</label>
+                      <input type="text" id="malaria-uf-infeccao-${id}" maxlength="2" placeholder="Ex: PA">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>45 - País provável de infecção</label>
+                      <input type="text" id="malaria-pais-infeccao-${id}" value="Brasil">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>46 - Município provável de infecção</label>
+                      <input type="text" id="malaria-municipio-infeccao-${id}" placeholder="Nome do Município">
+                  </div>
+                  <div class="form-group">
+                      <label>46 - Código (IBGE)</label>
+                      <input type="text" id="malaria-ibge-infeccao-${id}" placeholder="Código IBGE">
+                  </div>
+                  <div class="form-group">
+                      <label>47 - Distrito</label>
+                      <input type="text" id="malaria-distrito-infeccao-${id}" placeholder="Distrito">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>48 - Bairro</label>
+                      <input type="text" id="malaria-bairro-infeccao-${id}" placeholder="Bairro">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>49 - Localidade provável da infecção</label>
+                      <input type="text" id="malaria-localidade-infeccao-${id}" placeholder="Localidade">
+                  </div>
+                  <div class="form-group">
+                      <label>50 - Data de Encerramento</label>
+                      <input type="date" id="malaria-data-encerramento-${id}" value="${new Date().toISOString().substring(0,10)}">
+                  </div>
+                  <div class="form-group span-4">
+                      <label>Observações Adicionais</label>
+                      <textarea id="malaria-obs-${id}" rows="3" placeholder="Observações adicionais..."></textarea>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>Matrícula e Nome do Examinador</label>
+                      <input type="text" id="malaria-examinador-${id}" placeholder="Nome e matrícula">
+                  </div>
+             </div>
+          </div>
+        `;
+      } else if (id === 'raiva') {
+        block7Html = `
+          <!-- BLOCO 7: DADOS COMPLEMENTARES RAIVA HUMANA -->
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-clipboard-list"></i> Antecedentes Epidemiológicos e Exposição (Campos 31-42)</div>
+             <div class="sinan-grid-4">
+                  <div class="form-group">
+                      <label>31 - Data da Investigação</label>
+                      <input type="date" id="raiva-data-investigacao-${id}">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>32 - Ocupação</label>
+                      <input type="text" id="raiva-ocupacao-${id}" placeholder="Ex: Agricultor">
+                  </div>
+                  <div class="form-group">
+                      <label>33 - Tipo de Exposição ao Vírus Rábico</label>
+                      <select id="raiva-tipo-exposicao-${id}">
+                          <option value="1" selected>1 - Mordedura</option>
+                          <option value="2">2 - Arranhão</option>
+                          <option value="3">3 - Lambedura</option>
+                          <option value="4">4 - Contato Indireto</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>34 - Localização da Picada/Ferimento</label>
+                      <select id="raiva-localizacao-${id}">
+                          <option value="1" selected>1 - Mucosa</option>
+                          <option value="2">2 - Cabeça/Pescoço</option>
+                          <option value="3">3 - Mãos</option>
+                          <option value="4">4 - Pés</option>
+                          <option value="5">5 - Tronco</option>
+                          <option value="6">6 - Membros Superiores</option>
+                          <option value="7">7 - Membros Inferiores</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>35 - Ferimento</label>
+                      <select id="raiva-ferimento-${id}">
+                          <option value="1" selected>1 - Único</option>
+                          <option value="2">2 - Múltiplo</option>
+                          <option value="3">3 - Sem Ferimento</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>36 - Tipo de Ferimento</label>
+                      <select id="raiva-tipo-ferimento-${id}">
+                          <option value="1" selected>1 - Superficial</option>
+                          <option value="2">2 - Profundo</option>
+                          <option value="3">3 - Dilacerante</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>37 - Data da Exposição</label>
+                      <input type="date" id="raiva-data-exposicao-${id}">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>38 - Antecedentes de Tratamento Anti-Rábico?</label>
+                      <select id="raiva-antecedentes-trat-${id}">
+                          <option value="1">1 - Pré-exposição</option>
+                          <option value="2">2 - Pós-exposição</option>
+                          <option value="3" selected>3 - Não</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>39 - Número de Doses Aplicadas</label>
+                      <input type="number" id="raiva-doses-aplicadas-${id}" min="0" placeholder="0">
+                  </div>
+                  <div class="form-group">
+                      <label>40 - Data da Última Dose</label>
+                      <input type="date" id="raiva-data-ultima-dose-${id}">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>41 - Espécie do Animal Agressor</label>
+                      <select id="raiva-especie-animal-${id}">
+                          <option value="1" selected>1 - Canina</option>
+                          <option value="2">2 - Felina</option>
+                          <option value="3">3 - Quiróptera (Morcego)</option>
+                          <option value="4">4 - Primata (Macaco)</option>
+                          <option value="5">5 - Raposa</option>
+                          <option value="6">6 - Herbívora</option>
+                          <option value="7">7 - Outra</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>42 - Animal Vacinado?</label>
+                      <select id="raiva-animal-vacinado-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2">2 - Não</option>
+                          <option value="9" selected>9 - Ignorado</option>
+                      </select>
+                  </div>
+             </div>
+          </div>
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-hospital"></i> Atendimento e Tratamento (Campos 43-57)</div>
+             <div class="sinan-grid-4">
+                  <div class="form-group">
+                      <label>43 - Ocorreu Hospitalização?</label>
+                      <select id="raiva-hospitalizacao-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2" selected>2 - Não</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>44 - Data da Internação</label>
+                      <input type="date" id="raiva-data-internacao-${id}">
+                  </div>
+                  <div class="form-group">
+                      <label>45 - UF do Hospital</label>
+                      <input type="text" id="raiva-hospital-uf-${id}" maxlength="2" placeholder="PA">
+                  </div>
+                  <div class="form-group">
+                      <label>46 - Município do Hospital</label>
+                      <input type="text" id="raiva-hospital-mun-${id}" placeholder="Município">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>47 - Nome do Hospital</label>
+                      <input type="text" id="raiva-hospital-nome-${id}" placeholder="Nome do Hospital">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>48 - Principais Sinais/Sintomas</label>
+                      <input type="text" id="raiva-sintomas-${id}" placeholder="Aerofobia, Hidrofobia, Disfagia, Paralisia, Febre, etc.">
+                  </div>
+                  <div class="form-group">
+                      <label>49 - Vacina Anti-Rábica Atualmente?</label>
+                      <select id="raiva-vacina-atual-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2" selected>2 - Não</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>50 - Data do Início do Tratamento</label>
+                      <input type="date" id="raiva-inicio-tratamento-${id}">
+                  </div>
+                  <div class="form-group">
+                      <label>51 - Nº Doses Aplicadas Atualmente</label>
+                      <input type="number" id="raiva-vacina-doses-${id}" min="0" placeholder="0">
+                  </div>
+                  <div class="form-group">
+                      <label>52 - Data da 1ª Dose</label>
+                      <input type="date" id="raiva-data-1dose-${id}">
+                  </div>
+                  <div class="form-group">
+                      <label>53 - Data da Última Dose</label>
+                      <input type="date" id="raiva-data-ultdose-${id}">
+                  </div>
+                  <div class="form-group">
+                      <label>54 - Foi aplicado soro?</label>
+                      <select id="raiva-soro-aplicado-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2" selected>2 - Não</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>55 - Data da Aplicação do Soro</label>
+                      <input type="date" id="raiva-data-soro-${id}">
+                  </div>
+                  <div class="form-group">
+                      <label>56 - Qtd de Soro Aplicado (ml)</label>
+                      <input type="number" id="raiva-qtd-soro-${id}" min="0" placeholder="ml">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>57 - Infiltração de Soro no Ferimento</label>
+                      <select id="raiva-infiltracao-soro-${id}">
+                          <option value="1">1 - Sim, Total</option>
+                          <option value="2">2 - Sim, Parcial</option>
+                          <option value="3" selected>3 - Não</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+             </div>
+          </div>
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-map-marker-alt"></i> Conclusão e Investigação (Campos 58-71)</div>
+             <div class="sinan-grid-4">
+                  <div class="form-group span-2">
+                      <label>58 - Diagnóstico Laboratorial</label>
+                      <select id="raiva-diag-laboratorial-${id}">
+                          <option value="1">1 - Positivo</option>
+                          <option value="2">2 - Negativo</option>
+                          <option value="3">3 - Inconclusivo</option>
+                          <option value="4" selected>4 - Não realizado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>59 - Variante do Vírus</label>
+                      <input type="text" id="raiva-variante-${id}" placeholder="Ex: Variante 3">
+                  </div>
+                  <div class="form-group">
+                      <label>60 - Classificação Final</label>
+                      <select id="raiva-classificacao-${id}">
+                          <option value="1" selected>1 - Confirmado</option>
+                          <option value="2">2 - Descartado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-3">
+                      <label>61 - Critério de Confirmação/Descarte</label>
+                      <select id="raiva-criterio-${id}">
+                          <option value="1" selected>1 - Laboratório</option>
+                          <option value="2">2 - Óbito com Clínica Compatível + Vínculo</option>
+                          <option value="3">3 - Evolução Clínica Incompatível</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>62 - Autóctone?</label>
+                      <select id="raiva-autoctone-${id}">
+                          <option value="1" selected>1 - Sim</option>
+                          <option value="2">2 - Não</option>
+                          <option value="3">3 - Indeterminado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>63 - UF Infecção</label>
+                      <input type="text" id="raiva-uf-infeccao-${id}" maxlength="2" placeholder="PA">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>64 - País provável de infecção</label>
+                      <input type="text" id="raiva-pais-infeccao-${id}" value="Brasil">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>65 - Município de Infecção</label>
+                      <input type="text" id="raiva-municipio-infeccao-${id}" placeholder="Município">
+                  </div>
+                  <div class="form-group">
+                      <label>65 - Código (IBGE)</label>
+                      <input type="text" id="raiva-ibge-infeccao-${id}" placeholder="Código IBGE">
+                  </div>
+                  <div class="form-group">
+                      <label>66 - Distrito</label>
+                      <input type="text" id="raiva-distrito-infeccao-${id}" placeholder="Distrito">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>67 - Bairro</label>
+                      <input type="text" id="raiva-bairro-infeccao-${id}" placeholder="Bairro">
+                  </div>
+                  <div class="form-group">
+                      <label>68 - Zona</label>
+                      <select id="raiva-zona-infeccao-${id}">
+                          <option value="1" selected>1 - Urbana</option>
+                          <option value="2">2 - Rural</option>
+                          <option value="3">3 - Periurbana</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>69 - Relacionada ao Trabalho?</label>
+                      <select id="raiva-trabalho-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2" selected>2 - Não</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>70 - Data do Óbito</label>
+                      <input type="date" id="raiva-data-obito-${id}">
+                  </div>
+                  <div class="form-group">
+                      <label>71 - Data do Encerramento</label>
+                      <input type="date" id="raiva-data-encerramento-${id}" value="${new Date().toISOString().substring(0,10)}">
+                  </div>
+                  <div class="form-group span-4">
+                      <label>Informações Complementares e Observações</label>
+                      <textarea id="raiva-obs-${id}" rows="3" placeholder="Informações complementares..."></textarea>
+                  </div>
+             </div>
+          </div>
+        `;
+      } else if (id === 'leishmaniose-visceral') {
+        block7Html = `
+          <!-- BLOCO 7: DADOS COMPLEMENTARES LEISHMANIOSE VISCERAL -->
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-clipboard-list"></i> Dados Clínicos e Laboratoriais (Campos 31-37)</div>
+             <div class="sinan-grid-4">
+                  <div class="form-group">
+                      <label>31 - Data da Investigação</label>
+                      <input type="date" id="leish-visc-data-investigacao-${id}">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>32 - Ocupação</label>
+                      <input type="text" id="leish-visc-ocupacao-${id}" placeholder="Ex: Agricultor">
+                  </div>
+                  <div class="form-group span-3">
+                      <label>33 - Manifestações Clínicas</label>
+                      <input type="text" id="leish-visc-sintomas-${id}" placeholder="Febre, Emagrecimento, Aumento do Baço, Palidez, etc.">
+                  </div>
+                  <div class="form-group">
+                      <label>34 - Co-infecção HIV</label>
+                      <select id="leish-visc-hiv-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2" selected>2 - Não</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>35 - Diagnóstico Parasitológico</label>
+                      <select id="leish-visc-diag-parasito-${id}">
+                          <option value="1">1 - Positivo</option>
+                          <option value="2">2 - Negativo</option>
+                          <option value="3" selected>3 - Não Realizado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>36 - Diagnóstico Imunológico (Elisa/IFI)</label>
+                      <select id="leish-visc-diag-imuno-${id}">
+                          <option value="1">1 - Reagente</option>
+                          <option value="2">2 - Não Reagente</option>
+                          <option value="3">3 - Inconclusivo</option>
+                          <option value="4" selected>4 - Não Realizado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>37 - Tipo de Entrada</label>
+                      <select id="leish-visc-tipo-entrada-${id}">
+                          <option value="1" selected>1 - Caso Novo</option>
+                          <option value="2">2 - Recidiva</option>
+                          <option value="3">3 - Transferência</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+             </div>
+          </div>
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-pills"></i> Tratamento e Conclusão (Campos 38-55)</div>
+             <div class="sinan-grid-4">
+                  <div class="form-group">
+                      <label>38 - Data do Início do Tratamento</label>
+                      <input type="date" id="leish-visc-inicio-tratamento-${id}">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>39 - Droga Inicial Administrada</label>
+                      <select id="leish-visc-droga-${id}">
+                          <option value="1" selected>1 - Antimonial Pentavalente</option>
+                          <option value="2">2 - Anfotericina B</option>
+                          <option value="3">3 - Pentamidina</option>
+                          <option value="4">4 - Anfotericina B Lipossomal</option>
+                          <option value="5">5 - Outras</option>
+                          <option value="6">6 - Não Utilizada</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>40 - Peso (kg)</label>
+                      <input type="number" id="leish-visc-peso-${id}" min="0" placeholder="kg">
+                  </div>
+                  <div class="form-group">
+                      <label>41 - Dose Prescrita (mg/kg/dia)</label>
+                      <input type="text" id="leish-visc-dose-${id}" placeholder="Sb+5">
+                  </div>
+                  <div class="form-group">
+                      <label>42 - Total de Ampolas Prescritas</label>
+                      <input type="number" id="leish-visc-ampolas-${id}" min="0" placeholder="0">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>43 - Outra Droga Utilizada (Falência)</label>
+                      <select id="leish-visc-outra-droga-${id}">
+                          <option value="1">1 - Anfotericina B</option>
+                          <option value="2">2 - Anfotericina B Lipossomal</option>
+                          <option value="3">3 - Outras</option>
+                          <option value="4" selected>4 - Não se aplica</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>44 - Classificação Final</label>
+                      <select id="leish-visc-classificacao-${id}">
+                          <option value="1" selected>1 - Confirmado</option>
+                          <option value="2">2 - Descartado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>45 - Critério de Confirmação</label>
+                      <select id="leish-visc-criterio-${id}">
+                          <option value="1" selected>1 - Laboratorial</option>
+                          <option value="2">2 - Clínico-Epidemiológico</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>46 - Autóctone?</label>
+                      <select id="leish-visc-autoctone-${id}">
+                          <option value="1" selected>1 - Sim</option>
+                          <option value="2">2 - Não</option>
+                          <option value="3">3 - Indeterminado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>47 - UF Infecção</label>
+                      <input type="text" id="leish-visc-uf-infeccao-${id}" maxlength="2" placeholder="PA">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>48 - País provável de infecção</label>
+                      <input type="text" id="leish-visc-pais-infeccao-${id}" value="Brasil">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>49 - Município de Infecção</label>
+                      <input type="text" id="leish-visc-municipio-infeccao-${id}" placeholder="Município">
+                  </div>
+                  <div class="form-group">
+                      <label>50 - Distrito</label>
+                      <input type="text" id="leish-visc-distrito-infeccao-${id}" placeholder="Distrito">
+                  </div>
+                  <div class="form-group">
+                      <label>51 - Bairro</label>
+                      <input type="text" id="leish-visc-bairro-infeccao-${id}" placeholder="Bairro">
+                  </div>
+                  <div class="form-group">
+                      <label>52 - Relacionada ao Trabalho?</label>
+                      <select id="leish-visc-trabalho-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2" selected>2 - Não</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>53 - Evolução do Caso</label>
+                      <select id="leish-visc-evolucao-${id}">
+                          <option value="1" selected>1 - Cura</option>
+                          <option value="2">2 - Abandono</option>
+                          <option value="3">3 - Óbito por LV</option>
+                          <option value="4">4 - Óbito por outras causas</option>
+                          <option value="5">5 - Transferência</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>54 - Data do Óbito</label>
+                      <input type="date" id="leish-visc-data-obito-${id}">
+                  </div>
+                  <div class="form-group">
+                      <label>55 - Data do Encerramento</label>
+                      <input type="date" id="leish-visc-data-encerramento-${id}" value="${new Date().toISOString().substring(0,10)}">
+                  </div>
+                  <div class="form-group span-4">
+                      <label>Deslocamento nos últimos 6 meses (Datas e Cidades)</label>
+                      <input type="text" id="leish-visc-deslocamentos-${id}" placeholder="Ex: Jan/2026 - Marabá/PA, Fev/2026 - Altamira/PA">
+                  </div>
+                  <div class="form-group span-4">
+                      <label>Informações Complementares e Observações</label>
+                      <textarea id="leish-visc-obs-${id}" rows="3" placeholder="Informações adicionais..."></textarea>
+                  </div>
+             </div>
+          </div>
+        `;
+      } else if (id === 'chagas') {
+        block7Html = `
+          <!-- BLOCO 7: DADOS COMPLEMENTARES DOENÇA DE CHAGAS AGUDA -->
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-clipboard-list"></i> Dados Complementares e Epidemiologia (Campos 31-40)</div>
+             <div class="sinan-grid-4">
+                  <div class="form-group">
+                      <label>31 - Data da Investigação</label>
+                      <input type="date" id="chagas-data-investigacao-${id}">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>32 - Ocupação</label>
+                      <input type="text" id="chagas-ocupacao-${id}" placeholder="Ex: Agricultor">
+                  </div>
+                  <div class="form-group">
+                      <label>34 - Vestígios de Triatomíneos?</label>
+                      <select id="chagas-vestigios-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2">2 - Não</option>
+                          <option value="3">3 - Não Realizado</option>
+                          <option value="9" selected>9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>35 - Data do Encontro</label>
+                      <input type="date" id="chagas-data-vestigios-${id}">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>36 - Uso de Sangue/Hemoderivados (120 dias)?</label>
+                      <select id="chagas-sangue-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2">2 - Não</option>
+                          <option value="9" selected>9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>37 - Controle Sorológico na Hemoterapia?</label>
+                      <select id="chagas-controle-soro-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2">2 - Não</option>
+                          <option value="3">3 - Não se aplica</option>
+                          <option value="9" selected>9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>38 - Manipulação/Contato com T. cruzi?</label>
+                      <select id="chagas-contato-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2">2 - Não</option>
+                          <option value="3">3 - Não se aplica</option>
+                          <option value="9" selected>9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>39 - Idade <= 9m: Mãe com Infecção?</label>
+                      <select id="chagas-mae-infeccao-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2">2 - Não</option>
+                          <option value="3">3 - Não se aplica</option>
+                          <option value="9" selected>9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>40 - Possibilidade de Transmissão Oral?</label>
+                      <select id="chagas-transmissao-oral-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2">2 - Não</option>
+                          <option value="9" selected>9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-4">
+                      <label>33 - Deslocamento nos últimos 120 dias (Cidades e UFs)</label>
+                      <input type="text" id="chagas-deslocamentos-${id}" placeholder="Ex: Marabá/PA, Altamira/PA">
+                  </div>
+                  <div class="form-group span-4">
+                      <label>Observações e Informações Complementares</label>
+                      <textarea id="chagas-obs-${id}" rows="3" placeholder="Informações complementares..."></textarea>
+                  </div>
+             </div>
+          </div>
+        `;
+      } else if (id === 'leptospirose') {
+        block7Html = `
+          <!-- BLOCO 7: DADOS COMPLEMENTARES LEPTOSPIROSE -->
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-clipboard-list"></i> Antecedentes e Sintomas (Campos 31-42)</div>
+             <div class="sinan-grid-4">
+                  <div class="form-group">
+                      <label>31 - Data da Investigação</label>
+                      <input type="date" id="lepto-data-investigacao-${id}">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>32 - Ocupação</label>
+                      <input type="text" id="lepto-ocupacao-${id}" placeholder="Ex: Agricultor">
+                  </div>
+                  <div class="form-group span-3">
+                      <label>33 - Situação de Risco (Últimos 30 dias)</label>
+                      <input type="text" id="lepto-situacao-risco-${id}" placeholder="Água de enchente, esgoto, roedores, etc.">
+                  </div>
+                  <div class="form-group">
+                      <label>34 - Casos Anteriores no Local</label>
+                      <select id="lepto-casos-anteriores-${id}">
+                          <option value="1">1 - Casos Humanos</option>
+                          <option value="2">2 - Casos Animais</option>
+                          <option value="3">3 - Sim, ambos</option>
+                          <option value="4" selected>4 - Não</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>35 - Data do Atendimento</label>
+                      <input type="date" id="lepto-data-atendimento-${id}">
+                  </div>
+                  <div class="form-group span-3">
+                      <label>36 - Principais Sinais e Sintomas</label>
+                      <input type="text" id="lepto-sinais-sintomas-${id}" placeholder="Febre, Mialgia, Dor na panturrilha, Icterícia, etc.">
+                  </div>
+                  <div class="form-group">
+                      <label>37 - Ocorreu Hospitalização?</label>
+                      <select id="lepto-hospitalizacao-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2" selected>2 - Não</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>38 - Data da Internação</label>
+                      <input type="date" id="lepto-data-internacao-${id}">
+                  </div>
+                  <div class="form-group">
+                      <label>39 - Data de Alta</label>
+                      <input type="date" id="lepto-data-alta-${id}">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>42 - Nome do Hospital</label>
+                      <input type="text" id="lepto-hospital-nome-${id}" placeholder="Hospital">
+                  </div>
+             </div>
+          </div>
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-vial"></i> Resultados de Exames e Conclusão (Campos 43-74)</div>
+             <div class="sinan-grid-4">
+                  <div class="form-group span-2">
+                      <label>43-46 - Sorologia Elisa IgM</label>
+                      <select id="lepto-elisa-resultado-${id}">
+                          <option value="1">1 - Reagente</option>
+                          <option value="2">2 - Não Reagente</option>
+                          <option value="3">3 - Inconclusivo</option>
+                          <option value="4" selected>4 - Não Realizado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>47-54 - Teste de Microaglutinação (MAT)</label>
+                      <select id="lepto-mat-resultado-${id}">
+                          <option value="1">1 - Reagente</option>
+                          <option value="2">2 - Não Reagente</option>
+                          <option value="3">3 - Inconclusivo</option>
+                          <option value="4" selected>4 - Não Realizado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>61 - Classificação Final</label>
+                      <select id="lepto-classificacao-${id}">
+                          <option value="1" selected>1 - Confirmado</option>
+                          <option value="2">2 - Descartado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>62 - Critério de Confirmação</label>
+                      <select id="lepto-criterio-${id}">
+                          <option value="1" selected>1 - Clínico-Laboratorial</option>
+                          <option value="2">2 - Clínico-Epidemiológico</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>63 - Autóctone?</label>
+                      <select id="lepto-autoctone-${id}">
+                          <option value="1" selected>1 - Sim</option>
+                          <option value="2">2 - Não</option>
+                          <option value="3">3 - Indeterminado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>64 - UF Infecção</label>
+                      <input type="text" id="lepto-uf-infeccao-${id}" maxlength="2" placeholder="PA">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>65 - País de Infecção</label>
+                      <input type="text" id="lepto-pais-infeccao-${id}" value="Brasil">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>66 - Município de Infecção</label>
+                      <input type="text" id="lepto-municipio-infeccao-${id}" placeholder="Município">
+                  </div>
+                  <div class="form-group">
+                      <label>67 - Distrito</label>
+                      <input type="text" id="lepto-distrito-infeccao-${id}" placeholder="Distrito">
+                  </div>
+                  <div class="form-group">
+                      <label>68 - Bairro</label>
+                      <input type="text" id="lepto-bairro-infeccao-${id}" placeholder="Bairro">
+                  </div>
+                  <div class="form-group">
+                      <label>69 - Zona</label>
+                      <select id="lepto-zona-infeccao-${id}">
+                          <option value="1" selected>1 - Urbana</option>
+                          <option value="2">2 - Rural</option>
+                          <option value="3">3 - Periurbana</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>70 - Ambiente da Infecção</label>
+                      <select id="lepto-ambiente-infeccao-${id}">
+                          <option value="1" selected>1 - Domiciliar</option>
+                          <option value="2">2 - Trabalho</option>
+                          <option value="3">3 - Lazer</option>
+                          <option value="4">4 - Outro</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>71 - Relacionada ao Trabalho?</label>
+                      <select id="lepto-trabalho-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2" selected>2 - Não</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>72 - Evolução do Caso</label>
+                      <select id="lepto-evolucao-${id}">
+                          <option value="1" selected>1 - Cura</option>
+                          <option value="2">2 - Óbito por leptospirose</option>
+                          <option value="3">3 - Óbito por outras causas</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>73 - Data do Óbito</label>
+                      <input type="date" id="lepto-data-obito-${id}">
+                  </div>
+                  <div class="form-group">
+                      <label>74 - Data do Encerramento</label>
+                      <input type="date" id="lepto-data-encerramento-${id}" value="${new Date().toISOString().substring(0,10)}">
+                  </div>
+                  <div class="form-group span-4">
+                      <label>Endereços/Riscos nos 30 dias que antecederam os sintomas</label>
+                      <input type="text" id="lepto-obs-riscos-${id}" placeholder="Endereços de exposição...">
+                  </div>
+                  <div class="form-group span-4">
+                      <label>Observações</label>
+                      <textarea id="lepto-obs-${id}" rows="3" placeholder="Informações adicionais..."></textarea>
+                  </div>
+             </div>
+          </div>
+        `;
+      } else if (id === 'acidente-ofidico') {
+        block7Html = `
+          <!-- BLOCO 7: DADOS COMPLEMENTARES ACIDENTES POR ANIMAIS PEÇONHENTOS -->
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-clipboard-list"></i> Dados do Acidente (Campos 31-44)</div>
+             <div class="sinan-grid-4">
+                  <div class="form-group">
+                      <label>31 - Data da Investigação</label>
+                      <input type="date" id="ofidico-data-investigacao-${id}">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>32 - Ocupação</label>
+                      <input type="text" id="ofidico-ocupacao-${id}" placeholder="Ex: Agricultor">
+                  </div>
+                  <div class="form-group">
+                      <label>33 - Data do Acidente</label>
+                      <input type="date" id="ofidico-data-acidente-${id}">
+                  </div>
+                  <div class="form-group">
+                      <label>34 - UF Ocorrência</label>
+                      <input type="text" id="ofidico-uf-ocorrencia-${id}" maxlength="2" placeholder="PA">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>35 - Município de Ocorrência</label>
+                      <input type="text" id="ofidico-mun-ocorrencia-${id}" placeholder="Município">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>36 - Localidade de Ocorrência</label>
+                      <input type="text" id="ofidico-localidade-ocorrencia-${id}" placeholder="Localidade">
+                  </div>
+                  <div class="form-group">
+                      <label>37 - Zona de Ocorrência</label>
+                      <select id="ofidico-zona-ocorrencia-${id}">
+                          <option value="1" selected>1 - Urbana</option>
+                          <option value="2">2 - Rural</option>
+                          <option value="3">3 - Periurbana</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>38 - Tempo Picada/Atendimento</label>
+                      <select id="ofidico-tempo-atendimento-${id}">
+                          <option value="1" selected>1 - 0-1h</option>
+                          <option value="2">2 - 1-3h</option>
+                          <option value="3">3 - 3-6h</option>
+                          <option value="4">4 - 6-12h</option>
+                          <option value="5">5 - 12-24h</option>
+                          <option value="6">6 - 24h+</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>39 - Local da Picada</label>
+                      <select id="ofidico-local-picada-${id}">
+                          <option value="01">01 - Cabeça</option>
+                          <option value="02">02 - Braço</option>
+                          <option value="03">03 - Antebraço</option>
+                          <option value="04">04 - Mão</option>
+                          <option value="05">05 - Dedo da Mão</option>
+                          <option value="06">06 - Tronco</option>
+                          <option value="07">07 - Coxa</option>
+                          <option value="08">08 - Perna</option>
+                          <option value="09" selected>09 - Pé</option>
+                          <option value="10">10 - Dedo do Pé</option>
+                          <option value="99">99 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>40 - Manifestações Locais?</label>
+                      <select id="ofidico-locais-${id}">
+                          <option value="1" selected>1 - Sim</option>
+                          <option value="2">2 - Não</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>41 - Sintomas Locais</label>
+                      <input type="text" id="ofidico-sintomas-locais-${id}" placeholder="Dor, Edema, Equimose, Necrose...">
+                  </div>
+                  <div class="form-group">
+                      <label>42 - Manifestações Sistêmicas?</label>
+                      <select id="ofidico-sistemicas-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2" selected>2 - Não</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>43 - Sintomas Sistêmicos</label>
+                      <input type="text" id="ofidico-sintomas-sistemicos-${id}" placeholder="Neuroparalíticas, hemorrágicas, renais...">
+                  </div>
+                  <div class="form-group">
+                      <label>44 - Tempo de Coagulação</label>
+                      <select id="ofidico-tempo-coag-${id}">
+                          <option value="1" selected>1 - Normal</option>
+                          <option value="2">2 - Alterado</option>
+                          <option value="3">3 - Não Realizado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>45 - Tipo de Acidente</label>
+                      <select id="ofidico-tipo-acidente-${id}">
+                          <option value="1" selected>1 - Serpente</option>
+                          <option value="2">2 - Aranha</option>
+                          <option value="3">3 - Escorpião</option>
+                          <option value="4">4 - Lagarta</option>
+                          <option value="5">5 - Abelha</option>
+                          <option value="6">6 - Outros</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>46/47/48 - Agente Causador (Espécie)</label>
+                      <input type="text" id="ofidico-agente-especie-${id}" placeholder="Botrópico, Loxoscelismo, Lonomia, etc.">
+                  </div>
+             </div>
+          </div>
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-pills"></i> Classificação e Soroterapia (Campos 49-59)</div>
+             <div class="sinan-grid-4">
+                  <div class="form-group">
+                      <label>49 - Classificação do Caso</label>
+                      <select id="ofidico-classificacao-caso-${id}">
+                          <option value="1" selected>1 - Leve</option>
+                          <option value="2">2 - Moderado</option>
+                          <option value="3">3 - Grave</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>50 - Soroterapia?</label>
+                      <select id="ofidico-soroterapia-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2" selected>2 - Não</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>51 - Qtd de Ampolas de Soro</label>
+                      <input type="text" id="ofidico-soro-ampolas-${id}" placeholder="Ex: 4 ampolas SAB, 2 SAC">
+                  </div>
+                  <div class="form-group">
+                      <label>52 - Complicações Locais?</label>
+                      <select id="ofidico-compl-locais-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2" selected>2 - Não</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>53 - Especificar Complicações Locais</label>
+                      <input type="text" id="ofidico-compl-locais-especificar-${id}" placeholder="Infecção, Necrose, Amputação...">
+                  </div>
+                  <div class="form-group">
+                      <label>54 - Complicações Sistêmicas?</label>
+                      <select id="ofidico-compl-sistemicas-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2" selected>2 - Não</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>55 - Especificar Complicações Sistêmicas</label>
+                      <input type="text" id="ofidico-compl-sistemicas-especificar-${id}" placeholder="Insuf. Renal, Choque...">
+                  </div>
+                  <div class="form-group">
+                      <label>56 - Relacionado ao Trabalho?</label>
+                      <select id="ofidico-trabalho-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2" selected>2 - Não</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>57 - Evolução</label>
+                      <select id="ofidico-evolucao-${id}">
+                          <option value="1" selected>1 - Cura</option>
+                          <option value="2">2 - Óbito por acidente</option>
+                          <option value="3">3 - Óbito por outras causas</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>58 - Data do Óbito</label>
+                      <input type="date" id="ofidico-data-obito-${id}">
+                  </div>
+                  <div class="form-group">
+                      <label>59 - Data do Encerramento</label>
+                      <input type="date" id="ofidico-data-encerramento-${id}" value="${new Date().toISOString().substring(0,10)}">
+                  </div>
+                  <div class="form-group span-4">
+                      <label>Informações Complementares e Observações</label>
+                      <textarea id="ofidico-obs-${id}" rows="3" placeholder="Informações adicionais..."></textarea>
+                  </div>
+             </div>
+          </div>
+        `;
+      } else if (id === 'leishmaniose-tegumentar') {
+        block7Html = `
+          <!-- BLOCO 7: DADOS COMPLEMENTARES LEISHMANIOSE TEGUMENTAR -->
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-clipboard-list"></i> Dados Clínicos e Diagnósticos (Campos 31-40)</div>
+             <div class="sinan-grid-4">
+                  <div class="form-group">
+                      <label>31 - Data da Investigação</label>
+                      <input type="date" id="leish-tegu-data-investigacao-${id}">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>32 - Ocupação</label>
+                      <input type="text" id="leish-tegu-ocupacao-${id}" placeholder="Ex: Agricultor">
+                  </div>
+                  <div class="form-group">
+                      <label>33 - Presença de Lesão</label>
+                      <select id="leish-tegu-presenca-lesao-${id}">
+                          <option value="1">1 - Cutânea</option>
+                          <option value="2">2 - Mucosa</option>
+                          <option value="3" selected>3 - Ambas</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>34 - Se Mucosa, Cicatrizes Cutâneas?</label>
+                      <select id="leish-tegu-cicatrizes-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2" selected>2 - Não</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>35 - Co-infecção HIV</label>
+                      <select id="leish-tegu-hiv-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2" selected>2 - Não</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>36 - Parasitológico Direto</label>
+                      <select id="leish-tegu-diag-parasito-${id}">
+                          <option value="1">1 - Positivo</option>
+                          <option value="2">2 - Negativo</option>
+                          <option value="3" selected>3 - Não Realizado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>37 - Intradermoreação (IRM)</label>
+                      <select id="leish-tegu-diag-irm-${id}">
+                          <option value="1">1 - Positivo</option>
+                          <option value="2">2 - Negativo</option>
+                          <option value="3" selected>3 - Não Realizado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>38 - Histopatologia</label>
+                      <select id="leish-tegu-histopato-${id}">
+                          <option value="1">1 - Encontro de Parasitas</option>
+                          <option value="2">2 - Compatível</option>
+                          <option value="3">3 - Não Compatível</option>
+                          <option value="4" selected>4 - Não Realizado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>39 - Tipo de Entrada</label>
+                      <select id="leish-tegu-tipo-entrada-${id}">
+                          <option value="1" selected>1 - Caso Novo</option>
+                          <option value="2">2 - Recidiva</option>
+                          <option value="3">3 - Transferência</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>40 - Forma Clínica</label>
+                      <select id="leish-tegu-forma-clinica-${id}">
+                          <option value="1" selected>1 - Cutânea</option>
+                          <option value="2">2 - Mucosa</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+             </div>
+          </div>
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-pills"></i> Tratamento e Conclusão (Campos 41-58)</div>
+             <div class="sinan-grid-4">
+                  <div class="form-group">
+                      <label>41 - Data do Início do Tratamento</label>
+                      <input type="date" id="leish-tegu-inicio-tratamento-${id}">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>42 - Droga Inicial Administrada</label>
+                      <select id="leish-tegu-droga-${id}">
+                          <option value="1" selected>1 - Antimonial Pentavalente</option>
+                          <option value="2">2 - Anfotericina B</option>
+                          <option value="3">3 - Pentamidina</option>
+                          <option value="4">4 - Outras</option>
+                          <option value="5">5 - Não Utilizada</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>43 - Peso (kg)</label>
+                      <input type="number" id="leish-tegu-peso-${id}" min="0" placeholder="kg">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>44 - Dose Prescrita Sb+5 (mg/kg/dia)</label>
+                      <select id="leish-tegu-dose-${id}">
+                          <option value="1" selected>1 - Menor que 10</option>
+                          <option value="2">2 - Maior ou igual a 10 e menor que 15</option>
+                          <option value="3">3 - Igual a 15</option>
+                          <option value="4">4 - Maior ou igual a 20</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>45 - Total de Ampolas Prescritas</label>
+                      <input type="number" id="leish-tegu-ampolas-${id}" min="0" placeholder="0">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>46 - Outra Droga Utilizada (Falência)</label>
+                      <select id="leish-tegu-outra-droga-${id}">
+                          <option value="1">1 - Anfotericina B</option>
+                          <option value="2">2 - Pentamidina</option>
+                          <option value="3">3 - Outras</option>
+                          <option value="4" selected>4 - Não se aplica</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>47 - Critério de Confirmação</label>
+                      <select id="leish-tegu-criterio-${id}">
+                          <option value="1" selected>1 - Laboratorial</option>
+                          <option value="2">2 - Clínico-Epidemiológico</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>48 - Classificação Epidemiológica</label>
+                      <select id="leish-tegu-class-epidêmio-${id}">
+                          <option value="1" selected>1 - Autóctone</option>
+                          <option value="2">2 - Importado</option>
+                          <option value="3">3 - Indeterminado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>49 - Autóctone?</label>
+                      <select id="leish-tegu-autoctone-${id}">
+                          <option value="1" selected>1 - Sim</option>
+                          <option value="2">2 - Não</option>
+                          <option value="3">3 - Indeterminado</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>50 - UF Infecção</label>
+                      <input type="text" id="leish-tegu-uf-infeccao-${id}" maxlength="2" placeholder="PA">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>51 - País provável de infecção</label>
+                      <input type="text" id="leish-tegu-pais-infeccao-${id}" value="Brasil">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>52 - Município de Infecção</label>
+                      <input type="text" id="leish-tegu-municipio-infeccao-${id}" placeholder="Município">
+                  </div>
+                  <div class="form-group">
+                      <label>53 - Distrito</label>
+                      <input type="text" id="leish-tegu-distrito-infeccao-${id}" placeholder="Distrito">
+                  </div>
+                  <div class="form-group">
+                      <label>54 - Bairro</label>
+                      <input type="text" id="leish-tegu-bairro-infeccao-${id}" placeholder="Bairro">
+                  </div>
+                  <div class="form-group">
+                      <label>55 - Relacionada ao Trabalho?</label>
+                      <select id="leish-tegu-trabalho-${id}">
+                          <option value="1">1 - Sim</option>
+                          <option value="2" selected>2 - Não</option>
+                          <option value="9">9 - Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>56 - Evolução do Caso</label>
+                      <select id="leish-tegu-evolucao-${id}">
+                          <option value="1" selected>1 - Cura</option>
+                          <option value="2">2 - Abandono</option>
+                          <option value="3">3 - Óbito por LTA</option>
+                          <option value="4">4 - Óbito por outras causas</option>
+                          <option value="5">5 - Transferência</option>
+                          <option value="6">6 - Mudança de Diagnóstico</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                      <label>57 - Data do Óbito</label>
+                      <input type="date" id="leish-tegu-data-obito-${id}">
+                  </div>
+                  <div class="form-group">
+                      <label>58 - Data do Encerramento</label>
+                      <input type="date" id="leish-tegu-data-encerramento-${id}" value="${new Date().toISOString().substring(0,10)}">
+                  </div>
+                  <div class="form-group span-4">
+                      <label>Deslocamento nos últimos 6 meses (Datas e Cidades)</label>
+                      <input type="text" id="leish-tegu-deslocamentos-${id}" placeholder="Ex: Jan/2026 - Marabá/PA">
+                  </div>
+                  <div class="form-group span-4">
+                      <label>Informações Complementares e Observações</label>
+                      <textarea id="leish-tegu-obs-${id}" rows="3" placeholder="Informações adicionais..."></textarea>
+                  </div>
+             </div>
+          </div>
+        `;
+      } else {
+        block7Html = `
+          <!-- BLOCO 7: DADOS COMPLEMENTARES (Pagina 2 da ficha) -->
+          <div class="sinan-section">
+             <div class="sinan-section-title"><i class="fas fa-clipboard-list"></i> Dados Complementares (Pag. 2 da Ficha SINAN)</div>
+             <div class="sinan-grid-4">
+                  <div class="form-group span-2">
+                      <label>04 - Óbito?</label>
+                      <select id="comp-obito-${id}">
+                          <option value="1">1-Sim</option>
+                          <option value="2" selected>2-Nao</option>
+                          <option value="9">9-Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>05 - Contato com Caso Semelhante?</label>
+                      <select id="comp-contato-${id}">
+                          <option value="1">1-Sim</option>
+                          <option value="2" selected>2-Nao</option>
+                          <option value="9">9-Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>06 - Presença de Exantema?</label>
+                      <select id="comp-exantema-${id}">
+                          <option value="1">1-Sim</option>
+                          <option value="2" selected>2-Nao</option>
+                          <option value="9">9-Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>07 - Data do Início do Exantema</label>
+                      <input type="date" id="comp-exantema-date-${id}">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>08 - Presença de Petéquias ou Sufusões Hemorrágicas?</label>
+                      <select id="comp-petequias-${id}">
+                          <option value="1">1-Sim</option>
+                          <option value="2" selected>2-Nao</option>
+                          <option value="9">9-Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>09 - Foi Realizado Líquor?</label>
+                      <select id="comp-liquor-${id}">
+                          <option value="1">1-Sim</option>
+                          <option value="2" selected>2-Nao</option>
+                          <option value="9">9-Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-4">
+                      <label>11 - O paciente tomou vacina contra agravo notificado neste impresso?</label>
+                      <select id="comp-vacina-${id}">
+                          <option value="1">1-Sim</option>
+                          <option value="2" selected>2-Nao</option>
+                          <option value="9">9-Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>12 - Data da ultima dose tomada</label>
+                      <input type="date" id="comp-vacina-date-${id}">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>13 - Ocorreu Hospitalização?</label>
+                      <select id="comp-hospitalizacao-${id}">
+                          <option value="1">1-Sim</option>
+                          <option value="2" selected>2-Nao</option>
+                          <option value="9">9-Ignorado</option>
+                      </select>
+                  </div>
+                  <div class="form-group span-2">
+                      <label>14 - Data da Hospitalização</label>
+                      <input type="date" id="comp-hosp-date-${id}">
+                  </div>
+                  <div class="form-group" style="max-width:80px;">
+                      <label>15 - UF Hospital</label>
+                      <input type="text" id="comp-hospital-uf-${id}" placeholder="PA" maxlength="2">
+                  </div>
+                  <div class="form-group span-2">
+                      <label>16 - Município do Hospital</label>
+                      <input type="text" id="comp-hospital-mun-${id}" placeholder="Maraba">
+                  </div>
+                  <div class="form-group span-4">
+                      <label>17 - Nome do Hospital</label>
+                      <input type="text" id="comp-hospital-nome-${id}" placeholder="Nome do hospital">
+                  </div>
+             </div>
+          </div>
+        `;
+      }
+
       formDiv.innerHTML = `
         <div class="form-header">
           <i class="fas ${disease.icon}"></i>
@@ -3480,7 +5621,9 @@ const CaseNotificationModule = {
                  <i class="fas fa-search" style="font-size: 1.1rem;"></i>
                </button>
             </div>
-            <p style="font-size: 0.8rem; color: var(--text-gray); margin-top: 6px; margin-bottom: 0; line-height: 1.4;">Se o paciente nao for encontrado, preencha os dados abaixo — ele sera cadastrado automaticamente ao gravar.</p>
+            <p style="font-size: 0.8rem; color: var(--text-gray); margin-top: 6px; margin-bottom: 0; line-height: 1.4;">
+                ${id === 'tracoma' ? 'Para Tracoma (Inquérito), selecione um Paciente de Referência ou digite o nome do Paciente Foco. Os demais casos serão adicionados na tabela abaixo.' : 'Se o paciente nao for encontrado, preencha os dados abaixo — ele sera cadastrado automaticamente ao gravar.'}
+            </p>
           </div>
 
           <!-- BLOCO 1: DADOS GERAIS -->
@@ -3490,10 +5633,10 @@ const CaseNotificationModule = {
                  <div class="form-group">
                      <label>1 - Tipo de Notificação</label>
                      <select id="tipo-notificacao-${id}">
-                         <option value="1">1-Negativa</option>
-                         <option value="2" selected>2-Individual</option>
-                         <option value="3">3-Surto</option>
-                         <option value="4">4-Inquerito Tracoma</option>
+                         <option value="1" ${id === 'tracoma' ? 'disabled' : ''}>1-Negativa</option>
+                         <option value="2" ${id === 'tracoma' ? 'disabled' : 'selected'}>2-Individual</option>
+                         <option value="3" ${id === 'tracoma' ? 'disabled' : ''}>3-Surto</option>
+                         <option value="4" ${id === 'tracoma' ? 'selected' : ''}>4-Inquerito Tracoma</option>
                      </select>
                  </div>
                  <div class="form-group span-2">
@@ -3516,27 +5659,21 @@ const CaseNotificationModule = {
                      <label>6 - Unidade de Saúde (ou Outra Fonte Notificadora)</label>
                      <select id="health-unit-${id}" required>
                           <option value="">- Selecione -</option>
-                          <!-- Cidade Nova -->
                           <option value="ubs_jaime_pinto">UBS Jaime Pinto (CNES: 2614901)</option>
                           <option value="ubs_laranjeiras">UBS Laranjeiras (CNES: 2614774)</option>
                           <option value="ubs_liberdade">UBS Liberdade (Dr. Emerson Caselli) (CNES: 2614790)</option>
                           <option value="ubs_pedro_cavalcante">UBS Pedro Cavalcante (CNES: 2614931)</option>
                           <option value="ubs_jose_pereira">UBS José Pereira de Araújo (CNES: 0826359)</option>
-                          <!-- Nova Marabá -->
                           <option value="crismu">CRISMU - Centro de Referência Integrado da Saúde da Mulher (CNES: 9006095)</option>
                           <option value="ubs_edivan_xavier">UBS Edivan Xavier dos Santos (CNES: 0270199)</option>
                           <option value="ubs_zezinha">UBS Enfermeira Zezinha (CNES: 2301907)</option>
                           <option value="ubs_hiroshi_matsuda">UBS Hiroshi Matsuda (CNES: 2301389)</option>
                           <option value="ubs_mariana_moraes">UBS Mariana Moraes (CNES: 2614804)</option>
-                          <!-- Velha Marabá -->
                           <option value="ubs_demosthenes_azevedo">UBS Demósthenes Azevedo (CNES: 2614839)</option>
                           <option value="ubs_joao_batista">UBS João Batista Bezerra (CNES: 2614766)</option>
-                          <!-- São Félix -->
                           <option value="ubs_amadeu_vivacqua">UBS Amadeu Vivácqua (CNES: 2301958)</option>
                           <option value="ubs_maria_bico_doce">UBS Parteira Maria Bico Doce (CNES: 2614758)</option>
-                          <!-- Morada Nova -->
                           <option value="ubs_carlos_barreto">UBS Carlos Barreto (CNES: 2614855)</option>
-                          <!-- Zona Rural -->
                           <option value="posto_maria_bahia">Posto de Saúde Maria Bahia da Conceição (CNES: 2614723)</option>
                           <option value="ubs_elisa_chavito">UBS Elisa Monteiro Chavito (CNES: 2614715)</option>
                           <option value="posto_antonio_arruda">Posto de Saúde Antônio Arruda (CNES: 2614669)</option>
@@ -3544,16 +5681,14 @@ const CaseNotificationModule = {
                           <option value="posto_cristalandia">Posto de Saúde Cristalândia (CNES: 2614979)</option>
                           <option value="posto_carima">Posto de Saúde Carimã (CNES: 7711883)</option>
                           <option value="posto_jose_manoel">Posto de Saúde José Manoel da Anunciação (CNES: 2614707)</option>
-                          <!-- Hospitais -->
                           <option value="hmm">Hospital Municipal de Marabá - HMM (CNES: 2301850)</option>
                           <option value="regional">Hospital Regional do Sudeste do Pará (CNES: 5249449)</option>
                           <option value="hmi">Hospital Materno Infantil - HMI (CNES: 2301893)</option>
-                          <!-- Outros -->
                           <option value="outra">Outra / Rede Particular</option>
                      </select>
                  </div>
                  <div class="form-group">
-                     <label>7 - Data dos Primeiros Sintomas *</label>
+                     <label>${id === 'tracoma' ? 'Data do Inquérito *' : '7 - Data dos Primeiros Sintomas *'}</label>
                      <input type="date" id="symptoms-date-${id}" required>
                  </div>
              </div>
@@ -3561,7 +5696,7 @@ const CaseNotificationModule = {
 
           <!-- BLOCO 2: NOTIFICACAO INDIVIDUAL -->
           <div class="sinan-section">
-             <div class="sinan-section-title"><i class="fas fa-user"></i> Notificacao Individual (Campos 8-16)</div>
+             <div class="sinan-section-title"><i class="fas fa-user"></i> Notificacao Individual / Referência (Campos 8-16)</div>
              <div class="sinan-grid-4">
                  <div class="form-group span-3">
                      <label>8 - Nome do Paciente *</label>
@@ -3642,7 +5777,7 @@ const CaseNotificationModule = {
           </div>
 
           <!-- BLOCO 3: NOTIFICACAO DE SURTO -->
-          <div class="sinan-section">
+          <div class="sinan-section" style="${id === 'tracoma' ? 'display:none;' : ''}">
              <div class="sinan-section-title"><i class="fas fa-users"></i> Notificacao de Surto (Campos 17-19)</div>
              <div class="sinan-grid-4">
                  <div class="form-group span-2">
@@ -3748,92 +5883,7 @@ const CaseNotificationModule = {
              </div>
           </div>
 
-          <!-- BLOCO 7: DADOS COMPLEMENTARES (Pagina 2 da ficha) -->
-          <div class="sinan-section">
-             <div class="sinan-section-title"><i class="fas fa-clipboard-list"></i> Dados Complementares (Pag. 2 da Ficha SINAN)</div>
-             <div class="sinan-grid-4">
-                 <div class="form-group span-2">
-                     <label>04 - Óbito?</label>
-                     <select id="comp-obito-${id}">
-                         <option value="1">1-Sim</option>
-                         <option value="2" selected>2-Nao</option>
-                         <option value="9">9-Ignorado</option>
-                     </select>
-                 </div>
-                 <div class="form-group span-2">
-                     <label>05 - Contato com Caso Semelhante?</label>
-                     <select id="comp-contato-${id}">
-                         <option value="1">1-Sim</option>
-                         <option value="2" selected>2-Nao</option>
-                         <option value="9">9-Ignorado</option>
-                     </select>
-                 </div>
-                 <div class="form-group span-2">
-                     <label>06 - Presença de Exantema?</label>
-                     <select id="comp-exantema-${id}">
-                         <option value="1">1-Sim</option>
-                         <option value="2" selected>2-Nao</option>
-                         <option value="9">9-Ignorado</option>
-                     </select>
-                 </div>
-                 <div class="form-group span-2">
-                     <label>07 - Data do Início do Exantema</label>
-                     <input type="date" id="comp-exantema-date-${id}">
-                 </div>
-                 <div class="form-group span-2">
-                     <label>08 - Presença de Petéquias ou Sufusões Hemorrágicas?</label>
-                     <select id="comp-petequias-${id}">
-                         <option value="1">1-Sim</option>
-                         <option value="2" selected>2-Nao</option>
-                         <option value="9">9-Ignorado</option>
-                     </select>
-                 </div>
-                 <div class="form-group span-2">
-                     <label>09 - Foi Realizado Líquor?</label>
-                     <select id="comp-liquor-${id}">
-                         <option value="1">1-Sim</option>
-                         <option value="2" selected>2-Nao</option>
-                         <option value="9">9-Ignorado</option>
-                     </select>
-                 </div>
-                 <div class="form-group span-4">
-                     <label>11 - O paciente tomou vacina contra agravo notificado neste impresso?</label>
-                     <select id="comp-vacina-${id}">
-                         <option value="1">1-Sim</option>
-                         <option value="2" selected>2-Nao</option>
-                         <option value="9">9-Ignorado</option>
-                     </select>
-                 </div>
-                 <div class="form-group span-2">
-                     <label>12 - Data da ultima dose tomada</label>
-                     <input type="date" id="comp-vacina-date-${id}">
-                 </div>
-                 <div class="form-group span-2">
-                     <label>13 - Ocorreu Hospitalização?</label>
-                     <select id="comp-hospitalizacao-${id}">
-                         <option value="1">1-Sim</option>
-                         <option value="2" selected>2-Nao</option>
-                         <option value="9">9-Ignorado</option>
-                     </select>
-                 </div>
-                 <div class="form-group span-2">
-                     <label>14 - Data da Hospitalização</label>
-                     <input type="date" id="comp-hosp-date-${id}">
-                 </div>
-                 <div class="form-group" style="max-width:80px;">
-                     <label>15 - UF Hospital</label>
-                     <input type="text" id="comp-hospital-uf-${id}" placeholder="PA" maxlength="2">
-                 </div>
-                 <div class="form-group span-2">
-                     <label>16 - Município do Hospital</label>
-                     <input type="text" id="comp-hospital-mun-${id}" placeholder="Maraba">
-                 </div>
-                 <div class="form-group span-4">
-                     <label>17 - Nome do Hospital</label>
-                     <input type="text" id="comp-hospital-nome-${id}" placeholder="Nome do hospital">
-                 </div>
-             </div>
-          </div>
+          ${block7Html}
 
           <!-- HIPOTESE DIAGNOSTICA / OBSERVACOES -->
           <div class="sinan-section">
@@ -3876,6 +5926,18 @@ const CaseNotificationModule = {
           e.preventDefault();
           this.handleFormSubmit(disease, newForm);
         });
+
+        // Custom listeners for disease-specific forms
+        if (disease === 'tracoma') {
+          const addBtn = newForm.querySelector(`#btn-add-tracoma-case-${disease}`);
+          if (addBtn) {
+            addBtn.addEventListener('click', () => {
+              window.addTracomaCaseRow(`tracoma-cases-table-${disease}`);
+            });
+          }
+          // Initialize table with one empty row
+          window.addTracomaCaseRow(`tracoma-cases-table-${disease}`);
+        }
       }
     });
 
@@ -4149,35 +6211,434 @@ const CaseNotificationModule = {
 
     const observationsEl = document.getElementById(`patient-obs-${disease}`);
 
+    const cases = [];
+    if (disease === 'tracoma') {
+      const rows = form.querySelectorAll(`#tracoma-cases-table-${disease} tbody tr`);
+      rows.forEach(row => {
+        const fcChecked = Array.from(row.querySelectorAll('.t-fc:checked')).map(cb => cb.value);
+        cases.push({
+          inicial: row.querySelector('.t-inicial')?.value || '',
+          uf: row.querySelector('.t-uf')?.value || 'PA',
+          mun: row.querySelector('.t-mun')?.value || 'MARABA',
+          dist: row.querySelector('.t-dist')?.value || '',
+          bairro: row.querySelector('.t-bairro')?.value || '',
+          zona: row.querySelector('.t-zona')?.value || '9',
+          sexo: row.querySelector('.t-sexo')?.value || '9',
+          idade: row.querySelector('.t-idade')?.value || '',
+          fc: fcChecked,
+          cirurg: row.querySelector('.t-cirurg')?.value || '9',
+        });
+      });
+    }
+
+    let clinicalSignsObj = {
+      diabetes:          '9',
+      hepatopatias:      '9',
+      hipertensao:       '9',
+      hematologicas:     '9',
+      renal:             '9',
+      autoimunes:        '9',
+      occupation:        getVal(`occupation-${disease}`) || '',
+      pregnant:          getVal(`patient-pregnant-${disease}`) || '9',
+      obito:             getVal(`comp-obito-${disease}`) || '9',
+      contato:           getVal(`comp-contato-${disease}`) || '9',
+      exantema:          getVal(`comp-exantema-${disease}`) || '9',
+      petequias:         getVal(`comp-petequias-${disease}`) || '9',
+      liquor:            getVal(`comp-liquor-${disease}`) || '9',
+      vacina:            getVal(`comp-vacina-${disease}`) || '9',
+      hospitalizacao:    getVal(`comp-hospitalizacao-${disease}`) || '9',
+      hospitalName:      getVal(`comp-hospital-nome-${disease}`) || '',
+      hospitalUf:        getVal(`comp-hospital-uf-${disease}`) || '',
+      hospitalMun:       getVal(`comp-hospital-mun-${disease}`) || '',
+      exantemaDate:      getVal(`comp-exantema-date-${disease}`) || '',
+      vacinaDate:        getVal(`comp-vacina-date-${disease}`) || '',
+      hospitalizacaoDate:getVal(`comp-hosp-date-${disease}`) || '',
+    };
+
+    if (disease === 'dengue' || disease === 'chikungunya') {
+      clinicalSignsObj = {
+        dataInvestigacao:      getVal(`dengue-data-investigacao-${disease}`),
+        occupation:            getVal(`dengue-ocupacao-${disease}`),
+        sinaisClinicos: {
+          febre:               getVal(`dengue-sint-febre-${disease}`),
+          mialgia:             getVal(`dengue-sint-mialgia-${disease}`),
+          cefaleia:            getVal(`dengue-sint-cefaleia-${disease}`),
+          exantema:            getVal(`dengue-sint-exantema-${disease}`),
+          vomito:              getVal(`dengue-sint-vomito-${disease}`),
+          nauseas:             getVal(`dengue-sint-nauseas-${disease}`),
+          costas:              getVal(`dengue-sint-costas-${disease}`),
+          conjuntivite:        getVal(`dengue-sint-conjuntivite-${disease}`),
+          artrite:             getVal(`dengue-sint-artrite-${disease}`),
+          artralgia:           getVal(`dengue-sint-artralgia-${disease}`),
+          petequias:           getVal(`dengue-sint-petequias-${disease}`),
+          leucopenia:          getVal(`dengue-sint-leucopenia-${disease}`),
+          laco:                getVal(`dengue-sint-laco-${disease}`),
+          retroorbital:        getVal(`dengue-sint-retroorbital-${disease}`),
+        },
+        comorbidades: {
+          diabetes:            getVal(`dengue-comorb-diabetes-${disease}`),
+          hepatopatias:        getVal(`dengue-comorb-hepatopatias-${disease}`),
+          hipertensao:         getVal(`dengue-comorb-hipertensao-${disease}`),
+          autoimunes:          getVal(`dengue-comorb-autoimunes-${disease}`),
+          hematologicas:       getVal(`dengue-comorb-hematologicas-${disease}`),
+          renal:               getVal(`dengue-comorb-renal-${disease}`),
+          peptica:             getVal(`dengue-comorb-peptica-${disease}`),
+        },
+        lab: {
+          chikS1Date:          getVal(`chik-s1-date-${disease}`),
+          chikS1Res:           getVal(`chik-s1-res-${disease}`),
+          chikS2Date:          getVal(`chik-s2-date-${disease}`),
+          chikS2Res:           getVal(`chik-s2-res-${disease}`),
+          chikPrntDate:        getVal(`chik-prnt-date-${disease}`),
+          chikPrntRes:         getVal(`chik-prnt-res-${disease}`),
+          dengueIgmDate:       getVal(`dengue-igm-date-${disease}`),
+          dengueIgmRes:        getVal(`dengue-igm-res-${disease}`),
+          ns1Date:             getVal(`dengue-ns1-date-${disease}`),
+          ns1Res:              getVal(`dengue-ns1-res-${disease}`),
+          isolamentoDate:      getVal(`dengue-isolamento-date-${disease}`),
+          isolamentoRes:       getVal(`dengue-isolamento-res-${disease}`),
+          pcrDate:             getVal(`dengue-pcr-date-${disease}`),
+          pcrRes:              getVal(`dengue-pcr-res-${disease}`),
+          sorotipo:            getVal(`dengue-sorotipo-${disease}`),
+          histoDate:           getVal(`dengue-histo-date-${disease}`),
+          histoRes:            getVal(`dengue-histo-res-${disease}`),
+          imunoDate:           getVal(`dengue-imuno-date-${disease}`),
+          imunoRes:            getVal(`dengue-imuno-res-${disease}`),
+        },
+        hospitalizacao: {
+          ocorreu:             getVal(`dengue-hospitalizacao-${disease}`),
+          dataInternacao:      getVal(`dengue-data-internacao-${disease}`),
+          uf:                  getVal(`dengue-hospital-uf-${disease}`),
+          mun:                 getVal(`dengue-hospital-mun-${disease}`),
+          nome:                getVal(`dengue-hospital-nome-${disease}`),
+          fone:                getVal(`dengue-hospital-fone-${disease}`),
+        },
+        localInfeccao: {
+          autoctone:           getVal(`dengue-autoctone-${disease}`),
+          uf:                  getVal(`dengue-uf-infeccao-${disease}`),
+          pais:                getVal(`dengue-pais-infeccao-${disease}`),
+          mun:                 getVal(`dengue-mun-infeccao-${disease}`),
+          dist:                getVal(`dengue-dist-infeccao-${disease}`),
+          bairro:              getVal(`dengue-bairro-infeccao-${disease}`),
+        },
+        conclusao: {
+          classificacao:       getVal(`dengue-classificacao-${disease}`),
+          criterio:            getVal(`dengue-criterio-${disease}`),
+          apresentacaoChik:    getVal(`dengue-apresentacao-chik-${disease}`),
+          evolucao:            getVal(`dengue-evolucao-${disease}`),
+          dataObito:           getVal(`dengue-data-obito-${disease}`),
+          dataEncerramento:    getVal(`dengue-data-encerramento-${disease}`),
+        },
+        sinaisAlarme: {
+          dataInicio:          getVal(`dengue-sinais-alarme-date-${disease}`),
+          vomitos:             getVal(`dengue-alarme-vomitos-${disease}`),
+          dorAbdominal:        getVal(`dengue-alarme-dor-abdo-${disease}`),
+          letargia:            getVal(`dengue-alarme-letargia-${disease}`),
+          sangramento:         getVal(`dengue-alarme-sangramento-${disease}`),
+          hematocrito:         getVal(`dengue-alarme-hematocrito-${disease}`),
+          hepatomegalia:       getVal(`dengue-alarme-hepatomegalia-${disease}`),
+          acumuloLiq:          getVal(`dengue-alarme-acumulo-liq-${disease}`),
+          hipotensao:          getVal(`dengue-alarme-hipotensao-${disease}`),
+          plaquetas:           getVal(`dengue-alarme-plaquetas-${disease}`),
+        },
+        dengueGrave: {
+          dataInicio:          getVal(`dengue-sinais-grave-date-${disease}`),
+          pulso:               getVal(`dengue-grave-pulso-${disease}`),
+          pa:                  getVal(`dengue-grave-pa-${disease}`),
+          capilar:             getVal(`dengue-grave-capilar-${disease}`),
+          acumuloResp:         getVal(`dengue-grave-acumulo-resp-${disease}`),
+          taquicardia:         getVal(`dengue-grave-taquicardia-${disease}`),
+          extremidades:        getVal(`dengue-grave-extremidades-${disease}`),
+          hipotensaoTardia:    getVal(`dengue-grave-hipotensao-tardia-${disease}`),
+          hematemese:          getVal(`dengue-grave-hematemese-${disease}`),
+          melena:              getVal(`dengue-grave-melena-${disease}`),
+          metrorragia:         getVal(`dengue-grave-metrorragia-${disease}`),
+          snc:                 getVal(`dengue-grave-snc-${disease}`),
+          astAlt:              getVal(`dengue-grave-ast-alt-${disease}`),
+          miocardite:          getVal(`dengue-grave-miocardite-${disease}`),
+          consciencia:         getVal(`dengue-grave-consciencia-${disease}`),
+          outrosOrgaos:        getVal(`dengue-grave-outros-orgaos-${disease}`),
+        },
+        investigador: {
+          unidade:             getVal(`dengue-inv-unidade-${disease}`),
+          nome:                getVal(`dengue-inv-nome-${disease}`),
+          funcao:              getVal(`dengue-inv-funcao-${disease}`),
+        },
+        obs:                   getVal(`dengue-obs-${disease}`),
+      };
+    } else if (disease === 'tracoma') {
+      clinicalSignsObj = {
+        inquerito:          getVal(`tracoma-inquerito-${disease}`) || '1',
+        pessoasExaminadas:  getVal(`tracoma-examinadas-${disease}`) || '0',
+        casosPositivos:     getVal(`tracoma-positivos-${disease}`) || '0',
+        cases:              cases,
+      };
+    } else if (disease === 'hanseniase') {
+      clinicalSignsObj = {
+        prontuario:         getVal(`hanseniase-prontuario-${disease}`),
+        occupation:         getVal(`hanseniase-ocupacao-${disease}`),
+        lesoesCutaneas:     getVal(`hanseniase-lesoes-${disease}`),
+        formaClinica:       getVal(`hanseniase-forma-${disease}`),
+        classOperacional:   getVal(`hanseniase-class-oper-${disease}`),
+        nervosAfetados:     getVal(`hanseniase-nervos-${disease}`),
+        incapacidadeFisica: getVal(`hanseniase-incapacidade-${disease}`),
+        modoEntrada:        getVal(`hanseniase-modo-entrada-${disease}`),
+        modoDeteccao:       getVal(`hanseniase-modo-deteccao-${disease}`),
+        baciloscopia:       getVal(`hanseniase-baciloscopia-${disease}`),
+        dataInicioTratamento: getVal(`hanseniase-inicio-tratamento-${disease}`),
+        esquemaTerapeutico: getVal(`hanseniase-esquema-${disease}`),
+        contatosRegistrados:getVal(`hanseniase-contatos-${disease}`),
+      };
+    } else if (disease === 'esquistossomose') {
+      clinicalSignsObj = {
+        dataInvestigacao:   getVal(`esquisto-data-investigacao-${disease}`),
+        occupation:         getVal(`esquisto-ocupacao-${disease}`),
+        dataCoproscopia:    getVal(`esquisto-data-copro-${disease}`),
+        analiseQuant:       getVal(`esquisto-analise-quant-${disease}`),
+        analiseQual:        getVal(`esquisto-analise-qual-${disease}`),
+        outrosQual:         getVal(`esquisto-outros-qual-${disease}`),
+        outrosEspecificar:  getVal(`esquisto-outros-especificar-${disease}`),
+        fezTratamento:      getVal(`esquisto-fez-tratamento-${disease}`),
+        dataTratamento:     getVal(`esquisto-data-tratamento-${disease}`),
+        motivoNaoTratamento: getVal(`esquisto-motivo-nao-tratamento-${disease}`),
+        cura1Amostra:       getVal(`esquisto-cura-1amostra-${disease}`),
+        cura2Amostra:       getVal(`esquisto-cura-2amostra-${disease}`),
+        cura3Amostra:       getVal(`esquisto-cura-3amostra-${disease}`),
+        curaData3Amostra:   getVal(`esquisto-cura-data-3amostra-${disease}`),
+        formaClinica:       getVal(`esquisto-forma-clinica-${disease}`),
+        autoctone:          getVal(`esquisto-autoctone-${disease}`),
+        infeccaoUf:         getVal(`esquisto-infeccao-uf-${disease}`),
+        infeccaoPais:       getVal(`esquisto-infeccao-pais-${disease}`),
+        infeccaoMun:        getVal(`esquisto-infeccao-mun-${disease}`),
+        infeccaoDist:       getVal(`esquisto-infeccao-dist-${disease}`),
+        infeccaoBairro:     getVal(`esquisto-infeccao-bairro-${disease}`),
+        infeccaoPropriedade:getVal(`esquisto-infeccao-propriedade-${disease}`),
+        infeccaoHidrica:    getVal(`esquisto-infeccao-hidrica-${disease}`),
+        trabalho:           getVal(`esquisto-trabalho-${disease}`),
+        evolucao:           getVal(`esquisto-evolucao-${disease}`),
+        dataObito:          getVal(`esquisto-data-obito-${disease}`),
+        dataEncerramento:   getVal(`esquisto-data-encerramento-${disease}`),
+      };
+    } else if (disease === 'malaria') {
+      clinicalSignsObj = {
+        dataInvestigacao:   getVal(`malaria-data-investigacao-${disease}`),
+        occupation:         getVal(`malaria-ocupacao-${disease}`),
+        atividade:          getVal(`malaria-atividade-${disease}`),
+        tipoLamina:         getVal(`malaria-tipo-lamina-${disease}`),
+        sintomas:           getVal(`malaria-sintomas-${disease}`),
+        dataExame:          getVal(`malaria-data-exame-${disease}`),
+        resultadoExame:     getVal(`malaria-resultado-exame-${disease}`),
+        parasitos:          getVal(`malaria-parasitos-${disease}`),
+        parasitemiaCruzes:  getVal(`malaria-parasitemia-cruzes-${disease}`),
+        esquemaTratamento:  getVal(`malaria-esquema-tratamento-${disease}`),
+        dataInicioTrat:     getVal(`malaria-data-inicio-trat-${disease}`),
+        classificacaoFinal: getVal(`malaria-classificacao-final-${disease}`),
+        autoctone:          getVal(`malaria-autoctone-${disease}`),
+        ufInfeccao:         getVal(`malaria-uf-infeccao-${disease}`),
+        paisInfeccao:       getVal(`malaria-pais-infeccao-${disease}`),
+        municipioInfeccao:  getVal(`malaria-municipio-infeccao-${disease}`),
+        ibgeInfeccao:       getVal(`malaria-ibge-infeccao-${disease}`),
+        distritoInfeccao:   getVal(`malaria-distrito-infeccao-${disease}`),
+        bairroInfeccao:     getVal(`malaria-bairro-infeccao-${disease}`),
+        localidadeInfeccao: getVal(`malaria-localidade-infeccao-${disease}`),
+        dataEncerramento:   getVal(`malaria-data-encerramento-${disease}`),
+        obs:                getVal(`malaria-obs-${disease}`),
+        examinador:         getVal(`malaria-examinador-${disease}`),
+      };
+    } else if (disease === 'raiva') {
+      clinicalSignsObj = {
+        dataInvestigacao:   getVal(`raiva-data-investigacao-${disease}`),
+        occupation:         getVal(`raiva-ocupacao-${disease}`),
+        tipoExposicao:      getVal(`raiva-tipo-exposicao-${disease}`),
+        localizacaoPicada:  getVal(`raiva-localizacao-${disease}`),
+        ferimento:          getVal(`raiva-ferimento-${disease}`),
+        tipoFerimento:      getVal(`raiva-tipo-ferimento-${disease}`),
+        dataExposicao:      getVal(`raiva-data-exposicao-${disease}`),
+        antecedentesTrat:   getVal(`raiva-antecedentes-trat-${disease}`),
+        dosesAplicadas:     getVal(`raiva-doses-aplicadas-${disease}`),
+        dataUltimaDose:     getVal(`raiva-data-ultima-dose-${disease}`),
+        especieAnimal:      getVal(`raiva-especie-animal-${disease}`),
+        animalVacinado:     getVal(`raiva-animal-vacinado-${disease}`),
+        hospitalizacao:     getVal(`raiva-hospitalizacao-${disease}`),
+        dataInternacao:     getVal(`raiva-data-internacao-${disease}`),
+        hospitalUf:         getVal(`raiva-hospital-uf-${disease}`),
+        hospitalMun:        getVal(`raiva-hospital-mun-${disease}`),
+        hospitalNome:       getVal(`raiva-hospital-nome-${disease}`),
+        sintomas:           getVal(`raiva-sintomas-${disease}`),
+        vacinaAtual:        getVal(`raiva-vacina-atual-${disease}`),
+        inicioTratamento:   getVal(`raiva-inicio-tratamento-${disease}`),
+        vacinaDoses:        getVal(`raiva-vacina-doses-${disease}`),
+        data1Dose:          getVal(`raiva-data-1dose-${disease}`),
+        dataUltDose:        getVal(`raiva-data-ultdose-${disease}`),
+        soroAplicado:       getVal(`raiva-soro-aplicado-${disease}`),
+        dataSoro:           getVal(`raiva-data-soro-${disease}`),
+        qtdSoro:            getVal(`raiva-qtd-soro-${disease}`),
+        infiltracaoSoro:    getVal(`raiva-infiltracao-soro-${disease}`),
+        diagLaboratorial:   getVal(`raiva-diag-laboratorial-${disease}`),
+        variante:           getVal(`raiva-variante-${disease}`),
+        classificacao:      getVal(`raiva-classificacao-${disease}`),
+        criterio:           getVal(`raiva-criterio-${disease}`),
+        autoctone:          getVal(`raiva-autoctone-${disease}`),
+        ufInfeccao:         getVal(`raiva-uf-infeccao-${disease}`),
+        paisInfeccao:       getVal(`raiva-pais-infeccao-${disease}`),
+        municipioInfeccao:  getVal(`raiva-municipio-infeccao-${disease}`),
+        ibgeInfeccao:       getVal(`raiva-ibge-infeccao-${disease}`),
+        distritoInfeccao:   getVal(`raiva-distrito-infeccao-${disease}`),
+        bairroInfeccao:     getVal(`raiva-bairro-infeccao-${disease}`),
+        zonaInfeccao:       getVal(`raiva-zona-infeccao-${disease}`),
+        trabalho:           getVal(`raiva-trabalho-${disease}`),
+        dataObito:          getVal(`raiva-data-obito-${disease}`),
+        dataEncerramento:   getVal(`raiva-data-encerramento-${disease}`),
+        obs:                getVal(`raiva-obs-${disease}`),
+      };
+    } else if (disease === 'leishmaniose-visceral') {
+      clinicalSignsObj = {
+        dataInvestigacao:   getVal(`leish-visc-data-investigacao-${disease}`),
+        occupation:         getVal(`leish-visc-ocupacao-${disease}`),
+        sintomas:           getVal(`leish-visc-sintomas-${disease}`),
+        hiv:                getVal(`leish-visc-hiv-${disease}`),
+        diagParasito:       getVal(`leish-visc-diag-parasito-${disease}`),
+        diagImuno:          getVal(`leish-visc-diag-imuno-${disease}`),
+        tipoEntrada:        getVal(`leish-visc-tipo-entrada-${disease}`),
+        inicioTratamento:   getVal(`leish-visc-inicio-tratamento-${disease}`),
+        droga:              getVal(`leish-visc-droga-${disease}`),
+        peso:               getVal(`leish-visc-peso-${disease}`),
+        dose:               getVal(`leish-visc-dose-${disease}`),
+        ampolas:            getVal(`leish-visc-ampolas-${disease}`),
+        outraDroga:         getVal(`leish-visc-outra-droga-${disease}`),
+        classificacao:      getVal(`leish-visc-classificacao-${disease}`),
+        criterio:           getVal(`leish-visc-criterio-${disease}`),
+        autoctone:          getVal(`leish-visc-autoctone-${disease}`),
+        ufInfeccao:         getVal(`leish-visc-uf-infeccao-${disease}`),
+        paisInfeccao:       getVal(`leish-visc-pais-infeccao-${disease}`),
+        municipioInfeccao:  getVal(`leish-visc-municipio-infeccao-${disease}`),
+        distritoInfeccao:   getVal(`leish-visc-distrito-infeccao-${disease}`),
+        bairroInfeccao:     getVal(`leish-visc-bairro-infeccao-${disease}`),
+        trabalho:           getVal(`leish-visc-trabalho-${disease}`),
+        evolucao:           getVal(`leish-visc-evolucao-${disease}`),
+        dataObito:          getVal(`leish-visc-data-obito-${disease}`),
+        dataEncerramento:   getVal(`leish-visc-data-encerramento-${disease}`),
+        deslocamentos:      getVal(`leish-visc-deslocamentos-${disease}`),
+        obs:                getVal(`leish-visc-obs-${disease}`),
+      };
+    } else if (disease === 'chagas') {
+      clinicalSignsObj = {
+        dataInvestigacao:   getVal(`chagas-data-investigacao-${disease}`),
+        occupation:         getVal(`chagas-ocupacao-${disease}`),
+        vestigios:          getVal(`chagas-vestigios-${disease}`),
+        dataVestigios:      getVal(`chagas-data-vestigios-${disease}`),
+        sangue:             getVal(`chagas-sangue-${disease}`),
+        controleSoro:       getVal(`chagas-controle-soro-${disease}`),
+        contato:            getVal(`chagas-contato-${disease}`),
+        maeInfeccao:        getVal(`chagas-mae-infeccao-${disease}`),
+        transmissaoOral:    getVal(`chagas-transmissao-oral-${disease}`),
+        deslocamentos:      getVal(`chagas-deslocamentos-${disease}`),
+        obs:                getVal(`chagas-obs-${disease}`),
+      };
+    } else if (disease === 'leptospirose') {
+      clinicalSignsObj = {
+        dataInvestigacao:   getVal(`lepto-data-investigacao-${disease}`),
+        occupation:         getVal(`lepto-ocupacao-${disease}`),
+        situacaoRisco:      getVal(`lepto-situacao-risco-${disease}`),
+        casosAnteriores:    getVal(`lepto-casos-anteriores-${disease}`),
+        dataAtendimento:    getVal(`lepto-data-atendimento-${disease}`),
+        sinaisSintomas:     getVal(`lepto-sinais-sintomas-${disease}`),
+        hospitalizacao:     getVal(`lepto-hospitalizacao-${disease}`),
+        dataInternacao:     getVal(`lepto-data-internacao-${disease}`),
+        dataAlta:           getVal(`lepto-data-alta-${disease}`),
+        hospitalNome:       getVal(`lepto-hospital-nome-${disease}`),
+        elisaResultado:     getVal(`lepto-elisa-resultado-${disease}`),
+        matResultado:       getVal(`lepto-mat-resultado-${disease}`),
+        classificacao:      getVal(`lepto-classificacao-${disease}`),
+        criterio:           getVal(`lepto-criterio-${disease}`),
+        autoctone:          getVal(`lepto-autoctone-${disease}`),
+        ufInfeccao:         getVal(`lepto-uf-infeccao-${disease}`),
+        paisInfeccao:       getVal(`lepto-pais-infeccao-${disease}`),
+        municipioInfeccao:  getVal(`lepto-municipio-infeccao-${disease}`),
+        distritoInfeccao:   getVal(`lepto-distrito-infeccao-${disease}`),
+        bairroInfeccao:     getVal(`lepto-bairro-infeccao-${disease}`),
+        zonaInfeccao:       getVal(`lepto-zona-infeccao-${disease}`),
+        ambienteInfeccao:   getVal(`lepto-ambiente-infeccao-${disease}`),
+        trabalho:           getVal(`lepto-trabalho-${disease}`),
+        evolucao:           getVal(`lepto-evolucao-${disease}`),
+        dataObito:          getVal(`lepto-data-obito-${disease}`),
+        dataEncerramento:   getVal(`lepto-data-encerramento-${disease}`),
+        obsRiscos:          getVal(`lepto-obs-riscos-${disease}`),
+        obs:                getVal(`lepto-obs-${disease}`),
+      };
+    } else if (disease === 'acidente-ofidico') {
+      clinicalSignsObj = {
+        dataInvestigacao:   getVal(`ofidico-data-investigacao-${disease}`),
+        occupation:         getVal(`ofidico-ocupacao-${disease}`),
+        dataAcidente:       getVal(`ofidico-data-acidente-${disease}`),
+        ufOcorrencia:       getVal(`ofidico-uf-ocorrencia-${disease}`),
+        munOcorrencia:       getVal(`ofidico-mun-ocorrencia-${disease}`),
+        localidadeOcorrencia: getVal(`ofidico-localidade-ocorrencia-${disease}`),
+        zonaOcorrencia:     getVal(`ofidico-zona-ocorrencia-${disease}`),
+        tempoAtendimento:   getVal(`ofidico-tempo-atendimento-${disease}`),
+        localPicada:        getVal(`ofidico-local-picada-${disease}`),
+        locais:             getVal(`ofidico-locais-${disease}`),
+        sintomasLocais:     getVal(`ofidico-sintomas-locais-${disease}`),
+        sistemicas:         getVal(`ofidico-sistemicas-${disease}`),
+        sintomasSistemicos: getVal(`ofidico-sintomas-sistemicos-${disease}`),
+        tempoCoag:          getVal(`ofidico-tempo-coag-${disease}`),
+        tipoAcidente:       getVal(`ofidico-tipo-acidente-${disease}`),
+        agenteEspecie:      getVal(`ofidico-agente-especie-${disease}`),
+        classificacaoCaso:  getVal(`ofidico-classificacao-caso-${disease}`),
+        soroterapia:        getVal(`ofidico-soroterapia-${disease}`),
+        soroAmpolas:        getVal(`ofidico-soro-ampolas-${disease}`),
+        complLocais:        getVal(`ofidico-compl-locais-${disease}`),
+        complLocaisEspecificar: getVal(`ofidico-compl-locais-especificar-${disease}`),
+        complSistemicas:    getVal(`ofidico-compl-sistemicas-${disease}`),
+        complSistemicasEspecificar: getVal(`ofidico-compl-sistemicas-especificar-${disease}`),
+        trabalho:           getVal(`ofidico-trabalho-${disease}`),
+        evolucao:           getVal(`ofidico-evolucao-${disease}`),
+        dataObito:          getVal(`ofidico-data-obito-${disease}`),
+        dataEncerramento:   getVal(`ofidico-data-encerramento-${disease}`),
+        obs:                getVal(`ofidico-obs-${disease}`),
+      };
+    } else if (disease === 'leishmaniose-tegumentar') {
+      clinicalSignsObj = {
+        dataInvestigacao:   getVal(`leish-tegu-data-investigacao-${disease}`),
+        occupation:         getVal(`leish-tegu-ocupacao-${disease}`),
+        presencaLesao:      getVal(`leish-tegu-presenca-lesao-${disease}`),
+        cicatrizes:         getVal(`leish-tegu-cicatrizes-${disease}`),
+        hiv:                getVal(`leish-tegu-hiv-${disease}`),
+        diagParasito:       getVal(`leish-tegu-diag-parasito-${disease}`),
+        diagIrm:            getVal(`leish-tegu-diag-irm-${disease}`),
+        histopato:          getVal(`leish-tegu-histopato-${disease}`),
+        tipoEntrada:        getVal(`leish-tegu-tipo-entrada-${disease}`),
+        formaClinica:       getVal(`leish-tegu-forma-clinica-${disease}`),
+        inicioTratamento:   getVal(`leish-tegu-inicio-tratamento-${disease}`),
+        droga:              getVal(`leish-tegu-droga-${disease}`),
+        peso:               getVal(`leish-tegu-peso-${disease}`),
+        dose:               getVal(`leish-tegu-dose-${disease}`),
+        ampolas:            getVal(`leish-tegu-ampolas-${disease}`),
+        outraDroga:         getVal(`leish-tegu-outra-droga-${disease}`),
+        criterio:           getVal(`leish-tegu-criterio-${disease}`),
+        classEpidemio:      getVal(`leish-tegu-class-epidêmio-${disease}`),
+        autoctone:          getVal(`leish-tegu-autoctone-${disease}`),
+        ufInfeccao:         getVal(`leish-tegu-uf-infeccao-${disease}`),
+        paisInfeccao:       getVal(`leish-tegu-pais-infeccao-${disease}`),
+        municipioInfeccao:  getVal(`leish-tegu-municipio-infeccao-${disease}`),
+        distritoInfeccao:   getVal(`leish-tegu-distrito-infeccao-${disease}`),
+        bairroInfeccao:     getVal(`leish-tegu-bairro-infeccao-${disease}`),
+        trabalho:           getVal(`leish-tegu-trabalho-${disease}`),
+        evolucao:           getVal(`leish-tegu-evolucao-${disease}`),
+        dataObito:          getVal(`leish-tegu-data-obito-${disease}`),
+        dataEncerramento:   getVal(`leish-tegu-data-encerramento-${disease}`),
+        deslocamentos:      getVal(`leish-tegu-deslocamentos-${disease}`),
+        obs:                getVal(`leish-tegu-obs-${disease}`),
+      };
+    }
+
     const payload = {
       patientId: patientId || null,
       disease: disease,
       healthUnit: healthUnitEl ? healthUnitEl.value : 'Não informada',
       symptomsDate: symptomsDateEl ? symptomsDateEl.value : '',
       symptoms: checkedSymptoms,
-      clinicalSigns: {
-        diabetes:          '9',
-        hepatopatias:      '9',
-        hipertensao:       '9',
-        hematologicas:     '9',
-        renal:             '9',
-        autoimunes:        '9',
-        occupation:        getVal(`occupation-${disease}`) || '',
-        pregnant:          getVal(`patient-pregnant-${disease}`) || '9',
-        obito:             getVal(`comp-obito-${disease}`) || '9',
-        contato:           getVal(`comp-contato-${disease}`) || '9',
-        exantema:          getVal(`comp-exantema-${disease}`) || '9',
-        petequias:         getVal(`comp-petequias-${disease}`) || '9',
-        liquor:            getVal(`comp-liquor-${disease}`) || '9',
-        vacina:            getVal(`comp-vacina-${disease}`) || '9',
-        hospitalizacao:    getVal(`comp-hospitalizacao-${disease}`) || '9',
-        hospitalName:      getVal(`comp-hospital-nome-${disease}`) || '',
-        hospitalUf:        getVal(`comp-hospital-uf-${disease}`) || '',
-        hospitalMun:       getVal(`comp-hospital-mun-${disease}`) || '',
-        exantemaDate:      getVal(`comp-exantema-date-${disease}`) || '',
-        vacinaDate:        getVal(`comp-vacina-date-${disease}`) || '',
-        hospitalizacaoDate:getVal(`comp-hosp-date-${disease}`) || '',
-      },
+      clinicalSigns: clinicalSignsObj,
       labResults: {
         igmChikungunya:    '4',
         igmDengue:         '4',
@@ -4189,7 +6650,7 @@ const CaseNotificationModule = {
         bacterioscopia:    '',
       },
       surtoData: {
-        tipoNotificacao:getVal(`tipo-notificacao-${disease}`) || '2',
+        tipoNotificacao: disease === 'tracoma' ? '4' : (getVal(`tipo-notificacao-${disease}`) || '2'),
         dataNotificacao:getVal(`data-notificacao-${disease}`) || new Date().toISOString().substring(0,10),
         ufNotificacao:  getVal(`uf-notificacao-${disease}`) || 'PA',
         munNotificacao: getVal(`mun-notificacao-${disease}`) || 'MARABÁ',
@@ -5360,6 +7821,76 @@ document.addEventListener('DOMContentLoaded', () => {
 // PRINT E DETALHES DE NOTIFICAÇÃO
 // =========================================
 
+window.addTracomaCaseRow = function(tableId, data = {}) {
+    const table = document.getElementById(tableId);
+    if (!table) return;
+    const tbody = table.querySelector('tbody');
+    if (!tbody) return;
+
+    const tr = document.createElement('tr');
+    tr.style.borderBottom = '1px solid var(--border-color)';
+
+    const fc = Array.isArray(data.fc) ? data.fc : [];
+
+    tr.innerHTML = `
+        <td style="padding: 6px; border: 1px solid var(--border-color);">
+            <input type="text" class="t-inicial" value="${data.inicial || ''}" placeholder="Ex: E.S.S." style="width: 100%; border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 4px;">
+        </td>
+        <td style="padding: 6px; border: 1px solid var(--border-color);">
+            <input type="text" class="t-uf" value="${data.uf || 'PA'}" style="width: 100%; border: 1px solid var(--border-color); padding: 4px; border-radius: 4px; text-align: center;">
+        </td>
+        <td style="padding: 6px; border: 1px solid var(--border-color);">
+            <input type="text" class="t-mun" value="${data.mun || 'MARABA'}" style="width: 100%; border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 4px;">
+        </td>
+        <td style="padding: 6px; border: 1px solid var(--border-color);">
+            <input type="text" class="t-dist" value="${data.dist || ''}" style="width: 100%; border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 4px;">
+        </td>
+        <td style="padding: 6px; border: 1px solid var(--border-color);">
+            <input type="text" class="t-bairro" value="${data.bairro || ''}" style="width: 100%; border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 4px;">
+        </td>
+        <td style="padding: 6px; border: 1px solid var(--border-color);">
+            <select class="t-zona" style="width: 100%; border: 1px solid var(--border-color); padding: 4px; border-radius: 4px;">
+                <option value="1" ${data.zona === '1' ? 'selected' : ''}>1-Urbana</option>
+                <option value="2" ${data.zona === '2' ? 'selected' : ''}>2-Rural</option>
+                <option value="3" ${data.zona === '3' ? 'selected' : ''}>3-Periurbana</option>
+                <option value="9" ${data.zona === '9' || !data.zona ? 'selected' : ''}>9-Ignorado</option>
+            </select>
+        </td>
+        <td style="padding: 6px; border: 1px solid var(--border-color);">
+            <select class="t-sexo" style="width: 100%; border: 1px solid var(--border-color); padding: 4px; border-radius: 4px;">
+                <option value="M" ${data.sexo === 'M' ? 'selected' : ''}>M</option>
+                <option value="F" ${data.sexo === 'F' ? 'selected' : ''}>F</option>
+                <option value="I" ${data.sexo === 'I' || !data.sexo ? 'selected' : ''}>I</option>
+            </select>
+        </td>
+        <td style="padding: 6px; border: 1px solid var(--border-color);">
+            <input type="number" class="t-idade" value="${data.idade !== undefined ? data.idade : ''}" min="0" max="120" style="width: 100%; border: 1px solid var(--border-color); padding: 4px; border-radius: 4px; text-align: center;">
+        </td>
+        <td style="padding: 6px; border: 1px solid var(--border-color); font-size: 0.75rem;">
+            <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                <label style="display: inline-flex; align-items: center; gap: 2px;"><input type="checkbox" class="t-fc" value="TF" ${fc.includes('TF') ? 'checked' : ''}>TF</label>
+                <label style="display: inline-flex; align-items: center; gap: 2px;"><input type="checkbox" class="t-fc" value="TI" ${fc.includes('TI') ? 'checked' : ''}>TI</label>
+                <label style="display: inline-flex; align-items: center; gap: 2px;"><input type="checkbox" class="t-fc" value="TS" ${fc.includes('TS') ? 'checked' : ''}>TS</label>
+                <label style="display: inline-flex; align-items: center; gap: 2px;"><input type="checkbox" class="t-fc" value="TT" ${fc.includes('TT') ? 'checked' : ''}>TT</label>
+                <label style="display: inline-flex; align-items: center; gap: 2px;"><input type="checkbox" class="t-fc" value="CO" ${fc.includes('CO') ? 'checked' : ''}>CO</label>
+            </div>
+        </td>
+        <td style="padding: 6px; border: 1px solid var(--border-color);">
+            <select class="t-cirurg" style="width: 100%; border: 1px solid var(--border-color); padding: 4px; border-radius: 4px;">
+                <option value="2" ${data.cirurg === '2' ? 'selected' : ''}>2-Não</option>
+                <option value="1" ${data.cirurg === '1' ? 'selected' : ''}>1-Sim</option>
+                <option value="9" ${data.cirurg === '9' || !data.cirurg ? 'selected' : ''}>9-Ignorado</option>
+            </select>
+        </td>
+        <td style="padding: 6px; border: 1px solid var(--border-color); text-align: center;">
+            <button type="button" class="btn-remove-row" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px;" onclick="this.closest('tr').remove();">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </td>
+    `;
+    tbody.appendChild(tr);
+};
+
 window.printNotificationData = function(data) {
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
@@ -5377,7 +7908,7 @@ window.printNotificationData = function(data) {
         'chagas': 'B57', 'esquistossomose': 'B65', 'hanseniase': 'A30',
         'leptospirose': 'A27', 'tracoma': 'A71', 'raiva': 'A82',
         'ascaridiase': 'B77', 'ancilostomiase': 'B76', 'tricuriase': 'B79',
-        'acidente-ofidico': 'T63.0'
+        'acidente-ofidico': 'T63.0', 'malaria': 'B54'
     };
     const cid10 = cidMap[String(data.disease).toLowerCase()] || '---';
 
@@ -5412,6 +7943,10 @@ window.printNotificationData = function(data) {
         const p2 = dateStr.split('/');
         if (p2.length === 3) return p2[0] + p2[1] + p2[2];
         return dateStr;
+    }
+
+    function singleBox(val) {
+        return '<span class="single-box">' + (val !== undefined && val !== null ? val : '&nbsp;') + '</span>';
     }
 
     let cleanUnit = String(data.healthUnit || '').toLowerCase().trim();
@@ -5497,14 +8032,10 @@ window.printNotificationData = function(data) {
         unitName = data.healthUnitText || data.healthUnit || 'OUTRA UNIDADE';
     }
 
-    // Tipo notificacao
     const tipoNotif = data.tipoNotificacao || '2';
-
-    // Gestante code based on sex
     const sexCode = data.patientSex === 'Masculino' || data.patientSex === 'M' ? 'M' : (data.patientSex === 'Feminino' || data.patientSex === 'F' ? 'F' : 'I');
     const pregnantCode = (sexCode === 'M') ? '6' : (cs.pregnant || '9');
 
-    // Race code mapping
     let raceCode = '9';
     if (data.patientRace) {
         const rStr = String(data.patientRace).toLowerCase().trim();
@@ -5515,20 +8046,6 @@ window.printNotificationData = function(data) {
         else if (rStr.includes('indigena') || rStr.includes('indígena') || rStr === 'in' || rStr === '5') raceCode = '5';
     }
 
-    // Schooling code mapping
-    const schoolMap = {
-      'Analfabeto': '0',
-      'Ensino Fundamental 1a a 4a serie Incompleta': '1', '1a a 4a serie incompleta do EF': '1', '1ª a 4ª série incompleta do EF': '1',
-      'Ensino Fundamental 4a serie Completa': '2', '4a serie completa do EF': '2', '4ª série completa do EF': '2',
-      'Ensino Fundamental 5a a 8a serie Incompleta': '3', '5a a 8a serie incompleta do EF': '3', '5ª à 8ª série incompleta do EF': '3',
-      'Ensino Fundamental Completo': '4',
-      'Ensino Medio Incompleto': '5', 'Ensino Médio Incompleto': '5',
-      'Ensino Medio Completo': '6', 'Ensino Médio Completo': '6',
-      'Ensino Superior Incompleto': '7', 'Educação superior incompleta': '7',
-      'Ensino Superior Completo': '8', 'Educação superior completa': '8',
-      'Nao informada': '9', 'Não informada': '9', 'Ignorado': '9',
-      'Nao se aplica': '10', 'Não se aplica': '10'
-    };
     let schoolCode = '9';
     if (data.patientEducation) {
         const cleanSchool = String(data.patientEducation).toLowerCase().trim();
@@ -5545,34 +8062,37 @@ window.printNotificationData = function(data) {
         else if (cleanSchool.includes('nao informada') || cleanSchool.includes('não informada') || cleanSchool.startsWith('9')) schoolCode = '9';
     }
 
-    // Surto local double digit code
     const surtoLocalCode = data.surtoLocal ? String(data.surtoLocal).padStart(2, '0') : '';
-
-    // Zone code mapping
     const zoneCode = { 'Urbana':'1', 'Rural':'2', 'Periurbana':'3', 'Ignorado':'9', '1':'1', '2':'2', '3':'3', '9':'9' }[data.patientZone] || '9';
 
-    const html = `<!DOCTYPE html>
+    let html = '';
+    const diseaseLower = String(data.disease).toLowerCase();
+
+    function generateTracomaHtml() {
+        const inquerito1 = cs.inquerito === '1' ? 'X' : '&nbsp;';
+        const inquerito2 = cs.inquerito === '2' ? 'X' : '&nbsp;';
+        const pessoasExam = splitDigits(cs.pessoasExaminadas || '', 6);
+        const casosPos = splitDigits(cs.casosPositivos || '', 6);
+
+        return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Ficha SINAN - ${data.patientName || 'Paciente'}</title>
+<title>Boletim de Inquérito de Tracoma - ${data.patientName || 'Inquérito'}</title>
 <style>
   @media screen { body { background:#f0f0f0; margin:0; padding:20px; display:flex; flex-direction:column; align-items:center; font-family:Arial,Helvetica,sans-serif; } .sinan-page { background:#fff; width:210mm; padding:8mm 10mm; box-sizing:border-box; margin-bottom:25px; box-shadow:0 4px 15px rgba(0,0,0,0.15); border:1px solid #ccc; } }
   @media print { body { margin:0; padding:0; background:#fff; font-family:Arial,Helvetica,sans-serif; -webkit-print-color-adjust:exact; print-color-adjust:exact; } .sinan-page { width:210mm; min-height:297mm; padding:8mm 10mm; box-sizing:border-box; page-break-after:always; background:#fff; } .no-print { display:none !important; } }
   .sinan-page * { box-sizing:border-box; }
-  /* Header */
   .sn-header { display:flex; justify-content:space-between; align-items:stretch; border-bottom:2px solid #000; padding-bottom:6px; margin-bottom:6px; }
   .sn-header-left { width:30%; font-size:10px; font-weight:bold; line-height:1.4; }
   .sn-header-center { flex:1; text-align:center; padding:0 10px; }
   .sn-header-center .sn-sinan { font-size:11px; font-weight:bold; letter-spacing:2px; margin:0; }
-  .sn-header-center .sn-title { font-size:14px; font-weight:900; margin:2px 0; letter-spacing:0.5px; }
-  .sn-header-center .sn-subtitle { font-size:12px; font-weight:bold; text-decoration:underline; margin:0; }
+  .sn-header-center .sn-title { font-size:13px; font-weight:900; margin:2px 0; letter-spacing:0.5px; }
+  .sn-header-center .sn-subtitle { font-size:11px; font-weight:bold; text-decoration:underline; margin:0; }
   .sn-header-right { width:22%; display:flex; flex-direction:column; align-items:flex-end; justify-content:center; }
   .sn-num-label { font-size:8px; font-weight:bold; margin-bottom:2px; }
   .sn-num-box { border:1.5px solid #000; background:#f0f0f0; padding:5px 10px; font-size:13px; font-weight:bold; border-radius:4px; min-width:110px; text-align:center; }
-  /* Blocks */
   .sn-block { display:flex; width:100%; border:1.5px solid #000; margin-bottom:5px; }
-  .sn-sidebar { width:26px; background:#e6e6e6; border-right:1.5px solid #000; display:flex; align-items:center; justify-content:center; font-size:7.5px; font-weight:bold; text-align:center; text-transform:uppercase; writing-mode:vertical-rl; transform:rotate(180deg); padding:3px; flex-shrink:0; }
   .sn-content { flex:1; display:flex; flex-direction:column; }
   .sn-row { display:flex; width:100%; border-bottom:1px solid #000; }
   .sn-row:last-child { border-bottom:none; }
@@ -5583,23 +8103,133 @@ window.printNotificationData = function(data) {
   .cv { font-size:9.5px; font-weight:bold; color:#000; padding-top:2px; min-height:14px; text-transform:uppercase; display:flex; align-items:center; flex-wrap:wrap; }
   .digit-box { display:inline-flex; align-items:center; justify-content:center; width:11px; height:13px; border:1px solid #000; margin-right:1px; font-size:8px; font-family:monospace; font-weight:bold; background:#fff; }
   .check-box { display:inline-flex; align-items:center; justify-content:center; width:10px; height:10px; border:1px solid #000; margin:0 2px; font-size:7.5px; font-weight:bold; background:#fff; flex-shrink:0; }
-  .single-box { display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; border:1.5px solid #000; font-size:10px; font-weight:bold; background:#fff; flex-shrink:0; line-height:1; font-family:monospace; }
-  .double-box { display:inline-flex; align-items:center; }
-  .double-box span { display:inline-flex; align-items:center; justify-content:center; width:13px; height:13px; border:1px solid #000; font-size:8px; font-weight:bold; background:#fff; margin-left:-1px; line-height:1; font-family:monospace; }
-  .fr { display:flex; align-items:center; flex-wrap:wrap; gap:6px; font-size:7.5px; margin-top:2px; }
-  .fi { display:flex; align-items:center; gap:1px; }
+  .single-box { display:inline-flex; align-items:center; justify-content:center; width:11px; height:11px; border:1px solid #000; font-size:8px; font-weight:bold; background:#fff; flex-shrink:0; line-height:1; font-family:monospace; }
   .footer-info { display:flex; justify-content:space-between; font-size:7.5px; font-weight:bold; margin-top:3px; border-top:1px solid #888; padding-top:2px; }
   .no-print-btn { position:fixed; top:20px; right:20px; background:#0d8abc; color:#fff; border:none; padding:10px 20px; font-size:14px; font-weight:bold; border-radius:8px; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.2); z-index:9999; display:flex; align-items:center; gap:8px; }
   .no-print-btn:hover { background:#0a6f98; }
-  .pg2-header { text-align:center; border-bottom:2px solid #000; padding-bottom:6px; margin-bottom:6px; }
-  .pg2-title { font-size:16px; font-weight:900; margin:0; letter-spacing:1px; }
-  .pg2-sub { font-size:9px; margin:2px 0 0 0; font-weight:bold; }
 </style>
 </head>
 <body>
 <button class="no-print-btn no-print" onclick="window.print()">&#128438; Imprimir / Salvar PDF</button>
 
-<!-- PAGINA 1: FICHA DE NOTIFICACAO -->
+<div class="sinan-page">
+  <div class="sn-header">
+    <div class="sn-header-left">
+      Rep&uacute;blica Federativa do Brasil<br>
+      Minist&eacute;rio da Sa&uacute;de<br>
+      Secretaria de Vigil&acirc;ncia em Sa&uacute;de
+    </div>
+    <div class="sn-header-center">
+      <p class="sn-sinan">SINAN</p>
+      <p class="sn-title">BOLETIM DE INQU&Eacute;RITO DE TRACOMA</p>
+    </div>
+    <div class="sn-header-right">
+      <span class="sn-num-label">N&ordm;</span>
+      <div class="sn-num-box">${data.sinan_number || '---.---'}</div>
+    </div>
+  </div>
+
+  <div class="sn-block">
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1;">
+          <div class="ct"><span class="cn">1</span> Nº DA NOTIFICAÇÃO</div>
+          <div class="cv">${data.sinan_number || '---.---'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1;">
+          <div class="ct"><span class="cn">2</span> DATA DA NOTIFICAÇÃO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.dataNotificacao), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:2;">
+          <div class="ct"><span class="cn">3</span> AGRAVO / DOENÇA</div>
+          <div class="cv" style="font-weight:900;">TRACOMA &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Código (CID10): A 71.9</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.4;">
+          <div class="ct"><span class="cn">4</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.ufNotificacao || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">5</span> MUNICÍPIO</div>
+          <div class="cv">${data.munNotificacao || 'MARABA'}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.2;">
+          <div class="ct"><span class="cn">6</span> UNIDADE DE SAÚDE (OU OUTRA FONTE NOTIFICADORA)</div>
+          <div class="cv">${unitName}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2; position:relative;">
+          <div class="ct"><span class="cn">7</span> INQUÉRITO</div>
+          <div style="font-size:8px; margin-top:2px;">
+            <span class="check-box">${inquerito1}</span> 1 - Escolar &nbsp;&nbsp;&nbsp;&nbsp;
+            <span class="check-box">${inquerito2}</span> 2 - Domiciliar
+          </div>
+        </div>
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">8</span> Nº DE PESSOAS EXAMINADAS</div>
+          <div class="cv" style="padding-top:3px;">${pessoasExam}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">9</span> Nº DE CASOS POSITIVOS</div>
+          <div class="cv" style="padding-top:3px;">${casosPos}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="width: 100%; border: 1.5px solid #000; margin-top: 5px;">
+    <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
+      <thead>
+        <tr style="background: #e6e6e6; font-size: 7.5px; font-weight: bold; border-bottom: 1.5px solid #000; text-align: center; height: 22px;">
+          <th style="width: 15%; border-right: 1px solid #000; padding: 2px;">Nº do caso/iniciais do caso</th>
+          <th style="width: 5%; border-right: 1px solid #000; padding: 2px;">UF Resid.</th>
+          <th style="width: 15%; border-right: 1px solid #000; padding: 2px;">Município de residência</th>
+          <th style="width: 10%; border-right: 1px solid #000; padding: 2px;">Distrito</th>
+          <th style="width: 13%; border-right: 1px solid #000; padding: 2px;">Bairro</th>
+          <th style="width: 5%; border-right: 1px solid #000; padding: 2px;">Zona</th>
+          <th style="width: 5%; border-right: 1px solid #000; padding: 2px;">Sexo</th>
+          <th style="width: 12%; border-right: 1px solid #000; padding: 2px;">Idade</th>
+          <th colspan="5" style="width: 15%; border-right: 1px solid #000; padding: 2px; border-bottom: 1px solid #000;">Forma Clínica</th>
+          <th style="width: 5%; padding: 2px;">Encam. cirurg.</th>
+        </tr>
+        <tr style="background: #e6e6e6; font-size: 6.5px; font-weight: bold; border-bottom: 1.5px solid #000; text-align: center; height: 12px;">
+          <th colspan="8" style="border-right: 1px solid #000; padding: 1px;"></th>
+          <th style="width: 3%; border-right: 1px solid #000; padding: 1px;">TF</th>
+          <th style="width: 3%; border-right: 1px solid #000; padding: 1px;">TI</th>
+          <th style="width: 3%; border-right: 1px solid #000; padding: 1px;">TS</th>
+          <th style="width: 3%; border-right: 1px solid #000; padding: 1px;">TT</th>
+          <th style="width: 3%; border-right: 1px solid #000; padding: 1px;">CO</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${tracomaRowsHtml}
+      </tbody>
+    </table>
+  </div>
+
+  <div style="border: 1.5px solid #000; padding: 4px; font-size: 7px; margin-top: 5px; line-height: 1.2;">
+    <strong>LEGENDA:</strong><br>
+    <strong>Zona:</strong> 1-urbana &nbsp;&nbsp; 2-rural &nbsp;&nbsp; 3-periurbana &nbsp;&nbsp; 9-ignorado &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <strong>Sexo:</strong> M-masculino &nbsp;&nbsp; F-feminino &nbsp;&nbsp; 9-ignorado &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <strong>Encaminhamento para cirurgia:</strong> 1-Sim &nbsp;&nbsp; 2-Não &nbsp;&nbsp; 9-Ignorado<br>
+    <strong>Forma Clínica:</strong> 1-Sim &nbsp;&nbsp; 2-Não &nbsp;&nbsp; 9-Ignorado &nbsp;&nbsp;&nbsp;&nbsp; (<strong>TF</strong> - Tracoma Inflamatório Folicular / <strong>TI</strong> - Tracoma Inflamatório Intenso / <strong>TS</strong> - Tracoma Cicatricial / <strong>TT</strong> - Triquíase Tracomatosa / <strong>CO</strong> - Opacificação de Córnea)
+  </div>
+
+  <div class="footer-info">
+    <span>Boletim de Inqu&eacute;rito de Tracoma</span>
+    <span>Sinan NET</span>
+    <span>SVS 11/07/2006</span>
+  </div>
+</div>
+</body>
+</html>`;
+    }
+
+    function generatePage1Html(data) {
+        return `
 <div class="sinan-page">
   <div class="sn-header">
     <div class="sn-header-left">
@@ -5610,7 +8240,7 @@ window.printNotificationData = function(data) {
     <div class="sn-header-center">
       <p class="sn-sinan">SINAN</p>
       <p class="sn-title">SISTEMA DE INFORMA&Ccedil;&Atilde;O DE AGRAVOS DE NOTIFICA&Ccedil;&Atilde;O</p>
-      <p class="sn-subtitle">FICHA DE NOTIFICA&Ccedil;&Atilde;O</p>
+      <p class="sn-subtitle">FICHA DE NOTIFICA&Ccedil;&Atilde;O / INVESTIGAÇÃO</p>
     </div>
     <div class="sn-header-right">
       <span class="sn-num-label">N&ordm;</span>
@@ -5905,8 +8535,1158 @@ window.printNotificationData = function(data) {
     <span>SVS 17/07/2006</span>
   </div>
 </div>
+`;
+    }
 
-<!-- PAGINA 2: DADOS COMPLEMENTARES -->
+    function generatePage2Hanseniase(data) {
+        return `
+<div class="sinan-page">
+  <div class="pg2-header">
+    <p class="pg2-title">DADOS COMPLEMENTARES DO CASO - HANSENÍASE</p>
+    <p class="pg2-sub">(ANOTAR TODOS OS DADOS DISPONÍVEIS NO MOMENTO DA NOTIFICACAO)</p>
+  </div>
+
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados Complementares</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">31</span> Nº DO PRONTUÁRIO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.prontuario || '', 10)}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.5;">
+          <div class="ct"><span class="cn">32</span> OCUPAÇÃO</div>
+          <div class="cv">${cs.occupation || '&nbsp;'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">33</span> Nº DE LESÕES CUTÂNEAS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.lesoesCutaneas || '', 2)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:2.8;">
+          <div class="ct"><span class="cn">34</span> FORMA CLÍNICA</div>
+          <div style="font-size:5.5px; line-height:1.2; margin-top:2px; padding-right:25px;">
+            1 - Indeterminada &nbsp;&nbsp;&nbsp;&nbsp; 2 - Tuberculóide &nbsp;&nbsp;&nbsp;&nbsp; 3 - Dimorfa<br>
+            4 - Virchowiana &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5 - Não classificado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            ${cs.formaClinica || '9'}
+          </div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">35</span> CLASSIFICAÇÃO OPERACIONAL</div>
+          <div style="font-size:6px; line-height:1.2; margin-top:2px;">
+            1 - PB (Paucibacilar) &nbsp;&nbsp;&nbsp;&nbsp; 2 - MB (Multibacilar)
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            ${cs.classOperacional || '9'}
+          </div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">36</span> Nº DE NERVOS AFETADOS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.nervosAfetados || '', 2)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">37</span> AVALIAÇÃO DO GRAU DE INCAPACIDADE FÍSICA NO DIAGNÓSTICO</div>
+          <div style="font-size:5.5px; line-height:1.2; margin-top:2px; padding-right:20px;">
+            0-Grau Zero &nbsp;&nbsp; 1-Grau I &nbsp;&nbsp; 2-Grau II &nbsp;&nbsp; 3-Não Avaliado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            ${cs.incapacidadeFisica || '9'}
+          </div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.0;">
+          <div class="ct"><span class="cn">38</span> MODO DE ENTRADA</div>
+          <div style="font-size:5px; line-height:1.2; margin-top:2px; padding-right:25px;">
+            1 - Caso Novo &nbsp;&nbsp;&nbsp;&nbsp; 2 - Transferência do mesmo município &nbsp;&nbsp;&nbsp;&nbsp; 3 - Transferência de outro município (mesma UF)<br>
+            4 - Transferência de outro estado &nbsp;&nbsp;&nbsp;&nbsp; 5 - Transferência de outro país &nbsp;&nbsp;&nbsp;&nbsp; 6 - Recidiva &nbsp;&nbsp;&nbsp;&nbsp; 7 - Outros reingressos &nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            ${cs.modoEntrada || '9'}
+          </div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.0;">
+          <div class="ct"><span class="cn">39</span> MODO DE DETECÇÃO DO CASO NOVO</div>
+          <div style="font-size:5.5px; line-height:1.2; margin-top:2px; padding-right:25px;">
+            1 - Encaminhamento &nbsp;&nbsp;&nbsp;&nbsp; 2 - Demanda Espontânea &nbsp;&nbsp;&nbsp;&nbsp; 3 - Exame de Coletividade<br>
+            4 - Exame de Contatos &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5 - Outros Modos &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            ${cs.modoDeteccao || '9'}
+          </div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">40</span> BACILOSCOPIA</div>
+          <div style="font-size:5.5px; line-height:1.2; margin-top:2px;">
+            1 - Positiva &nbsp;&nbsp;&nbsp;&nbsp; 2 - Negativa &nbsp;&nbsp;&nbsp;&nbsp; 3 - Não realizada &nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            ${cs.baciloscopia || '9'}
+          </div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">41</span> DATA DO INÍCIO DO TRATAMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataInicioTratamento || ''), 8)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.3;">
+          <div class="ct"><span class="cn">42</span> ESQUEMA TERAPÊUTICO INICIAL</div>
+          <div style="font-size:5px; line-height:1.2; margin-top:2px; padding-right:20px;">
+            1 - PQT/PB/6 doses &nbsp;&nbsp;&nbsp;&nbsp; 2 - PQT/MB/12 doses<br>
+            3 - Outros Esquemas Substitutos
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            ${cs.esquemaTerapeutico || '9'}
+          </div>
+        <div class="sn-cell">
+          <div class="ct"><span class="cn">43</span> NÚMERO DE CONTATOS REGISTRADOS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.contatosRegistrados || '', 3)}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO INVESTIGADOR -->
+  <div class="sn-block" style="margin-top:10px;">
+    <div class="sn-sidebar">Investigador</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.0;">
+          <div class="ct">MUNICIPIO / UNIDADE DE SAÚDE</div>
+          <div class="cv">${data.munNotificacao || 'MARABA'} / ${unitName}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct">CÓDIGO DA UNID. DE SAÚDE</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cnesCode, 7)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct">NOME</div>
+          <div class="cv" style="font-weight:900; font-size:10px;">${data.notificatorName || 'Profissional de Saude'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct">FUNÇÃO</div>
+          <div class="cv">Profissional de Saude</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct">ASSINATURA</div>
+          <div class="cv" style="border-bottom:1px dotted #555; margin-top:4px; min-height:14px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-info">
+    <span>Hanseníase</span>
+    <span>Sinan NET</span>
+    <span>SVS 30/10/2007</span>
+  </div>
+</div>
+`;
+    }
+
+    function generatePage1EsquistossomoseHtml(data) {
+        return `
+<div class="sinan-page">
+  <div class="sn-header">
+    <div class="sn-header-left">
+      Rep&uacute;blica Federativa do Brasil<br>
+      Minist&eacute;rio da Sa&uacute;de
+    </div>
+    <div class="sn-header-center">
+      <p class="sn-sinan">SINAN</p>
+      <p class="sn-title">SISTEMA DE INFORMA&Ccedil;&Atilde;O DE AGRAVOS DE NOTIFICA&Ccedil;&Atilde;O</p>
+      <p class="sn-subtitle">FICHA DE INVESTIGA&Ccedil;&Atilde;O ESQUISTOSSOMOSE N&ordm;</p>
+    </div>
+    <div class="sn-header-right">
+      <span class="sn-num-label">N&ordm;</span>
+      <div class="sn-num-box">${data.sinan_number || '---.---'}</div>
+    </div>
+  </div>
+
+  <!-- CASO CONFIRMADO BANNER -->
+  <div style="border:1.5px solid #000; padding:3px 6px; margin-bottom:4px; font-size:7px; line-height:1.2; background:#fafafa;">
+    <strong>CASO CONFIRMADO:</strong> Todo indiv&iacute;duo que apresente ovos vi&aacute;veis de <em>Schistosoma mansoni</em> nas fezes ou em tecido submetido &agrave; bi&oacute;psia.
+  </div>
+
+  <!-- BLOCO 1: DADOS GERAIS -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados Gerais</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1; min-height:22px;">
+          <div class="ct"><span class="cn">1</span> TIPO DE NOTIFICA&Ccedil;&Atilde;O</div>
+          <div style="font-size:7.5px; margin-top:2px;">
+            2 - Individual
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            ${tipoNotif}
+          </div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.5; position:relative;">
+          <div class="ct"><span class="cn">2</span> AGRAVO/DOEN&Ccedil;A</div>
+          <div style="font-size:10px; font-weight:900; margin-top:2px;">ESQUISTOSSOMOSE</div>
+          <div style="position:absolute; right:8px; top:4px; font-size:7px; font-weight:bold;">
+            C&oacute;digo (CID10)<br>
+            <span style="font-size:8.5px; border:1px solid #000; padding:1px 4px; font-family:monospace; background:#fff;">B 65.9</span>
+          </div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">3</span> DATA DA NOTIFICA&Ccedil;&Atilde;O</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.dataNotificacao), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.4;">
+          <div class="ct"><span class="cn">4</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.ufNotificacao || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">5</span> MUNIC&Iacute;PIO DE NOTIFICA&Ccedil;&Atilde;O</div>
+          <div class="cv">${data.munNotificacao || 'MARABA'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('1504208', 7)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.2;">
+          <div class="ct"><span class="cn">6</span> UNIDADE DE SA&Uacute;DE (OU OUTRA FONTE NOTIFICADORA)</div>
+          <div class="cv">${unitName}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cnesCode, 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">7</span> DATA DOS PRIMEIROS SINTOMAS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.symptomsDate), 8)}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 2: NOTIFICAÇÃO INDIVIDUAL -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Notifica&ccedil;&atilde;o Individual</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:3.0;">
+          <div class="ct"><span class="cn">8</span> NOME DO PACIENTE</div>
+          <div class="cv" style="font-size:10px; font-weight:900;">${data.patientName || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">9</span> DATA DE NASCIMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.patientBirthDate), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct"><span class="cn">10</span> (OU) IDADE</div>
+          <div style="display:flex; align-items:center; gap:3px; margin-top:2px;">
+            <div>${splitDigits(data.patientAge || '', 3, true)}</div>
+            <div class="single-box">${data.patientAge ? '4' : '&nbsp;'}</div>
+            <div style="font-size:5px; line-height:1.0; font-weight:bold; margin-left:2px;">
+              1 - Hora<br>2 - Dia<br>3 - M&ecirc;s<br>4 - Ano
+            </div>
+          </div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:0.7;">
+          <div class="ct"><span class="cn">11</span> SEXO</div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">
+            M - Masculino<br>F - Feminino<br>I - Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            ${sexCode}
+          </div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">12</span> GESTANTE</div>
+          <div style="font-size:5.2px; line-height:1.1; margin-top:2px;">
+            1-1&ordm;Trimestre &nbsp;&nbsp; 2-2&ordm;Trimestre &nbsp;&nbsp; 3-3&ordm;Trimestre<br>
+            4-Idade gestacional Ignorada &nbsp;&nbsp; 5-N&atilde;o &nbsp;&nbsp; 6-N&atilde;o se aplica<br>
+            9-Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            ${pregnantCode}
+          </div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.3;">
+          <div class="ct"><span class="cn">13</span> RA&Ccedil;A/COR</div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">
+            1-Branca &nbsp;&nbsp; 2-Preta &nbsp;&nbsp; 3-Amarela<br>
+            4-Parda &nbsp;&nbsp; 5-Ind&iacute;gena &nbsp;&nbsp; 9-Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            ${raceCode}
+          </div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative;">
+          <div class="ct"><span class="cn">14</span> ESCOLARIDADE</div>
+          <div style="font-size:5px; line-height:1.2; margin-top:2px; padding-right:25px;">
+            0-Analfabeto &nbsp;&nbsp; 1-1&ordf; a 4&ordf; s&eacute;rie incompleta do EF &nbsp;&nbsp; 2-4&ordf; s&eacute;rie completa do EF<br>
+            3-5&ordf; &agrave; 8&ordf; s&eacute;rie incompleta do EF &nbsp;&nbsp; 4-Ensino fundamental completo &nbsp;&nbsp; 5-Ensino m&eacute;dio incompleto<br>
+            6-Ensino m&eacute;dio completo &nbsp;&nbsp; 7-Educa&ccedil;&atilde;o superior incompleta &nbsp;&nbsp; 8-Educa&ccedil;&atilde;o superior completa &nbsp;&nbsp; 9-Ignorado &nbsp;&nbsp; 10-N&atilde;o se aplica
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            ${schoolCode}
+          </div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.2;">
+          <div class="ct"><span class="cn">15</span> N&Uacute;MERO DO CART&Atilde;O SUS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.patientCns || '', 15)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">16</span> NOME DA M&Atilde;E</div>
+          <div class="cv" style="font-size:9px;">${data.patientMotherName || 'Nao informada'}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 3: DADOS DE RESIDÊNCIA -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados de Resid&ecirc;ncia</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.35;">
+          <div class="ct"><span class="cn">17</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.patientUf || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.7;">
+          <div class="ct"><span class="cn">18</span> MUNIC&Iacute;PIO DE RESID&Ecirc;NCIA</div>
+          <div class="cv">${data.patientMunicipality || 'MARABA'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct">C&Oacute;DIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('1504208', 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">19</span> DISTRITO</div>
+          <div class="cv">${data.patientDistrict || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">20</span> BAIRRO</div>
+          <div class="cv">${data.patientNeighborhood || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.5;">
+          <div class="ct"><span class="cn">21</span> LOGRADOURO (RUA, AVENIDA,...)</div>
+          <div class="cv">${data.patientAddress || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO</div>
+          <div class="cv"></div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct"><span class="cn">22</span> N&Uacute;MERO</div>
+          <div class="cv">${data.patientNumber || 'S/N'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">23</span> COMPLEMENTO (APTO., CASA,...)</div>
+          <div class="cv">${data.patientComplement || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">24</span> GEO CAMPO 1</div>
+          <div class="cv"></div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">25</span> GEO CAMPO 2</div>
+          <div class="cv"></div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">26</span> PONTO DE REFER&Ecirc;NCIA</div>
+          <div class="cv">${data.patientRef || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">27</span> CEP</div>
+          <div class="cv" style="padding-top:3px;">${formatCepDigits(data.patientCep)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">28</span> (DDD) TELEFONE</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits((data.patientPhone || '').replace(/\D/g,''), 11)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">29</span> ZONA</div>
+          <div style="font-size:6px; line-height:1.1; margin-top:2px;">
+            1 - Urbana &nbsp;&nbsp;&nbsp;&nbsp; 2 - Rural &nbsp;&nbsp;&nbsp;&nbsp; 3 - Periurbana &nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            ${zoneCode}
+          </div>
+        </div>
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct"><span class="cn">30</span> PA&Iacute;S (SE RESID. FORA)</div>
+          <div class="cv">${data.patientCountry || ''}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DADOS COMPLEMENTARES DO CASO -->
+  <div style="background:#e6e6e6; font-size:8px; font-weight:bold; text-align:center; padding:2px; border:1px solid #000; border-bottom:none;">
+    Dados Complementares do Caso
+  </div>
+
+  <!-- BLOCO 4: ANTECEDENTES EPIDEMIOLÓGICOS / LABORATÓRIO / TRATAMENTO -->
+  <div class="sn-block">
+    <div class="sn-sidebar" style="font-size:6px;">Ant. Epid. / Dados do Laborat&oacute;rio / Tratamento</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">31</span> DATA DA INVESTIGA&Ccedil;&Atilde;O</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataInvestigacao), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.8;">
+          <div class="ct"><span class="cn">32</span> OCUPA&Ccedil;&Atilde;O</div>
+          <div class="cv">${cs.occupation || ''}</div>
+        </div>
+      </div>
+
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">33</span> DATA DA COPROSCOPIA</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataCoproscopia), 8)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">34</span> AN&Aacute;LISE QUANTITATIVA</div>
+          <div style="font-size:5px; margin-top:2px;">0 - 0 (zero) &nbsp;&nbsp; 1 - 1 (um) ou mais ovos</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.analiseQuant || '0'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">35</span> AN&Aacute;LISE QUALITATIVA</div>
+          <div style="font-size:5px; margin-top:2px;">1-positivo &nbsp; 2-negativo &nbsp; 3-N/realiz</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.analiseQual || '3'}</div>
+        </div>
+      </div>
+
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">36</span> OUTROS</div>
+          <div style="font-size:5px; margin-top:2px;">1-positivo &nbsp; 2-negativo &nbsp; 3-N/realiz</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.outrosQual || '3'}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.4;">
+          <div class="ct"><span class="cn">37</span> OUTROS EXAMES (ESPECIFICAR)</div>
+          <div class="cv">${cs.outrosEspecificar || ''}</div>
+        </div>
+      </div>
+
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">38</span> FEZ TRATAMENTO?</div>
+          <div style="font-size:5px; line-height:1.1; margin-top:2px;">
+            1-Sim-Praziquantel &nbsp; 2-Sim-Oxamniquine<br>
+            3-N&atilde;o &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 9-Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.fezTratamento || '9'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">39</span> DATA DO TRATAMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataTratamento), 8)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">40</span> CASO N&Atilde;O TENHA FEITO TRAT., MOTIVO?</div>
+          <div style="font-size:5px; line-height:1.1; margin-top:2px;">
+            1-Contra Indica&ccedil;&atilde;o &nbsp; 2-Recusa<br>
+            3-Ausente &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 9-Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.motivoNaoTratamento || '9'}</div>
+        </div>
+      </div>
+
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.2;">
+          <div class="ct"><span class="cn">41</span> RESULTADO AN&Aacute;LISE VERIFICA&Ccedil;&Atilde;O DE CURA</div>
+          <div style="font-size:5px; margin-top:1px;">0-0 (zero) &nbsp;&nbsp; 1-1 ou mais ovos &nbsp;&nbsp; 2-N&atilde;o realizado</div>
+          <div style="display:flex; justify-content:space-around; align-items:center; font-size:6px; margin-top:2px;">
+            <span>1&ordf;amostra ${singleBox(cs.cura1Amostra || '2')}</span>
+            <span>2&ordf;amostra ${singleBox(cs.cura2Amostra || '2')}</span>
+            <span>3&ordf;amostra ${singleBox(cs.cura3Amostra || '2')}</span>
+          </div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">42</span> DATA RES. 3&ordf; AMOSTRA</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.curaData3Amostra), 8)}</div>
+        </div>
+      </div>
+
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.0;">
+          <div class="ct"><span class="cn">43</span> ESPECIFICAR FORMA CL&Iacute;NICA</div>
+          <div style="font-size:5px; line-height:1.1; margin-top:2px;">
+            1-Intestinal &nbsp;&nbsp; 2-Hepato Intestinal &nbsp;&nbsp; 3-Hepato Espl&ecirc;nica &nbsp;&nbsp; 4-Aguda &nbsp;&nbsp; 5-Outra (especificar)
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.formaClinica || '1'}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 5: CONCLUSÃO E LOCAL PROVÁVEL DE INFECÇÃO -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Conclus&atilde;o</div>
+    <div class="sn-content">
+      <div style="background:#e6e6e6; font-size:7.5px; font-weight:bold; padding:2px 5px; border-bottom:1px solid #000;">
+        Local Prov&aacute;vel de Infec&ccedil;&atilde;o
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:2.0;">
+          <div class="ct"><span class="cn">44</span> O CASO &Eacute; AUT&Oacute;CTONE DO MUNIC&Iacute;PIO DE RESID&Ecirc;NCIA?</div>
+          <div style="font-size:6px; margin-top:2px;">1-Sim &nbsp;&nbsp; 2-N&atilde;o &nbsp;&nbsp; 3-Indeterminado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.autoctone || '1'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.4;">
+          <div class="ct"><span class="cn">45</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.infeccaoUf || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">46</span> PA&Iacute;S</div>
+          <div class="cv">${cs.infeccaoPais || 'Brasil'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">47</span> MUNIC&Iacute;PIO</div>
+          <div class="cv">${cs.infeccaoMun || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('', 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">48</span> DISTRITO</div>
+          <div class="cv">${cs.infeccaoDist || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">49</span> BAIRRO</div>
+          <div class="cv">${cs.infeccaoBairro || ''}</div>
+        </div>
+      </div>
+
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.0;">
+          <div class="ct"><span class="cn">50</span> NOME DA PROPRIEDADE (SE &Aacute;REA RURAL)</div>
+          <div class="cv">${cs.infeccaoPropriedade || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.0;">
+          <div class="ct"><span class="cn">51</span> NOME DA COLE&Ccedil;&Atilde;O H&Iacute;DRICA</div>
+          <div class="cv">${cs.infeccaoHidrica || ''}</div>
+        </div>
+      </div>
+
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">52</span> DOEN&Ccedil;A RELACIONADA AO TRABALHO?</div>
+          <div style="font-size:6px; margin-top:2px;">1-Sim &nbsp;&nbsp; 2-N&atilde;o &nbsp;&nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.trabalho || '2'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:2.0;">
+          <div class="ct"><span class="cn">53</span> EVOLU&Ccedil;&Atilde;O DO CASO</div>
+          <div style="font-size:5px; line-height:1.1; margin-top:2px;">
+            1-Cura &nbsp; 2-N&atilde;o Cura &nbsp; 3-&Oacute;bito por esquistossomose<br>
+            4-&Oacute;bito por outras causas &nbsp; 9-Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.evolucao || '1'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">54</span> DATA DO &Oacute;BITO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataObito), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">55</span> DATA DO ENCERRAMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataEncerramento || data.dataNotificacao), 8)}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 6: INVESTIGADOR -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Investigador</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.0;">
+          <div class="ct">MUNIC&Iacute;PIO/UNIDADE DE SA&Uacute;DE</div>
+          <div class="cv">${data.munNotificacao || 'MARABA'} / ${unitName}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct">C&Oacute;D. DA UNID. DE SA&Uacute;DE</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cnesCode, 7)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct">NOME</div>
+          <div class="cv" style="font-weight:900; font-size:10px;">${data.notificatorName || 'Profissional de Saude'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct">FUN&Ccedil;&Atilde;O</div>
+          <div class="cv">Profissional de Saude</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct">ASSINATURA</div>
+          <div class="cv" style="border-bottom:1px dotted #555; margin-top:4px; min-height:14px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-info">
+    <span>Esquistossomose</span>
+    <span>Sinan on</span>
+    <span>SVS 08/10/2009</span>
+  </div>
+</div>
+        `;
+    }
+
+    function generatePage1MalariaHtml(data) {
+        return `
+<div class="sinan-page">
+  <div class="sn-header">
+    <div class="sn-header-left">
+      Rep&uacute;blica Federativa do Brasil<br>
+      Minist&eacute;rio da Sa&uacute;de<br>
+      Secretaria de Vigil&acirc;ncia em Sa&uacute;de
+    </div>
+    <div class="sn-header-center">
+      <p class="sn-sinan">SINAN</p>
+      <p class="sn-title">SISTEMA DE INFORMA&Ccedil;&Atilde;O DE AGRAVOS DE NOTIFICA&Ccedil;&Atilde;O</p>
+      <p class="sn-subtitle">FICHA DE INVESTIGAÇÃO MALÁRIA</p>
+    </div>
+    <div class="sn-header-right">
+      <span class="sn-num-label">N&ordm;</span>
+      <div class="sn-num-box">${data.sinan_number || '---.---'}</div>
+    </div>
+  </div>
+
+  <!-- BLOCO 1: DADOS GERAIS -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados Gerais</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1; min-height:24px;">
+          <div class="ct"><span class="cn">1</span> TIPO DE NOTIFICA&Ccedil;&Atilde;O</div>
+          <div style="font-size:7.5px; margin-top:2px;">
+            1 - Negativa &nbsp;&nbsp;&nbsp;&nbsp; 2 - Individual &nbsp;&nbsp;&nbsp;&nbsp; 3 - Surto &nbsp;&nbsp;&nbsp;&nbsp; 4 - Inqu&eacute;rito Tracoma
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            ${tipoNotif}
+          </div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.5;">
+          <div class="ct"><span class="cn">2</span> AGRAVO/DOEN&Ccedil;A</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; width:100%; font-size:11px; font-weight:900;">
+            <span>MAL&Aacute;RIA</span>
+            <span style="font-size:7px; font-weight:bold; display:inline-flex; align-items:center;">
+              C&oacute;digo (CID10) &nbsp; <span style="display:inline-block; font-size:9px; font-weight:bold; letter-spacing:2px; border:1px solid #000; padding:1px 2px; background:#fff; margin-left:3px; font-family:monospace; line-height:1;">B 5 4</span>
+            </span>
+          </div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">3</span> DATA DA NOTIFICA&Ccedil;&Atilde;O</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.dataNotificacao), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.4;">
+          <div class="ct"><span class="cn">4</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.ufNotificacao || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">5</span> MUNICIPIO DE NOTIFICACAO</div>
+          <div class="cv">${data.munNotificacao || 'MARABA'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">CODIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('1504208', 7)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.2;">
+          <div class="ct"><span class="cn">6</span> UNIDADE DE SAUDE (OU OUTRA FONTE NOTIFICADORA)</div>
+          <div class="cv">${unitName}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">CODIGO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cnesCode, 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">7</span> DATA DOS PRIMEIROS SINTOMAS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.symptomsDate), 8)}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 2: NOTIFICACAO INDIVIDUAL -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Notificacao Individual</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:3.0;">
+          <div class="ct"><span class="cn">8</span> NOME DO PACIENTE</div>
+          <div class="cv" style="font-size:10px; font-weight:900;">${data.patientName || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">9</span> DATA DE NASCIMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.patientBirthDate), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct"><span class="cn">10</span> (OU) IDADE</div>
+          <div style="display:flex; align-items:center; gap:3px; margin-top:2px;">
+            <div>${splitDigits(data.patientAge || '', 3, true)}</div>
+            <div class="single-box">${data.patientAge ? '4' : '&nbsp;'}</div>
+            <div style="font-size:5px; line-height:1.0; font-weight:bold; margin-left:2px;">
+              1 - Hora<br>
+              2 - Dia<br>
+              3 - M&ecirc;s<br>
+              4 - Ano
+            </div>
+          </div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:0.7;">
+          <div class="ct"><span class="cn">11</span> SEXO</div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">
+            M - Masculino<br>
+            F - Feminino<br>
+            I - Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            ${sexCode}
+          </div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">12</span> GESTANTE</div>
+          <div style="font-size:5.2px; line-height:1.1; margin-top:2px;">
+            1-1&ordm;Trimestre &nbsp;&nbsp; 2-2&ordm;Trimestre &nbsp;&nbsp; 3-3&ordm;Trimestre<br>
+            4-Idade gestacional Ignorada &nbsp;&nbsp; 5-N&atilde;o &nbsp;&nbsp; 6-N&atilde;o se aplica<br>
+            9-Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            ${pregnantCode}
+          </div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.3;">
+          <div class="ct"><span class="cn">13</span> RACA/COR</div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">
+            1-Branca &nbsp;&nbsp; 2-Preta &nbsp;&nbsp; 3-Amarela<br>
+            4-Parda &nbsp;&nbsp; 5-Ind&iacute;gena &nbsp;&nbsp; 9-Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            ${raceCode}
+          </div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative;">
+          <div class="ct"><span class="cn">14</span> ESCOLARIDADE</div>
+          <div style="font-size:5px; line-height:1.2; margin-top:2px; padding-right:25px;">
+            0-Analfabeto &nbsp;&nbsp; 1-1&ordf; a 4&ordf; s&eacute;rie incompleta do EF (antigo prim&aacute;rio ou 1&ordm; grau) &nbsp;&nbsp; 2-4&ordf; s&eacute;rie completa do EF (antigo prim&aacute;rio ou 1&ordm; grau)<br>
+            3-5&ordf; &agrave; 8&ordf; s&eacute;rie incompleta do EF (antigo gin&aacute;sio ou 1&ordm; grau) &nbsp;&nbsp; 4-Ensino fundamental completo (antigo gin&aacute;sio ou 1&ordm; grau) &nbsp;&nbsp; 5-Ensino m&eacute;dio incompleto (antigo colegial ou 2&ordm; grau)<br>
+            6-Ensino m&eacute;dio completo (antigo colegial ou 2&ordm; grau) &nbsp;&nbsp; 7-Educa&ccedil;&atilde;o superior incompleta &nbsp;&nbsp; 8-Educa&ccedil;&atilde;o superior completa &nbsp;&nbsp; 9-Ignorado &nbsp;&nbsp; 10-N&atilde;o se aplica
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            ${schoolCode}
+          </div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.2;">
+          <div class="ct"><span class="cn">15</span> NUMERO DO CARTAO SUS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.patientCns || '', 15)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">16</span> NOME DA MAE</div>
+          <div class="cv" style="font-size:9px;">${data.patientMotherName || 'Nao informada'}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 3: DADOS DE RESIDENCIA -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados de Residencia</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.35;">
+          <div class="ct"><span class="cn">17</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.patientUf || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.7;">
+          <div class="ct"><span class="cn">18</span> MUNICIPIO DE RESIDENCIA</div>
+          <div class="cv">${data.patientMunicipality || 'MARABA'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct">CODIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('1504208', 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">19</span> DISTRITO</div>
+          <div class="cv">${data.patientDistrict || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">20</span> BAIRRO</div>
+          <div class="cv">${data.patientNeighborhood || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.5;">
+          <div class="ct"><span class="cn">21</span> LOGRADOURO (RUA, AVENIDA,...)</div>
+          <div class="cv">${data.patientAddress || 'Nao informado'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct"><span class="cn">22</span> NUMERO</div>
+          <div class="cv">${data.patientNumber || 'S/N'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">23</span> COMPLEMENTO (APTO., CASA,...)</div>
+          <div class="cv">${data.patientComplement || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">24</span> GEO CAMPO 1</div>
+          <div class="cv"></div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">25</span> GEO CAMPO 2</div>
+          <div class="cv"></div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">26</span> PONTO DE REFERENCIA</div>
+          <div class="cv">${data.patientRef || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">27</span> CEP</div>
+          <div class="cv" style="padding-top:3px;">${formatCepDigits(data.patientCep)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">28</span> (DDD) TELEFONE</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits((data.patientPhone || '').replace(/\\D/g,''), 11)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">29</span> ZONA</div>
+          <div style="font-size:6px; line-height:1.1; margin-top:2px;">
+            1 - Urbana &nbsp;&nbsp;&nbsp;&nbsp; 2 - Rural &nbsp;&nbsp;&nbsp;&nbsp; 3 - Periurbana &nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            ${zoneCode}
+          </div>
+        </div>
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct"><span class="cn">30</span> PAIS (SE RESID. FORA)</div>
+          <div class="cv">${data.patientCountry || ''}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 4: DADOS COMPLEMENTARES DO CASO -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados do Exame</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">31</span> DATA DA INVESTIGAÇÃO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataInvestigacao || ''), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">32</span> OCUPAÇÃO</div>
+          <div class="cv">${cs.occupation || '&nbsp;'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:2.0;">
+          <div class="ct"><span class="cn">33</span> PRINCIPAL ATIVIDADE NOS ÚLTIMOS 15 DIAS</div>
+          <div style="font-size:4.8px; line-height:1.0; margin-top:2px; padding-right:20px;">
+            1-Agric. &nbsp; 2-Pecu. &nbsp; 3-Dom. &nbsp; 4-Tur. &nbsp; 5-Gar. &nbsp; 6-Expl.veg. &nbsp; 7-Caça/pesca<br>
+            8-Const.estrad &nbsp; 9-Miner. &nbsp; 10-Viajante &nbsp; 11-Outros &nbsp; 12-Motorista &nbsp; 99-Ign
+          </div>
+          <div class="double-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            <span>${String(cs.atividade || '99').padStart(2, '0')[0]}</span>
+            <span>${String(cs.atividade || '99').padStart(2, '0')[1]}</span>
+          </div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">34</span> TIPO DE LÂMINA</div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px; padding-right:20px;">
+            1 - BP (Busca Passiva) &nbsp;&nbsp;&nbsp;&nbsp; 2 - BA (Busca Ativa) &nbsp;&nbsp;&nbsp;&nbsp; 3 - LVC
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            ${cs.tipoLamina || '1'}
+          </div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">35</span> PRESENÇA DE SINTOMAS</div>
+          <div style="font-size:6px; line-height:1.1; margin-top:2px; padding-right:20px;">
+            1 - Com sintomas &nbsp;&nbsp;&nbsp;&nbsp; 2 - Sem sintomas
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            ${cs.sintomas || '1'}
+          </div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">36</span> DATA DO EXAME</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataExame || ''), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:2.5;">
+          <div class="ct"><span class="cn">37</span> RESULTADO DO EXAME</div>
+          <div style="font-size:4.8px; line-height:1.1; margin-top:2px; padding-right:20px;">
+            1-Neg &nbsp; 2-F(Falcip) &nbsp; 3-F+FG &nbsp; 4-V(Vivax) &nbsp; 5-F+V &nbsp; 6-V+FG &nbsp; 7-FG(Gamet) &nbsp; 8-M(Malariae) &nbsp; 9-F+M &nbsp; 10-Outras
+          </div>
+          <div class="double-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            <span>${String(cs.resultadoExame || '01').padStart(2, '0')[0]}</span>
+            <span>${String(cs.resultadoExame || '01').padStart(2, '0')[1]}</span>
+          </div>
+        </div>
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">38</span> PARASITOS POR mm³</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.parasitos || '', 6, false)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">39</span> PARASITEMIA EM "CRUZES"</div>
+          <div style="font-size:5px; line-height:1.1; margin-top:2px; padding-right:20px;">
+            1 - &lt; +/2 &nbsp;&nbsp;&nbsp;&nbsp; 2 - +/2 &nbsp;&nbsp;&nbsp;&nbsp; 3 - + &nbsp;&nbsp;&nbsp;&nbsp; 4 - ++ &nbsp;&nbsp;&nbsp;&nbsp; 5 - +++ &nbsp;&nbsp;&nbsp;&nbsp; 6 - ++++
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            ${cs.parasitemiaCruzes || '1'}
+          </div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:2.5;">
+          <div class="ct"><span class="cn">40</span> ESQUEMA DE TRATAMENTO UTILIZADO</div>
+          <div style="font-size:4.8px; line-height:1.0; margin-top:2px; padding-right:25px;">
+            1-Pv 3d+Pri 7d &nbsp; 2-Pf Quin 3d+Dox 5d+Pri &nbsp; 3-Pv+Pf Mef+Pri &nbsp; 4-Pm Clo 3d &nbsp; 5-Pv Criança<br>
+            6-Pf Mef+Pri &nbsp; 7-Pf Quin 7d &nbsp; 8-Pf Criança &nbsp; 9-Pv+Pf Quin+Dox+Pri &nbsp; 12-Pf Artem+Lum &nbsp; 99-Out
+          </div>
+          <div class="double-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            <span>${String(cs.esquemaTratamento || '01').padStart(2, '0')[0]}</span>
+            <span>${String(cs.esquemaTratamento || '01').padStart(2, '0')[1]}</span>
+          </div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">41</span> DATA INÍCIO DO TRATAMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataInicioTrat || ''), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:3.0; border-right:none; background:#fafafa;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-info">
+    <span>Malária</span>
+    <span>Sinan NET</span>
+    <span>SVS 01/01/2010</span>
+  </div>
+</div>
+`;
+    }
+
+    function generatePage2MalariaHtml(data) {
+        const sexDigit = sexCode === 'M' ? '1' : (sexCode === 'F' ? '2' : '&nbsp;');
+
+        return `
+<div class="sinan-page">
+  <div class="pg2-header">
+    <p class="pg2-title">DADOS COMPLEMENTARES DO CASO - MALÁRIA</p>
+    <p class="pg2-sub">(ANOTAR TODOS OS DADOS DISPONÍVEIS NO MOMENTO DA NOTIFICACAO)</p>
+  </div>
+
+  <!-- BLOCO CONCLUSAO -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Conclusão</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">42</span> CLASSIFICAÇÃO FINAL</div>
+          <div style="font-size:7px; line-height:1.2; margin-top:2px;">
+            1 - Confirmado &nbsp;&nbsp;&nbsp;&nbsp; 2 - Descartado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            ${cs.classificacaoFinal || '1'}
+          </div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:2.8;">
+          <div class="ct"><span class="cn">43</span> CASO É AUTÓCTONE DO MUNICÍPIO DE RESIDÊNCIA?</div>
+          <div style="font-size:7px; line-height:1.2; margin-top:2px;">
+            1 - Sim &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 - Não &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3 - Indeterminado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            ${cs.autoctone || '1'}
+          </div>
+        </div>
+      </div>
+      <div class="sn-row" style="background:#f0f0f0; padding:3px; font-weight:bold; font-size:7.5px; border-bottom:1px solid #000;">
+        &nbsp; LOCAL PROVÁVEL DA FONTE DE INFECÇÃO (no período de 15 dias)
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.5;">
+          <div class="ct"><span class="cn">44</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.ufInfeccao || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">45</span> PAÍS PROVÁVEL DE INFECÇÃO</div>
+          <div class="cv">${cs.paisInfeccao || 'Brasil'}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.0;">
+          <div class="ct"><span class="cn">46</span> MUNICÍPIO PROVÁVEL DA INFECÇÃO</div>
+          <div class="cv">${cs.municipioInfeccao || 'MARABA'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct">CÓDIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.ibgeInfeccao || '1504208', 7)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">47</span> DISTRITO</div>
+          <div class="cv">${cs.distritoInfeccao || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">48</span> BAIRRO</div>
+          <div class="cv">${cs.bairroInfeccao || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.5;">
+          <div class="ct"><span class="cn">49</span> LOCALIDADE PROVÁVEL DA INFECÇÃO</div>
+          <div class="cv">${cs.localidadeInfeccao || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">50</span> DATA DE ENCERRAMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataEncerramento || ''), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.5; background:#fafafa; border-right:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DADOS OBSERVACOES -->
+  <div class="sn-block" style="margin-top:5px; min-height:80px; flex-direction:column; padding:5px 8px;">
+    <div style="font-size:7px; font-weight:bold; text-transform:uppercase; margin-bottom:5px;">Observações Adicionais:</div>
+    <div style="font-size:9px; line-height:1.4; color:#000; min-height:60px; white-space:pre-wrap;">${cs.obs || ''}</div>
+  </div>
+
+  <!-- LINHA DE CORTE DA NOTIFICACAO -->
+  <div style="border-top:1px dashed #000; margin:15px 0; position:relative; text-align:center;">
+    <span style="position:absolute; top:-6px; left:50%; transform:translateX(-50%); background:#fff; padding:0 10px; font-size:8px; font-weight:bold; text-transform:uppercase; color:#333;">
+      <i class="fas fa-scissors"></i> Recortar Aqui
+    </span>
+  </div>
+
+  <!-- COMPROVANTE DE ENTREGA AO PACIENTE -->
+  <div class="sn-block" style="margin-top:10px;">
+    <div class="sn-sidebar" style="font-size:6.5px; writing-mode:vertical-rl; padding:1px; width:22px;">SMS-UF / Município</div>
+    <div class="sn-content">
+      <div class="sn-row" style="background:#f0f0f0; border-bottom:1.5px solid #000; font-weight:bold; font-size:8.5px; padding:3px 8px; display:flex; justify-content:space-between; align-items:center;">
+        <span>COMPROVANTE DE RESULTADO DO EXAME PARA SER ENTREGUE AO PACIENTE</span>
+        <span style="font-size:7px; border:1px solid #000; padding:1px 3px; background:#fff;">MALÁRIA</span>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.8;">
+          <div class="ct">Nome do Paciente:</div>
+          <div class="cv" style="font-size:9.5px; font-weight:900;">${data.patientName || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.6;">
+          <div class="ct">Idade:</div>
+          <div class="cv">${data.patientAge || ''}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:0.8;">
+          <div class="ct">Sexo:</div>
+          <div style="font-size:5px; line-height:1.0; margin-top:2px;">
+            1 - Masc<br>2 - Fem
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            ${sexDigit}
+          </div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct">Nº da notificação</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.sinan_number || '', 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct">Data do exame</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataExame || ''), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct">Resultado do exame</div>
+          <div class="cv" style="font-size:9px; font-weight:900;">
+            ${cs.resultadoExame === '1' ? 'NEGATIVO' : 
+              cs.resultadoExame === '2' ? 'P. FALCIPARUM' : 
+              cs.resultadoExame === '3' ? 'P. FALCIPARUM + GAMETÓCITOS' : 
+              cs.resultadoExame === '4' ? 'P. VIVAX' : 
+              cs.resultadoExame === '5' ? 'P. FALCIPARUM + P. VIVAX' : 
+              cs.resultadoExame === '6' ? 'P. VIVAX + GAMETÓCITOS FALCIP' : 
+              cs.resultadoExame === '7' ? 'GAMETÓCITO FALCIPARUM ISOLADO' : 
+              cs.resultadoExame === '8' ? 'P. MALARIAE' : 
+              cs.resultadoExame === '9' ? 'P. FALCIPARUM + P. MALARIAE' : 
+              cs.resultadoExame === '10' ? 'OUTRAS ESPÉCIES' : 'NÃO INFORMADO'}
+          </div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.5;">
+          <div class="ct">Matricula e nome do examinador:</div>
+          <div class="cv">${cs.examinador || '&nbsp;'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.5; background:#fafafa; border-right:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-info">
+    <span>Malária</span>
+    <span>Comprovante de resultado do exame</span>
+    <span>Sinan NET</span>
+    <span>SVS</span>
+    <span>01/01/2010</span>
+  </div>
+</div>
+`;
+    }
+
+    function generatePage2Standard(data) {
+        return `
 <div class="sinan-page">
   <div class="pg2-header">
     <p class="pg2-title">DADOS COMPLEMENTARES</p>
@@ -6070,8 +9850,4194 @@ window.printNotificationData = function(data) {
     <span>SVS 17/07/2006</span>
   </div>
 </div>
+`;
+    }
+
+    function generatePage1CustomHtml(data, title, cid, customBlockHtml) {
+        const formattedCid = String(cid).split('').map(char => `<span style="display:inline-block; font-size:9px; font-weight:bold; letter-spacing:0px; border:1px solid #000; padding:1px 2px; background:#fff; margin-left:1px; font-family:monospace; line-height:1;">${char}</span>`).join('');
+        return `
+<div class="sinan-page">
+  <div class="sn-header">
+    <div class="sn-header-left">
+      Rep&uacute;blica Federativa do Brasil<br>
+      Minist&eacute;rio da Sa&uacute;de<br>
+      Secretaria de Vigil&acirc;ncia em Sa&uacute;de
+    </div>
+    <div class="sn-header-center">
+      <p class="sn-sinan">SINAN</p>
+      <p class="sn-title">SISTEMA DE INFORMA&Ccedil;&Atilde;O DE AGRAVOS DE NOTIFICA&Ccedil;&Atilde;O</p>
+      <p class="sn-subtitle">FICHA DE NOTIFICAÇÃO / INVESTIGAÇÃO</p>
+    </div>
+    <div class="sn-header-right">
+      <span class="sn-num-label">N&ordm;</span>
+      <div class="sn-num-box">${data.sinan_number || '---.---'}</div>
+    </div>
+  </div>
+
+  <!-- BLOCO 1: DADOS GERAIS -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados Gerais</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1; min-height:24px;">
+          <div class="ct"><span class="cn">1</span> TIPO DE NOTIFICA&Ccedil;&Atilde;O</div>
+          <div style="font-size:7.5px; margin-top:2px;">
+            1 - Negativa &nbsp;&nbsp;&nbsp;&nbsp; 2 - Individual &nbsp;&nbsp;&nbsp;&nbsp; 3 - Surto &nbsp;&nbsp;&nbsp;&nbsp; 4 - Inqu&eacute;rito Tracoma
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            ${tipoNotif}
+          </div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.5;">
+          <div class="ct"><span class="cn">2</span> AGRAVO/DOEN&Ccedil;A</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; width:100%; font-size:11px; font-weight:900;">
+            <span>${title.toUpperCase()}</span>
+            <span style="font-size:7px; font-weight:bold; display:inline-flex; align-items:center;">
+              C&oacute;digo (CID10) &nbsp; ${formattedCid}
+            </span>
+          </div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">3</span> DATA DA NOTIFICA&Ccedil;&Atilde;O</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.dataNotificacao), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.4;">
+          <div class="ct"><span class="cn">4</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.ufNotificacao || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">5</span> MUNICIPIO DE NOTIFICACAO</div>
+          <div class="cv">${data.munNotificacao || 'MARABA'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">CODIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('1504208', 7)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.2;">
+          <div class="ct"><span class="cn">6</span> UNIDADE DE SAUDE (OU OUTRA FONTE NOTIFICADORA)</div>
+          <div class="cv">${unitName}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">CODIGO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cnesCode, 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">7</span> DATA DOS PRIMEIROS SINTOMAS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.symptomsDate), 8)}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 2: NOTIFICACAO INDIVIDUAL -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Notificacao Individual</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:3.0;">
+          <div class="ct"><span class="cn">8</span> NOME DO PACIENTE</div>
+          <div class="cv" style="font-size:10px; font-weight:900;">${data.patientName || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">9</span> DATA DE NASCIMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.patientBirthDate), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct"><span class="cn">10</span> (OU) IDADE</div>
+          <div style="display:flex; align-items:center; gap:3px; margin-top:2px;">
+            <div>${splitDigits(data.patientAge || '', 3, true)}</div>
+            <div class="single-box">${data.patientAge ? '4' : '&nbsp;'}</div>
+            <div style="font-size:5px; line-height:1.0; font-weight:bold; margin-left:2px;">
+              1 - Hora<br>
+              2 - Dia<br>
+              3 - M&ecirc;s<br>
+              4 - Ano
+            </div>
+          </div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:0.7;">
+          <div class="ct"><span class="cn">11</span> SEXO</div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">
+            M - Masculino<br>
+            F - Feminino<br>
+            I - Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            ${sexCode}
+          </div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">12</span> GESTANTE</div>
+          <div style="font-size:5.2px; line-height:1.1; margin-top:2px;">
+            1-1&ordm;Trimestre &nbsp;&nbsp; 2-2&ordm;Trimestre &nbsp;&nbsp; 3-3&ordm;Trimestre<br>
+            4-Idade gestacional Ignorada &nbsp;&nbsp; 5-N&atilde;o &nbsp;&nbsp; 6-N&atilde;o se aplica<br>
+            9-Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            ${pregnantCode}
+          </div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.3;">
+          <div class="ct"><span class="cn">13</span> RACA/COR</div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">
+            1-Branca &nbsp;&nbsp; 2-Preta &nbsp;&nbsp; 3-Amarela<br>
+            4-Parda &nbsp;&nbsp; 5-Ind&iacute;gena &nbsp;&nbsp; 9-Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            ${raceCode}
+          </div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative;">
+          <div class="ct"><span class="cn">14</span> ESCOLARIDADE</div>
+          <div style="font-size:5px; line-height:1.2; margin-top:2px; padding-right:25px;">
+            0-Analfabeto &nbsp;&nbsp; 1-1&ordf; a 4&ordf; s&eacute;rie incompleta do EF (antigo prim&aacute;rio ou 1&ordm; grau) &nbsp;&nbsp; 2-4&ordf; s&eacute;rie completa do EF (antigo prim&aacute;rio ou 1&ordm; grau)<br>
+            3-5&ordf; &agrave; 8&ordf; s&eacute;rie incompleta do EF (antigo gin&aacute;sio ou 1&ordm; grau) &nbsp;&nbsp; 4-Ensino fundamental completo (antigo gin&aacute;sio ou 1&ordm; grau) &nbsp;&nbsp; 5-Ensino m&eacute;dio incompleto (antigo colegial ou 2&ordm; grau)<br>
+            6-Ensino m&eacute;dio completo (antigo colegial ou 2&ordm; grau) &nbsp;&nbsp; 7-Educa&ccedil;&atilde;o superior incompleta &nbsp;&nbsp; 8-Educa&ccedil;&atilde;o superior completa &nbsp;&nbsp; 9-Ignorado &nbsp;&nbsp; 10-N&atilde;o se aplica
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            ${schoolCode}
+          </div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.2;">
+          <div class="ct"><span class="cn">15</span> NUMERO DO CARTAO SUS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.patientCns || '', 15)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">16</span> NOME DA MAE</div>
+          <div class="cv" style="font-size:9px;">${data.patientMotherName || 'Nao informada'}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 3: DADOS DE RESIDENCIA -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados de Residencia</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.35;">
+          <div class="ct"><span class="cn">17</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.patientUf || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.7;">
+          <div class="ct"><span class="cn">18</span> MUNICIPIO DE RESIDENCIA</div>
+          <div class="cv">${data.patientMunicipality || 'MARABA'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct">CODIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('1504208', 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">19</span> DISTRITO</div>
+          <div class="cv">${data.patientDistrict || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">20</span> BAIRRO</div>
+          <div class="cv">${data.patientNeighborhood || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.5;">
+          <div class="ct"><span class="cn">21</span> LOGRADOURO (RUA, AVENIDA,...)</div>
+          <div class="cv">${data.patientAddress || 'Nao informado'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct"><span class="cn">22</span> NUMERO</div>
+          <div class="cv">${data.patientNumber || 'S/N'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">23</span> COMPLEMENTO (APTO., CASA,...)</div>
+          <div class="cv">${data.patientComplement || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">24</span> GEO CAMPO 1</div>
+          <div class="cv"></div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">25</span> GEO CAMPO 2</div>
+          <div class="cv"></div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">26</span> PONTO DE REFERENCIA</div>
+          <div class="cv">${data.patientRef || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">27</span> CEP</div>
+          <div class="cv" style="padding-top:3px;">${formatCepDigits(data.patientCep)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">28</span> (DDD) TELEFONE</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits((data.patientPhone || '').replace(/\D/g,''), 11)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">29</span> ZONA</div>
+          <div style="font-size:6px; line-height:1.1; margin-top:2px;">
+            1 - Urbana &nbsp;&nbsp;&nbsp;&nbsp; 2 - Rural &nbsp;&nbsp;&nbsp;&nbsp; 3 - Periurbana &nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            ${zoneCode}
+          </div>
+        </div>
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct"><span class="cn">30</span> PAIS (SE RESID. FORA)</div>
+          <div class="cv">${data.patientCountry || ''}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 4: DADOS COMPLEMENTARES (PARTE 1) -->
+  ${customBlockHtml}
+
+  <div class="footer-info">
+    <span>Notificacao - ${title}</span>
+    <span>Sinan NET</span>
+    <span>SVS 17/07/2006</span>
+  </div>
+</div>
+`;
+    }
+
+    // ----------------------------------------------------
+    // 1. RAIVA HUMANA (SVS 08/06/2006) - 2 PAGINAS
+    // ----------------------------------------------------
+    function generatePage1RaivaHtml(data) {
+        return `
+<div class="sinan-page">
+  <div class="sn-header">
+    <div class="sn-header-left">
+      Rep&uacute;blica Federativa do Brasil<br>
+      Minist&eacute;rio da Sa&uacute;de
+    </div>
+    <div class="sn-header-center">
+      <p class="sn-sinan">SINAN</p>
+      <p class="sn-title">SISTEMA DE INFORMA&Ccedil;&Atilde;O DE AGRAVOS DE NOTIFICA&Ccedil;&Atilde;O</p>
+      <p class="sn-subtitle">FICHA DE INVESTIGA&Ccedil;&Atilde;O RAIVA HUMANA N&ordm;</p>
+    </div>
+    <div class="sn-header-right">
+      <span class="sn-num-label">N&ordm;</span>
+      <div class="sn-num-box">${data.sinan_number || '---.---'}</div>
+    </div>
+  </div>
+
+  <div style="border:1.5px solid #000; padding:3px 6px; margin-bottom:4px; font-size:7px; line-height:1.2; background:#fafafa;">
+    <strong>CASO SUSPEITO:</strong> Todo paciente com quadro cl&iacute;nico sugestivo de encefalite r&aacute;bica, com antecedentes ou n&atilde;o de exposi&ccedil;&atilde;o &agrave; infec&ccedil;&atilde;o pelo v&iacute;rus r&aacute;bico.
+  </div>
+
+  <!-- BLOCO 1: DADOS GERAIS -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados Gerais</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1; min-height:22px;">
+          <div class="ct"><span class="cn">1</span> TIPO DE NOTIFICA&Ccedil;&Atilde;O</div>
+          <div style="font-size:7.5px; margin-top:2px;">2 - Individual</div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">${tipoNotif}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.5; position:relative;">
+          <div class="ct"><span class="cn">2</span> AGRAVO/DOEN&Ccedil;A</div>
+          <div style="font-size:10px; font-weight:900; margin-top:2px;">RAIVA HUMANA</div>
+          <div style="position:absolute; right:8px; top:4px; font-size:7px; font-weight:bold;">
+            C&oacute;digo (CID10)<br>
+            <span style="font-size:8.5px; border:1px solid #000; padding:1px 4px; font-family:monospace; background:#fff;">A 8 2.9</span>
+          </div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">3</span> DATA DA NOTIFICA&Ccedil;&Atilde;O</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.dataNotificacao), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.4;">
+          <div class="ct"><span class="cn">4</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.ufNotificacao || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">5</span> MUNIC&Iacute;PIO DE NOTIFICA&Ccedil;&Atilde;O</div>
+          <div class="cv">${data.munNotificacao || 'MARABA'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('1504208', 7)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.2;">
+          <div class="ct"><span class="cn">6</span> UNIDADE DE SA&Uacute;DE (OU OUTRA FONTE NOTIFICADORA)</div>
+          <div class="cv">${unitName}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cnesCode, 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">7</span> DATA DOS PRIMEIROS SINTOMAS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.symptomsDate), 8)}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 2: NOTIFICAÇÃO INDIVIDUAL -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Notifica&ccedil;&atilde;o Individual</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:3.0;">
+          <div class="ct"><span class="cn">8</span> NOME DO PACIENTE</div>
+          <div class="cv" style="font-size:10px; font-weight:900;">${data.patientName || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">9</span> DATA DE NASCIMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.patientBirthDate), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct"><span class="cn">10</span> (OU) IDADE</div>
+          <div style="display:flex; align-items:center; gap:3px; margin-top:2px;">
+            <div>${splitDigits(data.patientAge || '', 3, true)}</div>
+            <div class="single-box">${data.patientAge ? '4' : '&nbsp;'}</div>
+            <div style="font-size:5px; line-height:1.0; font-weight:bold; margin-left:2px;">1 - Hora<br>2 - Dia<br>3 - M&ecirc;s<br>4 - Ano</div>
+          </div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:0.7;">
+          <div class="ct"><span class="cn">11</span> SEXO</div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">M - Masculino<br>F - Feminino<br>I - Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${sexCode}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">12</span> GESTANTE</div>
+          <div style="font-size:5.2px; line-height:1.1; margin-top:2px;">1-1&ordm;Trim. &nbsp; 2-2&ordm;Trim. &nbsp; 3-3&ordm;Trim.<br>4-Ignorada &nbsp; 5-N&atilde;o &nbsp; 6-N&atilde;o se aplica &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${pregnantCode}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.3;">
+          <div class="ct"><span class="cn">13</span> RA&Ccedil;A/COR</div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">1-Branca &nbsp; 2-Preta &nbsp; 3-Amarela<br>4-Parda &nbsp; 5-Ind&iacute;gena &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${raceCode}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative;">
+          <div class="ct"><span class="cn">14</span> ESCOLARIDADE</div>
+          <div style="font-size:5px; line-height:1.2; margin-top:2px; padding-right:25px;">
+            0-Analfabeto &nbsp;&nbsp; 1-1&ordf; a 4&ordf; s&eacute;rie inc. EF &nbsp;&nbsp; 2-4&ordf; s&eacute;rie comp. EF &nbsp;&nbsp; 3-5&ordf; &agrave; 8&ordf; s&eacute;rie inc. EF &nbsp;&nbsp; 4-EF completo<br>
+            5-EM incompleto &nbsp;&nbsp; 6-EM completo &nbsp;&nbsp; 7-Superior incompleto &nbsp;&nbsp; 8-Superior completo &nbsp;&nbsp; 9-Ignorado &nbsp;&nbsp; 10-N&atilde;o se aplica
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">${schoolCode}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.2;">
+          <div class="ct"><span class="cn">15</span> N&Uacute;MERO DO CART&Atilde;O SUS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.patientCns || '', 15)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">16</span> NOME DA M&Atilde;E</div>
+          <div class="cv" style="font-size:9px;">${data.patientMotherName || 'Nao informada'}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 3: DADOS DE RESIDÊNCIA -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados de Resid&ecirc;ncia</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.35;">
+          <div class="ct"><span class="cn">17</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.patientUf || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.7;">
+          <div class="ct"><span class="cn">18</span> MUNIC&Iacute;PIO DE RESID&Ecirc;NCIA</div>
+          <div class="cv">${data.patientMunicipality || 'MARABA'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct">C&Oacute;DIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('1504208', 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">19</span> DISTRITO</div>
+          <div class="cv">${data.patientDistrict || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">20</span> BAIRRO</div>
+          <div class="cv">${data.patientNeighborhood || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.5;">
+          <div class="ct"><span class="cn">21</span> LOGRADOURO (RUA, AVENIDA,...)</div>
+          <div class="cv">${data.patientAddress || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO</div>
+          <div class="cv"></div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct"><span class="cn">22</span> N&Uacute;MERO</div>
+          <div class="cv">${data.patientNumber || 'S/N'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">23</span> COMPLEMENTO (APTO., CASA,...)</div>
+          <div class="cv">${data.patientComplement || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">24</span> GEO CAMPO 1</div>
+          <div class="cv"></div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">25</span> GEO CAMPO 2</div>
+          <div class="cv"></div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">26</span> PONTO DE REFER&Ecirc;NCIA</div>
+          <div class="cv">${data.patientRef || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">27</span> CEP</div>
+          <div class="cv" style="padding-top:3px;">${formatCepDigits(data.patientCep)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">28</span> (DDD) TELEFONE</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits((data.patientPhone || '').replace(/\D/g,''), 11)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">29</span> ZONA</div>
+          <div style="font-size:6px; line-height:1.1; margin-top:2px;">1 - Urbana &nbsp; 2 - Rural &nbsp; 3 - Periurbana &nbsp; 9 - Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${zoneCode}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct"><span class="cn">30</span> PA&Iacute;S (SE RESID. FORA)</div>
+          <div class="cv">${data.patientCountry || ''}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:#e6e6e6; font-size:8px; font-weight:bold; text-align:center; padding:2px; border:1px solid #000; border-bottom:none;">
+    Dados Complementares do Caso
+  </div>
+
+  <!-- BLOCO 4: ANTECEDENTES EPIDEMIOLÓGICOS E ATENDIMENTO -->
+  <div class="sn-block">
+    <div class="sn-sidebar" style="font-size:6px;">Antecedentes Epidemiol&oacute;gicos</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">31</span> DATA DA INVESTIGA&Ccedil;&Atilde;O</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataInvestigacao), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.8;">
+          <div class="ct"><span class="cn">32</span> OCUPA&Ccedil;&Atilde;O</div>
+          <div class="cv">${cs.occupation || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">33</span> TIPO DE EXPOSI&Ccedil;&Atilde;O AO V&Iacute;RUS R&Aacute;BICO</div>
+          <div style="font-size:5px; margin-top:2px;">1-Sim &nbsp; 2-N&atilde;o &nbsp; 9-Ignorado: Arranh&atilde;o / Lambedura / Mordedura / Contato Indireto</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.tipoExposicao || '9'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">34</span> LOCALIZA&Ccedil;&Atilde;O</div>
+          <div style="font-size:5px; margin-top:2px;">Mucosa, Cabe&ccedil;a/Pesco&ccedil;o, M&atilde;os, P&eacute;s, Tronco, Membros Sup/Inf</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.localizacaoPicada || '9'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.0;">
+          <div class="ct"><span class="cn">35</span> FERIMENTO</div>
+          <div style="font-size:5px; margin-top:2px;">1-&Uacute;nico &nbsp; 2-M&uacute;ltiplo &nbsp; 3-Sem Ferimento &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.ferimento || '9'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.0;">
+          <div class="ct"><span class="cn">36</span> TIPO DE FERIMENTO</div>
+          <div style="font-size:5px; margin-top:2px;">1-Profundo &nbsp; 2-Superficial &nbsp; 3-Dilacerante</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.tipoFerimento || '9'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">37</span> DATA DA EXPOSI&Ccedil;&Atilde;O</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataExposicao), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">38</span> ANTECEDENTES DE TRATAMENTO ANTI-R&Aacute;BICO?</div>
+          <div style="font-size:5px; margin-top:2px;">1-Sim &nbsp; 2-N&atilde;o &nbsp; 9-Ignorado (Pr&eacute;-Exposi&ccedil;&atilde;o / P&oacute;s-Exposi&ccedil;&atilde;o)</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.antecedentesTrat || '3'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct"><span class="cn">39</span> N&ordm; DOSES APLICADAS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.dosesAplicadas || '', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">40</span> DATA &Uacute;LTIMA DOSE</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataUltimaDose), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">41</span> ESP&Eacute;CIE DO ANIMAL AGRESSOR</div>
+          <div style="font-size:5px; margin-top:2px;">1-Canina &nbsp; 2-Felina &nbsp; 3-Quir&oacute;ptera &nbsp; 4-Primata &nbsp; 5-Raposa &nbsp; 6-Herb&iacute;vora &nbsp; 7-Outra &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.especieAnimal || '1'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.0;">
+          <div class="ct"><span class="cn">42</span> ANIMAL VACINADO?</div>
+          <div style="font-size:5px; margin-top:2px;">1-Sim &nbsp; 2-N&atilde;o &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.animalVacinado || '9'}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sn-block">
+    <div class="sn-sidebar">Atendimento</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.0;">
+          <div class="ct"><span class="cn">43</span> HOSPITALIZA&Ccedil;&Atilde;O?</div>
+          <div style="font-size:6px; margin-top:2px;">1-Sim &nbsp; 2-N&atilde;o &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.hospitalizacao || '2'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">44</span> DATA DA INTERNA&Ccedil;&Atilde;O</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataInternacao), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.4;">
+          <div class="ct"><span class="cn">45</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.hospitalUf || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">46</span> MUNIC&Iacute;PIO HOSPITAL</div>
+          <div class="cv">${cs.hospitalMun || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.0;">
+          <div class="ct"><span class="cn">47</span> NOME DO HOSPITAL</div>
+          <div class="cv">${cs.hospitalNome || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell">
+          <div class="ct"><span class="cn">48</span> PRINCIPAIS SINAIS / SINTOMAS</div>
+          <div class="cv" style="font-size:8.5px;">${cs.sintomas || 'Aerofobia, Hidrofobia, Disfagia, Parestesia, Paralisia, Agitacao, Febre, Agressividade'}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-info">
+    <span>Raiva Humana</span>
+    <span>Sinan NET</span>
+    <span>SVS 08/06/2006</span>
+  </div>
+</div>
+        `;
+    }
+
+    function generatePage2RaivaHtml(data) {
+        return `
+<div class="sinan-page">
+  <div class="pg2-header">
+    <p class="pg2-title">DADOS COMPLEMENTARES DO CASO - RAIVA HUMANA</p>
+  </div>
+
+  <!-- BLOCO TRATAMENTO ATUAL -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Tratamento Atual</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">49</span> APLICA&Ccedil;&Atilde;O DE VACINA ANTI-R&Aacute;BICA ATUALMENTE</div>
+          <div style="font-size:6px; margin-top:2px;">1-Sim &nbsp;&nbsp; 2-N&atilde;o &nbsp;&nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.vacinaAtual || '2'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">50</span> DATA DO IN&Iacute;CIO DO TRATAMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.inicioTratamento), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">51</span> N&ordm; DOSES APLICADAS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.vacinaDoses || '', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">52</span> DATA DA 1&ordf; DOSE DA VACINA</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.data1Dose), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">53</span> DATA DA &Uacute;LTIMA DOSE DA VACINA</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataUltDose), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.0;">
+          <div class="ct"><span class="cn">54</span> FOI APLICADO SORO?</div>
+          <div style="font-size:6px; margin-top:2px;">1-Sim &nbsp; 2-N&atilde;o &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.soroAplicado || '2'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">55</span> SE SIM, DATA DA APLICA&Ccedil;&Atilde;O</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataSoro), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">56</span> QTD DE SORO APLICADO (ML)</div>
+          <div class="cv">${cs.qtdSoro || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:2.0;">
+          <div class="ct"><span class="cn">57</span> INFILTRA&Ccedil;&Atilde;O DE SORO NO(S) LOCAL(AIS) DO(S) FERIMENTO(S)</div>
+          <div style="font-size:6px; margin-top:2px;">1-Sim, Total &nbsp;&nbsp; 2-Sim, Parcial &nbsp;&nbsp; 3-N&atilde;o &nbsp;&nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.infiltracaoSoro || '3'}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO CONCLUSÃO -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Conclus&atilde;o</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:2.0;">
+          <div class="ct"><span class="cn">58</span> DIAGN&Oacute;STICO LABORATORIAL</div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">1-Positivo &nbsp; 2-Negativo &nbsp; 3-Inconclusivo &nbsp; 4-N&atilde;o realizado<br>Imunofluoresc&ecirc;ncia direta / Histol&oacute;gico / Prova biol&oacute;gica / Imunofluoresc&ecirc;ncia indireta</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.diagLaboratorial || '4'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">59</span> VARIANTE</div>
+          <div class="cv">${cs.variante || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.0;">
+          <div class="ct"><span class="cn">60</span> CLASSIFICA&Ccedil;&Atilde;O FINAL</div>
+          <div style="font-size:6px; margin-top:2px;">1-Confirmado &nbsp;&nbsp; 2-Descartado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.classificacao || '1'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:2.0;">
+          <div class="ct"><span class="cn">61</span> CRIT&Eacute;RIO DE CONFIRMA&Ccedil;&Atilde;O / DESCARTE</div>
+          <div style="font-size:5.5px; margin-top:2px;">1-Laborat&oacute;rio &nbsp; 2-&Oacute;bito com Cl&iacute;nica Compat&iacute;vel + V&iacute;nculo Epid. &nbsp; 3-Evolu&ccedil;&atilde;o Cl&iacute;nica Incompat&iacute;vel</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.criterio || '1'}</div>
+        </div>
+      </div>
+      <div style="background:#e6e6e6; font-size:7.5px; font-weight:bold; padding:2px 5px; border-bottom:1px solid #000;">
+        Local Prov&aacute;vel da Fonte de Infec&ccedil;&atilde;o (no per&iacute;odo de 45 dias)
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">62</span> AUT&Oacute;CTONE DO MUNIC&Iacute;PIO DE RESID&Ecirc;NCIA?</div>
+          <div style="font-size:6px; margin-top:2px;">1-Sim &nbsp;&nbsp; 2-N&atilde;o &nbsp;&nbsp; 3-Indeterminado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.autoctone || '1'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.4;">
+          <div class="ct"><span class="cn">63</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.ufInfeccao || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">64</span> PA&Iacute;S</div>
+          <div class="cv">${cs.paisInfeccao || 'Brasil'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">65</span> MUNIC&Iacute;PIO</div>
+          <div class="cv">${cs.municipioInfeccao || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('', 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">66</span> DISTRITO</div>
+          <div class="cv">${cs.distritoInfeccao || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">67</span> BAIRRO</div>
+          <div class="cv">${cs.bairroInfeccao || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">68</span> ZONA</div>
+          <div style="font-size:6px; margin-top:2px;">1-Urbana &nbsp;&nbsp; 2-Rural &nbsp;&nbsp; 3-Periurbana &nbsp;&nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.zonaInfeccao || '1'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">69</span> DOEN&Ccedil;A RELACIONADA AO TRABALHO?</div>
+          <div style="font-size:6px; margin-top:2px;">1-Sim &nbsp;&nbsp; 2-N&atilde;o &nbsp;&nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.trabalho || '2'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">70</span> DATA DO &Oacute;BITO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataObito), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">71</span> DATA DO ENCERRAMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataEncerramento || data.dataNotificacao), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell">
+          <div class="ct">INFORMA&Ccedil;&Otilde;ES COMPLEMENTARES</div>
+          <div class="cv" style="font-size:9px; font-weight:normal; min-height:40px;">${cs.obs || ''}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO INVESTIGADOR -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Investigador</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.0;">
+          <div class="ct">MUNIC&Iacute;PIO/UNIDADE DE SA&Uacute;DE</div>
+          <div class="cv">${data.munNotificacao || 'MARABA'} / ${unitName}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct">C&Oacute;D. DA UNID. DE SA&Uacute;DE</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cnesCode, 7)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct">NOME</div>
+          <div class="cv" style="font-weight:900; font-size:10px;">${data.notificatorName || 'Profissional de Saude'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct">FUN&Ccedil;&Atilde;O</div>
+          <div class="cv">Profissional de Saude</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct">ASSINATURA</div>
+          <div class="cv" style="border-bottom:1px dotted #555; margin-top:4px; min-height:14px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-info">
+    <span>Raiva Humana</span>
+    <span>Sinan NET</span>
+    <span>SVS 08/06/2006</span>
+  </div>
+</div>
+        `;
+    }
+
+    // ----------------------------------------------------
+    // 2. DOENÇA DE CHAGAS AGUDA (SVS 08/10/2009) - 2 PAGINAS
+    // ----------------------------------------------------
+    function generatePage1ChagasHtml(data) {
+        return `
+<div class="sinan-page">
+  <div class="sn-header">
+    <div class="sn-header-left">
+      Rep&uacute;blica Federativa do Brasil<br>
+      Minist&eacute;rio da Sa&uacute;de
+    </div>
+    <div class="sn-header-center">
+      <p class="sn-sinan">SINAN</p>
+      <p class="sn-title">SISTEMA DE INFORMA&Ccedil;&Atilde;O DE AGRAVOS DE NOTIFICA&Ccedil;&Atilde;O</p>
+      <p class="sn-subtitle">FICHA DE INVESTIGA&Ccedil;&Atilde;O DOEN&Ccedil;A DE CHAGAS AGUDA N&ordm;</p>
+    </div>
+    <div class="sn-header-right">
+      <span class="sn-num-label">N&ordm;</span>
+      <div class="sn-num-box">${data.sinan_number || '---.---'}</div>
+    </div>
+  </div>
+
+  <div style="border:1.5px solid #000; padding:3px 6px; margin-bottom:4px; font-size:6.5px; line-height:1.2; background:#fafafa;">
+    <strong>CASO SUSPEITO:</strong> Febre prolongada (>7 dias) e quadro cl&iacute;nico sugestivo de DCA...<br>
+    <strong>CASO CONFIRMADO:</strong> a- Crit&eacute;rio laboratorial: exame parasitol&oacute;gico direto positivo ou sorologia IgM/IgG... b- Crit&eacute;rio cl&iacute;nico-epidemiol&oacute;gico.
+  </div>
+
+  <!-- BLOCO 1: DADOS GERAIS -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados Gerais</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1; min-height:22px;">
+          <div class="ct"><span class="cn">1</span> TIPO DE NOTIFICA&Ccedil;&Atilde;O</div>
+          <div style="font-size:7.5px; margin-top:2px;">2 - Individual</div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">${tipoNotif}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.5; position:relative;">
+          <div class="ct"><span class="cn">2</span> AGRAVO/DOEN&Ccedil;A</div>
+          <div style="font-size:10px; font-weight:900; margin-top:2px;">DOEN&Ccedil;A DE CHAGAS AGUDA</div>
+          <div style="position:absolute; right:8px; top:4px; font-size:7px; font-weight:bold;">
+            C&oacute;digo (CID10)<br>
+            <span style="font-size:8.5px; border:1px solid #000; padding:1px 4px; font-family:monospace; background:#fff;">B 57.1</span>
+          </div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">3</span> DATA DA NOTIFICA&Ccedil;&Atilde;O</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.dataNotificacao), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.4;">
+          <div class="ct"><span class="cn">4</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.ufNotificacao || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">5</span> MUNIC&Iacute;PIO DE NOTIFICA&Ccedil;&Atilde;O</div>
+          <div class="cv">${data.munNotificacao || 'MARABA'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('1504208', 7)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.2;">
+          <div class="ct"><span class="cn">6</span> UNIDADE DE SA&Uacute;DE (OU OUTRA FONTE NOTIFICADORA)</div>
+          <div class="cv">${unitName}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cnesCode, 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">7</span> DATA DOS PRIMEIROS SINTOMAS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.symptomsDate), 8)}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 2: NOTIFICAÇÃO INDIVIDUAL -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Notifica&ccedil;&atilde;o Individual</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:3.0;">
+          <div class="ct"><span class="cn">8</span> NOME DO PACIENTE</div>
+          <div class="cv" style="font-size:10px; font-weight:900;">${data.patientName || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">9</span> DATA DE NASCIMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.patientBirthDate), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct"><span class="cn">10</span> (OU) IDADE</div>
+          <div style="display:flex; align-items:center; gap:3px; margin-top:2px;">
+            <div>${splitDigits(data.patientAge || '', 3, true)}</div>
+            <div class="single-box">${data.patientAge ? '4' : '&nbsp;'}</div>
+            <div style="font-size:5px; line-height:1.0; font-weight:bold; margin-left:2px;">1 - Hora<br>2 - Dia<br>3 - M&ecirc;s<br>4 - Ano</div>
+          </div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:0.7;">
+          <div class="ct"><span class="cn">11</span> SEXO</div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">M - Masculino<br>F - Feminino<br>I - Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${sexCode}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">12</span> GESTANTE</div>
+          <div style="font-size:5.2px; line-height:1.1; margin-top:2px;">1-1&ordm;Trim. &nbsp; 2-2&ordm;Trim. &nbsp; 3-3&ordm;Trim.<br>4-Ignorada &nbsp; 5-N&atilde;o &nbsp; 6-N&atilde;o se aplica &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${pregnantCode}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.3;">
+          <div class="ct"><span class="cn">13</span> RA&Ccedil;A/COR</div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">1-Branca &nbsp; 2-Preta &nbsp; 3-Amarela<br>4-Parda &nbsp; 5-Ind&iacute;gena &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${raceCode}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative;">
+          <div class="ct"><span class="cn">14</span> ESCOLARIDADE</div>
+          <div style="font-size:5px; line-height:1.2; margin-top:2px; padding-right:25px;">
+            0-Analfabeto &nbsp;&nbsp; 1-1&ordf; a 4&ordf; s&eacute;rie inc. EF &nbsp;&nbsp; 2-4&ordf; s&eacute;rie comp. EF &nbsp;&nbsp; 3-5&ordf; &agrave; 8&ordf; s&eacute;rie inc. EF &nbsp;&nbsp; 4-EF completo<br>
+            5-EM incompleto &nbsp;&nbsp; 6-EM completo &nbsp;&nbsp; 7-Superior incompleto &nbsp;&nbsp; 8-Superior completo &nbsp;&nbsp; 9-Ignorado &nbsp;&nbsp; 10-N&atilde;o se aplica
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">${schoolCode}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.2;">
+          <div class="ct"><span class="cn">15</span> N&Uacute;MERO DO CART&Atilde;O SUS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.patientCns || '', 15)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">16</span> NOME DA M&Atilde;E</div>
+          <div class="cv" style="font-size:9px;">${data.patientMotherName || 'Nao informada'}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 3: DADOS DE RESIDÊNCIA -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados de Resid&ecirc;ncia</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.35;">
+          <div class="ct"><span class="cn">17</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.patientUf || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.7;">
+          <div class="ct"><span class="cn">18</span> MUNIC&Iacute;PIO DE RESID&Ecirc;NCIA</div>
+          <div class="cv">${data.patientMunicipality || 'MARABA'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct">C&Oacute;DIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('1504208', 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">19</span> DISTRITO</div>
+          <div class="cv">${data.patientDistrict || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">20</span> BAIRRO</div>
+          <div class="cv">${data.patientNeighborhood || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.5;">
+          <div class="ct"><span class="cn">21</span> LOGRADOURO (RUA, AVENIDA,...)</div>
+          <div class="cv">${data.patientAddress || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO</div>
+          <div class="cv"></div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct"><span class="cn">22</span> N&Uacute;MERO</div>
+          <div class="cv">${data.patientNumber || 'S/N'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">23</span> COMPLEMENTO (APTO., CASA,...)</div>
+          <div class="cv">${data.patientComplement || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">24</span> GEO CAMPO 1</div>
+          <div class="cv"></div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">25</span> GEO CAMPO 2</div>
+          <div class="cv"></div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">26</span> PONTO DE REFER&Ecirc;NCIA</div>
+          <div class="cv">${data.patientRef || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">27</span> CEP</div>
+          <div class="cv" style="padding-top:3px;">${formatCepDigits(data.patientCep)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">28</span> (DDD) TELEFONE</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits((data.patientPhone || '').replace(/\D/g,''), 11)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">29</span> ZONA</div>
+          <div style="font-size:6px; line-height:1.1; margin-top:2px;">1 - Urbana &nbsp; 2 - Rural &nbsp; 3 - Periurbana &nbsp; 9 - Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${zoneCode}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct"><span class="cn">30</span> PA&Iacute;S (SE RESID. FORA)</div>
+          <div class="cv">${data.patientCountry || ''}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:#e6e6e6; font-size:8px; font-weight:bold; text-align:center; padding:2px; border:1px solid #000; border-bottom:none;">
+    Dados Complementares do Caso
+  </div>
+
+  <!-- BLOCO 4: ANTECEDENTES EPIDEMIOLÓGICOS -->
+  <div class="sn-block">
+    <div class="sn-sidebar" style="font-size:6px;">Antecedentes Epidemiol&oacute;gicos</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">31</span> DATA DA INVESTIGA&Ccedil;&Atilde;O</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataInvestigacao), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.8;">
+          <div class="ct"><span class="cn">32</span> OCUPA&Ccedil;&Atilde;O</div>
+          <div class="cv">${cs.occupation || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell">
+          <div class="ct"><span class="cn">33</span> DESLOCAMENTO (VIAGENS PARA &Aacute;REAS INFESTADAS AT&Eacute; 120 DIAS ANTES)</div>
+          <div class="cv" style="font-size:8.5px;">${cs.deslocamentos || 'Sem historico de deslocamento'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">34</span> VEST&Iacute;GIOS DE TRIATOM&Iacute;DEOS INTRA-DOMIC&Iacute;LIO</div>
+          <div style="font-size:5px; margin-top:2px;">1-Sim &nbsp; 2-N&atilde;o &nbsp; 3-N&atilde;o Realizado &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.vestigios || '9'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">35</span> DATA DE ENCONTRO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataVestigios), 8)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">36</span> USO DE SANGUE/HEMODERIVADOS (120D)</div>
+          <div style="font-size:5px; margin-top:2px;">1-Sim &nbsp; 2-N&atilde;o &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.sangue || '9'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">37</span> CONTROLE SOROL&Oacute;GICO NA HEMOTERAPIA</div>
+          <div style="font-size:5px; margin-top:2px;">1-Sim &nbsp; 2-N&atilde;o &nbsp; 3-N&atilde;o se aplica &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.controleSoro || '9'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">38</span> MANIPULA&Ccedil;&Atilde;O/CONTATO COM T. CRUZI</div>
+          <div style="font-size:5px; margin-top:2px;">1-Sim &nbsp; 2-N&atilde;o &nbsp; 3-N&atilde;o se aplica &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.contato || '9'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">39</span> &le; 9 MESES DE IDADE: M&Atilde;E COM INFEC&Ccedil;&Atilde;O CHAG&Aacute;SICA</div>
+          <div style="font-size:5px; margin-top:2px;">1-Sim &nbsp; 2-N&atilde;o &nbsp; 3-N&atilde;o se aplica &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.maeInfeccao || '9'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">40</span> POSSIBILIDADE DE TRANSMISS&Atilde;O VIA ORAL</div>
+          <div style="font-size:5px; margin-top:2px;">1-Sim &nbsp; 2-N&atilde;o &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.transmissaoOral || '9'}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-info">
+    <span>Doen&ccedil;a de Chagas Aguda</span>
+    <span>Sinan NET</span>
+    <span>SVS 08/10/2009</span>
+  </div>
+</div>
+        `;
+    }
+
+    function generatePage2ChagasHtml(data) {
+        return `
+<div class="sinan-page">
+  <div class="pg2-header">
+    <p class="pg2-title">DADOS COMPLEMENTARES DO CASO - DOEN&Ccedil;A DE CHAGAS AGUDA</p>
+  </div>
+
+  <!-- DADOS CLÍNICOS E LABORATÓRIO -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Cl&iacute;nica / Lab</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell">
+          <div class="ct"><span class="cn">41</span> SINAIS E SINTOMAS</div>
+          <div class="cv" style="font-size:8.5px;">${cs.sintomas || 'Assintomatico, Febre Persistente, Edema, Hepatomegalia, Esplenomegalia, Roma&ntilde;a, Arrítmias'}</div>
+        </div>
+      </div>
+      <div style="background:#e6e6e6; font-size:7.5px; font-weight:bold; padding:2px 5px; border-bottom:1px solid #000;">Exames Realizados</div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:2.0;">
+          <div class="ct"><span class="cn">42-43</span> PARASITOL&Oacute;GICO DIRETO</div>
+          <div style="font-size:5.5px; margin-top:2px;">1-Positivo &nbsp; 2-Negativo &nbsp; 3-N&atilde;o realizado (Fresca / Strout / Microhemat&oacute;crito)</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.diagParasito || '3'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:2.0;">
+          <div class="ct"><span class="cn">44-45</span> PARASITOL&Oacute;GICO INDIRETO</div>
+          <div style="font-size:5.5px; margin-top:2px;">1-Positivo &nbsp; 2-Negativo &nbsp; 3-N&atilde;o realizado (Xenodiagn&oacute;stico / Hemocultivo)</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.parasitoIndireto || '3'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">46-48</span> SOROLOGIA ELISA</div>
+          <div style="font-size:5.5px; margin-top:2px;">1-Reagente &nbsp; 2-N&atilde;o-Reagente &nbsp; 3-Inconclusivo &nbsp; 4-N&atilde;o realizado (IgM / IgG)</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.elisaResultado || '4'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">49-50</span> IFI / HEMOAGLUTINA&Ccedil;&Atilde;O</div>
+          <div style="font-size:5.5px; margin-top:2px;">1-Reagente &nbsp; 2-N&atilde;o-Reagente &nbsp; 3-Inconclusivo &nbsp; 4-N&atilde;o realizado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.ifiResultado || '4'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:2.0;">
+          <div class="ct"><span class="cn">51-52</span> HISTOPATOL&Oacute;GICO (BI&Oacute;PSIA / NECR&Oacute;PSIA)</div>
+          <div style="font-size:5.5px; margin-top:2px;">1-Positivo &nbsp; 2-Negativo &nbsp; 3-N&atilde;o realizado &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.histopatologico || '3'}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRATAMENTO E MEDIDAS DE CONTROLE -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Trat. / Controle</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">53</span> TIPO DE TRATAMENTO</div>
+          <div style="font-size:6px; margin-top:2px;">1-Sim (Sintom&aacute;tico / Espec&iacute;fico) &nbsp; 2-N&atilde;o &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.tipoTratamento || '2'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">54</span> DROGA UTILIZADA</div>
+          <div style="font-size:6px; margin-top:2px;">1-Benznidazol &nbsp;&nbsp; 2-Outro</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.droga || '1'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">55</span> TEMPO TRATAMENTO (DIAS)</div>
+          <div class="cv">${cs.tempoTratamento || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell">
+          <div class="ct"><span class="cn">56</span> MEDIDAS TOMADAS</div>
+          <div class="cv" style="font-size:8.5px;">${cs.medidasTomadas || 'Controle de Triatomi' + 'deos, Biosseguranca, Fiscalizacao'}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO CONCLUSÃO -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Conclus&atilde;o</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.0;">
+          <div class="ct"><span class="cn">57</span> CLASSIFICA&Ccedil;&Atilde;O FINAL</div>
+          <div style="font-size:6px; margin-top:2px;">1-Confirmado &nbsp;&nbsp; 2-Descartado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.classificacao || '1'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">58</span> CRIT&Eacute;RIO DE CONFIRMA&Ccedil;&Atilde;O</div>
+          <div style="font-size:5.5px; margin-top:2px;">1-Laboratorial &nbsp; 2-Cl&iacute;nico-Epidemiol&oacute;gico &nbsp; 3-Cl&iacute;nico</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.criterio || '1'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">59</span> EVOLU&Ccedil;&Atilde;O DO CASO</div>
+          <div style="font-size:5.5px; margin-top:2px;">1-Vivo &nbsp; 2-&Oacute;bito por D. Chagas Aguda &nbsp; 3-&Oacute;bito por outras &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.evolucao || '1'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">60</span> DATA DO &Oacute;BITO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataObito), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">61</span> MODO PROV&Aacute;VEL DA INFEC&Ccedil;&Atilde;O</div>
+          <div style="font-size:5px; margin-top:2px;">1-Transfusional &nbsp; 2-Vetorial &nbsp; 3-Vertical &nbsp; 4-Acidental &nbsp; 5-Oral &nbsp; 6-Outra &nbsp; 9-Ignorada</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.modoInfeccao || '2'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">62</span> LOCAL PROV&Aacute;VEL DA INFEC&Ccedil;&Atilde;O (120D)</div>
+          <div style="font-size:5px; margin-top:2px;">1-Hemoterapia &nbsp; 2-Domic&iacute;lio &nbsp; 3-Laborat&oacute;rio &nbsp; 4-Outro &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.localInfeccao || '2'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">63</span> AUT&Oacute;CTONE DO MUNIC&Iacute;PIO?</div>
+          <div style="font-size:6px; margin-top:2px;">1-Sim &nbsp;&nbsp; 2-N&atilde;o &nbsp;&nbsp; 3-Indeterminado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.autoctone || '1'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.4;">
+          <div class="ct"><span class="cn">64</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.ufInfeccao || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">65</span> PA&Iacute;S</div>
+          <div class="cv">${cs.paisInfeccao || 'Brasil'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">66</span> MUNIC&Iacute;PIO</div>
+          <div class="cv">${cs.municipioInfeccao || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct"><span class="cn">67</span> DISTRITO</div>
+          <div class="cv">${cs.distritoInfeccao || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">68</span> BAIRRO</div>
+          <div class="cv">${cs.bairroInfeccao || ''}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">69</span> DOEN&Ccedil;A RELACIONADA AO TRABALHO?</div>
+          <div style="font-size:6px; margin-top:2px;">1-Sim &nbsp;&nbsp; 2-N&atilde;o &nbsp;&nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.trabalho || '2'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">70</span> DATA DO ENCERRAMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataEncerramento || data.dataNotificacao), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell">
+          <div class="ct">OBSERVA&Ccedil;&Otilde;ES</div>
+          <div class="cv" style="font-size:9px; font-weight:normal; min-height:35px;">${cs.obs || ''}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO INVESTIGADOR -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Investigador</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.0;">
+          <div class="ct">MUNIC&Iacute;PIO/UNIDADE DE SA&Uacute;DE</div>
+          <div class="cv">${data.munNotificacao || 'MARABA'} / ${unitName}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct">C&Oacute;D. DA UNID. DE SA&Uacute;DE</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cnesCode, 7)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct">NOME</div>
+          <div class="cv" style="font-weight:900; font-size:10px;">${data.notificatorName || 'Profissional de Saude'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct">FUN&Ccedil;&Atilde;O</div>
+          <div class="cv">Profissional de Saude</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct">ASSINATURA</div>
+          <div class="cv" style="border-bottom:1px dotted #555; margin-top:4px; min-height:14px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-info">
+    <span>Doen&ccedil;a de Chagas Aguda</span>
+    <span>Sinan NET</span>
+    <span>SVS 08/10/2009</span>
+  </div>
+</div>
+        `;
+    }
+
+    // ----------------------------------------------------
+    // 3. LEPTOSPIROSE (SVS 02/02/2007) - 2 PAGINAS
+    // ----------------------------------------------------
+    function generatePage1LeptospiroseHtml(data) {
+        return `
+<div class="sinan-page">
+  <div class="sn-header">
+    <div class="sn-header-left">
+      Rep&uacute;blica Federativa do Brasil<br>
+      Minist&eacute;rio da Sa&uacute;de
+    </div>
+    <div class="sn-header-center">
+      <p class="sn-sinan">SINAN</p>
+      <p class="sn-title">SISTEMA DE INFORMA&Ccedil;&Atilde;O DE AGRAVOS DE NOTIFICA&Ccedil;&Atilde;O</p>
+      <p class="sn-subtitle">FICHA DE INVESTIGA&Ccedil;&Atilde;O LEPTOSPIROSE N&ordm;</p>
+    </div>
+    <div class="sn-header-right">
+      <span class="sn-num-label">N&ordm;</span>
+      <div class="sn-num-box">${data.sinan_number || '---.---'}</div>
+    </div>
+  </div>
+
+  <div style="border:1.5px solid #000; padding:3px 6px; margin-bottom:4px; font-size:6.5px; line-height:1.2; background:#fafafa;">
+    <strong>CASO SUSPEITO:</strong> Indiv&iacute;duo com febre, cefal&eacute;ia e mialgia, que apresente pelo menos um dos seguintes crit&eacute;rios: Crit&eacute;rio 1- antecedentes epidemiol&oacute;gicos sugestivos... Crit&eacute;rio 2- sufus&atilde;o conjuntival, sinais de insufici&ecirc;ncia renal, icter&iacute;cia e/ou hemorragia.
+  </div>
+
+  <!-- BLOCO 1: DADOS GERAIS -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados Gerais</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1; min-height:22px;">
+          <div class="ct"><span class="cn">1</span> TIPO DE NOTIFICA&Ccedil;&Atilde;O</div>
+          <div style="font-size:7.5px; margin-top:2px;">2 - Individual</div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">${tipoNotif}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.5; position:relative;">
+          <div class="ct"><span class="cn">2</span> AGRAVO/DOEN&Ccedil;A</div>
+          <div style="font-size:10px; font-weight:900; margin-top:2px;">LEPTOSPIROSE</div>
+          <div style="position:absolute; right:8px; top:4px; font-size:7px; font-weight:bold;">
+            C&oacute;digo (CID10)<br>
+            <span style="font-size:8.5px; border:1px solid #000; padding:1px 4px; font-family:monospace; background:#fff;">A 2 7.9</span>
+          </div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">3</span> DATA DA NOTIFICA&Ccedil;&Atilde;O</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.dataNotificacao), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.4;">
+          <div class="ct"><span class="cn">4</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.ufNotificacao || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">5</span> MUNIC&Iacute;PIO DE NOTIFICA&Ccedil;&Atilde;O</div>
+          <div class="cv">${data.munNotificacao || 'MARABA'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('1504208', 7)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.2;">
+          <div class="ct"><span class="cn">6</span> UNIDADE DE SA&Uacute;DE (OU OUTRA FONTE NOTIFICADORA)</div>
+          <div class="cv">${unitName}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cnesCode, 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">7</span> DATA DOS PRIMEIROS SINTOMAS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.symptomsDate), 8)}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 2: NOTIFICAÇÃO INDIVIDUAL -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Notifica&ccedil;&atilde;o Individual</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:3.0;">
+          <div class="ct"><span class="cn">8</span> NOME DO PACIENTE</div>
+          <div class="cv" style="font-size:10px; font-weight:900;">${data.patientName || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">9</span> DATA DE NASCIMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.patientBirthDate), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct"><span class="cn">10</span> (OU) IDADE</div>
+          <div style="display:flex; align-items:center; gap:3px; margin-top:2px;">
+            <div>${splitDigits(data.patientAge || '', 3, true)}</div>
+            <div class="single-box">${data.patientAge ? '4' : '&nbsp;'}</div>
+            <div style="font-size:5px; line-height:1.0; font-weight:bold; margin-left:2px;">1 - Hora<br>2 - Dia<br>3 - M&ecirc;s<br>4 - Ano</div>
+          </div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:0.7;">
+          <div class="ct"><span class="cn">11</span> SEXO</div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">M - Masculino<br>F - Feminino<br>I - Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${sexCode}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">12</span> GESTANTE</div>
+          <div style="font-size:5.2px; line-height:1.1; margin-top:2px;">1-1&ordm;Trim. &nbsp; 2-2&ordm;Trim. &nbsp; 3-3&ordm;Trim.<br>4-Ignorada &nbsp; 5-N&atilde;o &nbsp; 6-N&atilde;o se aplica &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${pregnantCode}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.3;">
+          <div class="ct"><span class="cn">13</span> RA&Ccedil;A/COR</div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">1-Branca &nbsp; 2-Preta &nbsp; 3-Amarela<br>4-Parda &nbsp; 5-Ind&iacute;gena &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${raceCode}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative;">
+          <div class="ct"><span class="cn">14</span> ESCOLARIDADE</div>
+          <div style="font-size:5px; line-height:1.2; margin-top:2px; padding-right:25px;">
+            0-Analfabeto &nbsp;&nbsp; 1-1&ordf; a 4&ordf; s&eacute;rie inc. EF &nbsp;&nbsp; 2-4&ordf; s&eacute;rie comp. EF &nbsp;&nbsp; 3-5&ordf; &agrave; 8&ordf; s&eacute;rie inc. EF &nbsp;&nbsp; 4-EF completo<br>
+            5-EM incompleto &nbsp;&nbsp; 6-EM completo &nbsp;&nbsp; 7-Superior incompleto &nbsp;&nbsp; 8-Superior completo &nbsp;&nbsp; 9-Ignorado &nbsp;&nbsp; 10-N&atilde;o se aplica
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">${schoolCode}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.2;">
+          <div class="ct"><span class="cn">15</span> N&Uacute;MERO DO CART&Atilde;O SUS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.patientCns || '', 15)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">16</span> NOME DA M&Atilde;E</div>
+          <div class="cv" style="font-size:9px;">${data.patientMotherName || 'Nao informada'}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 3: DADOS DE RESIDÊNCIA -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados de Resid&ecirc;ncia</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.35;">
+          <div class="ct"><span class="cn">17</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.patientUf || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.7;">
+          <div class="ct"><span class="cn">18</span> MUNIC&Iacute;PIO DE RESID&Ecirc;NCIA</div>
+          <div class="cv">${data.patientMunicipality || 'MARABA'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct">C&Oacute;DIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('1504208', 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">19</span> DISTRITO</div>
+          <div class="cv">${data.patientDistrict || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">20</span> BAIRRO</div>
+          <div class="cv">${data.patientNeighborhood || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.5;">
+          <div class="ct"><span class="cn">21</span> LOGRADOURO (RUA, AVENIDA,...)</div>
+          <div class="cv">${data.patientAddress || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO</div>
+          <div class="cv"></div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct"><span class="cn">22</span> N&Uacute;MERO</div>
+          <div class="cv">${data.patientNumber || 'S/N'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">23</span> COMPLEMENTO (APTO., CASA,...)</div>
+          <div class="cv">${data.patientComplement || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">24</span> GEO CAMPO 1</div>
+          <div class="cv"></div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">25</span> GEO CAMPO 2</div>
+          <div class="cv"></div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">26</span> PONTO DE REFER&Ecirc;NCIA</div>
+          <div class="cv">${data.patientRef || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">27</span> CEP</div>
+          <div class="cv" style="padding-top:3px;">${formatCepDigits(data.patientCep)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">28</span> (DDD) TELEFONE</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits((data.patientPhone || '').replace(/\D/g,''), 11)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">29</span> ZONA</div>
+          <div style="font-size:6px; line-height:1.1; margin-top:2px;">1 - Urbana &nbsp; 2 - Rural &nbsp; 3 - Periurbana &nbsp; 9 - Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${zoneCode}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct"><span class="cn">30</span> PA&Iacute;S (SE RESID. FORA)</div>
+          <div class="cv">${data.patientCountry || ''}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:#e6e6e6; font-size:8px; font-weight:bold; text-align:center; padding:2px; border:1px solid #000; border-bottom:none;">
+    Dados Complementares do Caso
+  </div>
+
+  <!-- BLOCO 4: ANTECEDENTES EPIDEMIOLÓGICOS E SINAIS CLÍNICOS -->
+  <div class="sn-block">
+    <div class="sn-sidebar" style="font-size:6px;">Antecedentes Epidemiol&oacute;gicos</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">31</span> DATA DA INVESTIGA&Ccedil;&Atilde;O</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataInvestigacao), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.8;">
+          <div class="ct"><span class="cn">32</span> OCUPA&Ccedil;&Atilde;O</div>
+          <div class="cv">${cs.occupation || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell">
+          <div class="ct"><span class="cn">33</span> SITUA&Ccedil;&Atilde;O DE RISCO OCORRIDA NOS 30 DIAS QUE ANTECEDERAM OS SINTOMAS</div>
+          <div class="cv" style="font-size:8.5px;">${cs.situacaoRisco || '&Aacute;gua/lama de enchente, Fossa/esgoto, Rio/lagoa, Roedores, Lixo/entulho'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:2.0;">
+          <div class="ct"><span class="cn">34</span> CASOS ANTERIORES NO LOCAL PROV&Aacute;VEL DE INFEC&Ccedil;&Atilde;O (2 MESES)</div>
+          <div style="font-size:5.5px; margin-top:2px;">1-Sim &nbsp; 2-N&atilde;o &nbsp; 9-Ignorado (Casos Humanos / Casos Animais)</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.casosAnteriores || '9'}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados Cl&iacute;nicos / Atendimento</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">35</span> DATA ATENDIMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataAtendimento), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:3.0;">
+          <div class="ct"><span class="cn">36</span> SINAIS E SINTOMAS</div>
+          <div class="cv" style="font-size:8.5px;">${cs.sinaisSintomas || 'Febre, Mialgia, Dor panturrilha, Cefaleia, Icterícia, Insuficiência renal, Hemorragia'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.0;">
+          <div class="ct"><span class="cn">37</span> HOSPITALIZA&Ccedil;&Atilde;O?</div>
+          <div style="font-size:6px; margin-top:2px;">1-Sim &nbsp; 2-N&atilde;o &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.hospitalizacao || '2'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">38</span> DATA INTERNA&Ccedil;&Atilde;O</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataInternacao), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">39</span> DATA DE ALTA</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataAlta), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.4;">
+          <div class="ct"><span class="cn">40</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.hospitalUf || 'PA', 2)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">41</span> MUNIC&Iacute;PIO HOSPITAL</div>
+          <div class="cv">${cs.hospitalMun || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.2;">
+          <div class="ct"><span class="cn">42</span> NOME DO HOSPITAL</div>
+          <div class="cv">${cs.hospitalNome || ''}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-info">
+    <span>Leptospirose</span>
+    <span>Sinan NET</span>
+    <span>SVS 02/02/2007</span>
+  </div>
+</div>
+        `;
+    }
+
+    function generatePage2LeptospiroseHtml(data) {
+        return `
+<div class="sinan-page">
+  <div class="pg2-header">
+    <p class="pg2-title">DADOS COMPLEMENTARES DO CASO - LEPTOSPIROSE</p>
+  </div>
+
+  <!-- BLOCO LABORATÓRIO -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Laborat&oacute;rio</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:2.0;">
+          <div class="ct"><span class="cn">43-46</span> SOROLOGIA IgM ELISA</div>
+          <div style="font-size:5.5px; margin-top:2px;">1-Reagente &nbsp; 2-N&atilde;o Reagente &nbsp; 3-Inconclusivo &nbsp; 4-N&atilde;o Realizado (1&ordf; e 2&ordf; amostras)</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.elisaResultado || '4'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:2.0;">
+          <div class="ct"><span class="cn">47-54</span> MICROAGLUTINA&Ccedil;&Atilde;O (MAT)</div>
+          <div style="font-size:5.5px; margin-top:2px;">1-Reagente &nbsp; 2-N&atilde;o Reagente &nbsp; 3-Inconclusivo &nbsp; 4-N&atilde;o Realizado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.matResultado || '4'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.3;">
+          <div class="ct"><span class="cn">55-56</span> ISOLAMENTO</div>
+          <div style="font-size:5.5px; margin-top:2px;">1-Positivo &nbsp; 2-Negativo &nbsp; 3-Inconclusivo &nbsp; 4-N&atilde;o realizado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.isolamento || '4'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.3;">
+          <div class="ct"><span class="cn">57-58</span> IMUNOHISTOQU&Iacute;MICA</div>
+          <div style="font-size:5.5px; margin-top:2px;">1-Positivo &nbsp; 2-Negativo &nbsp; 3-Inconclusivo &nbsp; 4-N&atilde;o realizado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.imunohistoquimica || '4'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.3;">
+          <div class="ct"><span class="cn">59-60</span> RT-PCR</div>
+          <div style="font-size:5.5px; margin-top:2px;">1-Positivo &nbsp; 2-Negativo &nbsp; 3-Inconclusivo &nbsp; 4-N&atilde;o realizado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.pcr || '4'}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO CONCLUSÃO -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Conclus&atilde;o</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.0;">
+          <div class="ct"><span class="cn">61</span> CLASSIFICA&Ccedil;&Atilde;O FINAL</div>
+          <div style="font-size:6px; margin-top:2px;">1-Confirmado &nbsp;&nbsp; 2-Descartado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.classificacao || '1'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">62</span> CRIT&Eacute;RIO DE CONFIRMA&Ccedil;&Atilde;O / DESCARTE</div>
+          <div style="font-size:5.5px; margin-top:2px;">1-Cl&iacute;nico-Laboratorial &nbsp;&nbsp; 2-Cl&iacute;nico-Epidemiol&oacute;gico</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.criterio || '1'}</div>
+        </div>
+      </div>
+      <div style="background:#e6e6e6; font-size:7.5px; font-weight:bold; padding:2px 5px; border-bottom:1px solid #000;">
+        Local Prov&aacute;vel da Fonte de Infec&ccedil;&atilde;o (no per&iacute;odo de 30 dias)
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">63</span> AUT&Oacute;CTONE DO MUNIC&Iacute;PIO DE RESID&Ecirc;NCIA?</div>
+          <div style="font-size:6px; margin-top:2px;">1-Sim &nbsp;&nbsp; 2-N&atilde;o &nbsp;&nbsp; 3-Indeterminado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.autoctone || '1'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.4;">
+          <div class="ct"><span class="cn">64</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.ufInfeccao || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">65</span> PA&Iacute;S</div>
+          <div class="cv">${cs.paisInfeccao || 'Brasil'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">66</span> MUNIC&Iacute;PIO</div>
+          <div class="cv">${cs.municipioInfeccao || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('', 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">67</span> DISTRITO</div>
+          <div class="cv">${cs.distritoInfeccao || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">68</span> BAIRRO</div>
+          <div class="cv">${cs.bairroInfeccao || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">69</span> &Aacute;REA PROV&Aacute;VEL DE INFEC&Ccedil;&Atilde;O</div>
+          <div style="font-size:5.5px; margin-top:2px;">1-Urbana &nbsp; 2-Rural &nbsp; 3-Peri-Urbana &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.areaInfeccao || '1'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">70</span> AMBIENTE DA INFEC&Ccedil;&Atilde;O</div>
+          <div style="font-size:5.5px; margin-top:2px;">1-Domiciliar &nbsp; 2-Trabalho &nbsp; 3-Lazer &nbsp; 4-Outro &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.ambienteInfeccao || '1'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">71</span> DOEN&Ccedil;A RELACIONADA AO TRABALHO?</div>
+          <div style="font-size:6px; margin-top:2px;">1-Sim &nbsp;&nbsp; 2-N&atilde;o &nbsp;&nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.trabalho || '2'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">72</span> EVOLU&Ccedil;&Atilde;O DO CASO</div>
+          <div style="font-size:5.5px; margin-top:2px;">1-Cura &nbsp; 2-&Oacute;bito por leptospirose &nbsp; 3-&Oacute;bito por outras &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.evolucao || '1'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">73</span> DATA DO &Oacute;BITO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataObito), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">74</span> DATA DO ENCERRAMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataEncerramento || data.dataNotificacao), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell">
+          <div class="ct">INFORMA&Ccedil;&Otilde;ES COMPLEMENTARES E OBSERVA&Ccedil;&Otilde;ES</div>
+          <div class="cv" style="font-size:9px; font-weight:normal; min-height:40px;">${cs.obs || ''}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO INVESTIGADOR -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Investigador</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.0;">
+          <div class="ct">MUNIC&Iacute;PIO/UNIDADE DE SA&Uacute;DE</div>
+          <div class="cv">${data.munNotificacao || 'MARABA'} / ${unitName}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct">C&Oacute;D. DA UNID. DE SA&Uacute;DE</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cnesCode, 7)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct">NOME</div>
+          <div class="cv" style="font-weight:900; font-size:10px;">${data.notificatorName || 'Profissional de Saude'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct">FUN&Ccedil;&Atilde;O</div>
+          <div class="cv">Profissional de Saude</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct">ASSINATURA</div>
+          <div class="cv" style="border-bottom:1px dotted #555; margin-top:4px; min-height:14px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-info">
+    <span>Leptospirose</span>
+    <span>Sinan NET</span>
+    <span>SVS 02/02/2007</span>
+  </div>
+</div>
+        `;
+    }
+
+    // ----------------------------------------------------
+    // 4. LEISHMANIOSE VISCERAL (SVS 27/09/2005) - 2 PAGINAS
+    // ----------------------------------------------------
+    function generatePage1LeishVisceralHtml(data) {
+        return `
+<div class="sinan-page">
+  <div class="sn-header">
+    <div class="sn-header-left">
+      Rep&uacute;blica Federativa do Brasil<br>
+      Minist&eacute;rio da Sa&uacute;de
+    </div>
+    <div class="sn-header-center">
+      <p class="sn-sinan">SINAN</p>
+      <p class="sn-title">SISTEMA DE INFORMA&Ccedil;&Atilde;O DE AGRAVOS DE NOTIFICA&Ccedil;&Atilde;O</p>
+      <p class="sn-subtitle">FICHA DE INVESTIGA&Ccedil;&Atilde;O LEISHMANIOSE VISCERAL N&ordm;</p>
+    </div>
+    <div class="sn-header-right">
+      <span class="sn-num-label">N&ordm;</span>
+      <div class="sn-num-box">${data.sinan_number || '---.---'}</div>
+    </div>
+  </div>
+
+  <div style="border:1.5px solid #000; padding:3px 6px; margin-bottom:4px; font-size:6.5px; line-height:1.2; background:#fafafa;">
+    <strong>CASO SUSPEITO:</strong> Todo indiv&iacute;duo proveniente de &aacute;rea com ocorr&ecirc;ncia de transmiss&atilde;o, com febre e esplenomegalia. Todo indiv&iacute;duo proveniente de &aacute;rea sem ocorr&ecirc;ncia de transmiss&atilde;o, com febre e esplenomegalia, desde que descartado os diagn&oacute;sticos diferenciais mais freq&uuml;entes na regi&atilde;o.
+  </div>
+
+  <!-- BLOCO 1: DADOS GERAIS -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados Gerais</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1; min-height:22px;">
+          <div class="ct"><span class="cn">1</span> TIPO DE NOTIFICA&Ccedil;&Atilde;O</div>
+          <div style="font-size:7.5px; margin-top:2px;">2 - Individual</div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">${tipoNotif}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.5; position:relative;">
+          <div class="ct"><span class="cn">2</span> AGRAVO/DOEN&Ccedil;A</div>
+          <div style="font-size:10px; font-weight:900; margin-top:2px;">LEISHMANIOSE VISCERAL</div>
+          <div style="position:absolute; right:8px; top:4px; font-size:7px; font-weight:bold;">
+            C&oacute;digo (CID10)<br>
+            <span style="font-size:8.5px; border:1px solid #000; padding:1px 4px; font-family:monospace; background:#fff;">B 5 5.0</span>
+          </div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">3</span> DATA DA NOTIFICA&Ccedil;&Atilde;O</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.dataNotificacao), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.4;">
+          <div class="ct"><span class="cn">4</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.ufNotificacao || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">5</span> MUNIC&Iacute;PIO DE NOTIFICA&Ccedil;&Atilde;O</div>
+          <div class="cv">${data.munNotificacao || 'MARABA'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('1504208', 7)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.2;">
+          <div class="ct"><span class="cn">6</span> UNIDADE DE SA&Uacute;DE (OU OUTRA FONTE NOTIFICADORA)</div>
+          <div class="cv">${unitName}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cnesCode, 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">7</span> DATA DOS PRIMEIROS SINTOMAS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.symptomsDate), 8)}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 2: NOTIFICAÇÃO INDIVIDUAL -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Notifica&ccedil;&atilde;o Individual</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:3.0;">
+          <div class="ct"><span class="cn">8</span> NOME DO PACIENTE</div>
+          <div class="cv" style="font-size:10px; font-weight:900;">${data.patientName || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">9</span> DATA DE NASCIMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.patientBirthDate), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct"><span class="cn">10</span> (OU) IDADE</div>
+          <div style="display:flex; align-items:center; gap:3px; margin-top:2px;">
+            <div>${splitDigits(data.patientAge || '', 3, true)}</div>
+            <div class="single-box">${data.patientAge ? '4' : '&nbsp;'}</div>
+            <div style="font-size:5px; line-height:1.0; font-weight:bold; margin-left:2px;">1 - Hora<br>2 - Dia<br>3 - M&ecirc;s<br>4 - Ano</div>
+          </div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:0.7;">
+          <div class="ct"><span class="cn">11</span> SEXO</div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">M - Masculino<br>F - Feminino<br>I - Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${sexCode}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">12</span> GESTANTE</div>
+          <div style="font-size:5.2px; line-height:1.1; margin-top:2px;">1-1&ordm;Trim. &nbsp; 2-2&ordm;Trim. &nbsp; 3-3&ordm;Trim.<br>4-Ignorada &nbsp; 5-N&atilde;o &nbsp; 6-N&atilde;o se aplica &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${pregnantCode}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.3;">
+          <div class="ct"><span class="cn">13</span> RA&Ccedil;A/COR</div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">1-Branca &nbsp; 2-Preta &nbsp; 3-Amarela<br>4-Parda &nbsp; 5-Ind&iacute;gena &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${raceCode}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative;">
+          <div class="ct"><span class="cn">14</span> ESCOLARIDADE</div>
+          <div style="font-size:5px; line-height:1.2; margin-top:2px; padding-right:25px;">
+            0-Analfabeto &nbsp;&nbsp; 1-1&ordf; a 4&ordf; s&eacute;rie inc. EF &nbsp;&nbsp; 2-4&ordf; s&eacute;rie comp. EF &nbsp;&nbsp; 3-5&ordf; &agrave; 8&ordf; s&eacute;rie inc. EF &nbsp;&nbsp; 4-EF completo<br>
+            5-EM incompleto &nbsp;&nbsp; 6-EM completo &nbsp;&nbsp; 7-Superior incompleto &nbsp;&nbsp; 8-Superior completo &nbsp;&nbsp; 9-Ignorado &nbsp;&nbsp; 10-N&atilde;o se aplica
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">${schoolCode}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.2;">
+          <div class="ct"><span class="cn">15</span> N&Uacute;MERO DO CART&Atilde;O SUS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.patientCns || '', 15)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">16</span> NOME DA M&Atilde;E</div>
+          <div class="cv" style="font-size:9px;">${data.patientMotherName || 'Nao informada'}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 3: DADOS DE RESIDÊNCIA -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados de Resid&ecirc;ncia</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.35;">
+          <div class="ct"><span class="cn">17</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.patientUf || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.7;">
+          <div class="ct"><span class="cn">18</span> MUNIC&Iacute;PIO DE RESID&Ecirc;NCIA</div>
+          <div class="cv">${data.patientMunicipality || 'MARABA'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct">C&Oacute;DIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('1504208', 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">19</span> DISTRITO</div>
+          <div class="cv">${data.patientDistrict || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">20</span> BAIRRO</div>
+          <div class="cv">${data.patientNeighborhood || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.5;">
+          <div class="ct"><span class="cn">21</span> LOGRADOURO (RUA, AVENIDA,...)</div>
+          <div class="cv">${data.patientAddress || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO</div>
+          <div class="cv"></div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct"><span class="cn">22</span> N&Uacute;MERO</div>
+          <div class="cv">${data.patientNumber || 'S/N'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">23</span> COMPLEMENTO (APTO., CASA,...)</div>
+          <div class="cv">${data.patientComplement || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">24</span> GEO CAMPO 1</div>
+          <div class="cv"></div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">25</span> GEO CAMPO 2</div>
+          <div class="cv"></div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">26</span> PONTO DE REFER&Ecirc;NCIA</div>
+          <div class="cv">${data.patientRef || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">27</span> CEP</div>
+          <div class="cv" style="padding-top:3px;">${formatCepDigits(data.patientCep)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">28</span> (DDD) TELEFONE</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits((data.patientPhone || '').replace(/\D/g,''), 11)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">29</span> ZONA</div>
+          <div style="font-size:6px; line-height:1.1; margin-top:2px;">1 - Urbana &nbsp; 2 - Rural &nbsp; 3 - Periurbana &nbsp; 9 - Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${zoneCode}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct"><span class="cn">30</span> PA&Iacute;S (SE RESID. FORA)</div>
+          <div class="cv">${data.patientCountry || ''}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:#e6e6e6; font-size:8px; font-weight:bold; text-align:center; padding:2px; border:1px solid #000; border-bottom:none;">
+    Dados Complementares do Caso
+  </div>
+
+  <!-- BLOCO 4: ANTECEDENTES, DADOS CLÍNICOS E LABORATÓRIO -->
+  <div class="sn-block">
+    <div class="sn-sidebar" style="font-size:6px;">Antecedentes / Cl&iacute;nica / Lab</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">31</span> DATA DA INVESTIGA&Ccedil;&Atilde;O</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataInvestigacao), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.8;">
+          <div class="ct"><span class="cn">32</span> OCUPA&Ccedil;&Atilde;O</div>
+          <div class="cv">${cs.occupation || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:3.0;">
+          <div class="ct"><span class="cn">33</span> MANIFESTA&Ccedil;&Otilde;ES CL&Iacute;NICAS (SINAIS E SINTOMAS)</div>
+          <div class="cv" style="font-size:8.5px;">${cs.sintomas || 'Febre, Fraqueza, Edema, Emagrecimento, Tosse/diarreia, Palidez, Aumento do Baço/Fígado, Icterícia'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.0;">
+          <div class="ct"><span class="cn">34</span> CO-INFEC&Ccedil;&Atilde;O HIV</div>
+          <div style="font-size:6px; margin-top:2px;">1-Sim &nbsp; 2-N&atilde;o &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.hiv || '2'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">35</span> DIAGN&Oacute;STICO PARASITOL&Oacute;GICO</div>
+          <div style="font-size:5.5px; margin-top:2px;">1-Positivo &nbsp; 2-Negativo &nbsp; 3-N&atilde;o Realizado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.diagParasito || '3'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">36</span> DIAGN&Oacute;STICO IMUNOL&Oacute;GICO (IFI / OUTRO)</div>
+          <div style="font-size:5.5px; margin-top:2px;">1-Positivo &nbsp; 2-Negativo &nbsp; 3-N&atilde;o Realizado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.diagImuno || '3'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.0;">
+          <div class="ct"><span class="cn">37</span> TIPO DE ENTRADA</div>
+          <div style="font-size:5.5px; margin-top:2px;">1-Caso Novo &nbsp; 2-Recidiva &nbsp; 3-Transfer&ecirc;ncia &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.tipoEntrada || '1'}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRATAMENTO -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Tratamento</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">38</span> DATA IN&Iacute;CIO TRATAMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.inicioTratamento), 8)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:2.0;">
+          <div class="ct"><span class="cn">39</span> DROGA INICIAL ADMINISTRADA</div>
+          <div style="font-size:5px; margin-top:2px;">1-Antimonial Pentavalente &nbsp; 2-Anfotericina b &nbsp; 3-Pentamidina &nbsp; 4-Anfotericina lipossomal &nbsp; 5-Outras &nbsp; 6-N&atilde;o Utilizada</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.droga || '1'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct"><span class="cn">40</span> PESO (KG)</div>
+          <div class="cv">${cs.peso || ''}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">41</span> DOSE PRESCRITA (MG/KG/DIA Sb+5)</div>
+          <div style="font-size:5px; margin-top:2px;">1- &ge;10 e <15 &nbsp; 2- &ge;15 e <20 &nbsp; 3- &ge;20</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.dose || '1'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">42</span> N&ordm; TOTAL AMPOLAS PRESCRITAS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.ampolas || '', 3)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">43</span> OUTRA DROGA (FAL&Ecirc;NCIA TRAT. INICIAL)</div>
+          <div style="font-size:5px; margin-top:2px;">1-Anfotericina b &nbsp; 2-Anfotericina lipossomal &nbsp; 3-Outras &nbsp; 4-N&atilde;o se Aplica</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.outraDroga || '4'}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-info">
+    <span>Leishmaniose Visceral</span>
+    <span>Sinan NET</span>
+    <span>SVS 27/09/2005</span>
+  </div>
+</div>
+        `;
+    }
+
+    function generatePage2LeishVisceralHtml(data) {
+        return `
+<div class="sinan-page">
+  <div class="pg2-header">
+    <p class="pg2-title">DADOS COMPLEMENTARES DO CASO - LEISHMANIOSE VISCERAL</p>
+  </div>
+
+  <!-- BLOCO CONCLUSÃO -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Conclus&atilde;o</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.0;">
+          <div class="ct"><span class="cn">44</span> CLASSIFICA&Ccedil;&Atilde;O FINAL</div>
+          <div style="font-size:6px; margin-top:2px;">1-Confirmado &nbsp;&nbsp; 2-Descartado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.classificacao || '1'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">45</span> CRIT&Eacute;RIO DE CONFIRMA&Ccedil;&Atilde;O</div>
+          <div style="font-size:6px; margin-top:2px;">1-Laboratorial &nbsp;&nbsp; 2-Cl&iacute;nico-Epidemiol&oacute;gico</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.criterio || '1'}</div>
+        </div>
+      </div>
+      <div style="background:#e6e6e6; font-size:7.5px; font-weight:bold; padding:2px 5px; border-bottom:1px solid #000;">
+        Local Prov&aacute;vel da Fonte de Infec&ccedil;&atilde;o
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">46</span> AUT&Oacute;CTONE DO MUNIC&Iacute;PIO DE RESID&Ecirc;NCIA?</div>
+          <div style="font-size:6px; margin-top:2px;">1-Sim &nbsp;&nbsp; 2-N&atilde;o &nbsp;&nbsp; 3-Indeterminado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.autoctone || '1'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.4;">
+          <div class="ct"><span class="cn">47</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.ufInfeccao || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">48</span> PA&Iacute;S</div>
+          <div class="cv">${cs.paisInfeccao || 'Brasil'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">49</span> MUNIC&Iacute;PIO</div>
+          <div class="cv">${cs.municipioInfeccao || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('', 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">50</span> DISTRITO</div>
+          <div class="cv">${cs.distritoInfeccao || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">51</span> BAIRRO</div>
+          <div class="cv">${cs.bairroInfeccao || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">52</span> DOEN&Ccedil;A RELACIONADA AO TRABALHO?</div>
+          <div style="font-size:6px; margin-top:2px;">1-Sim &nbsp;&nbsp; 2-N&atilde;o &nbsp;&nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.trabalho || '2'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">53</span> EVOLU&Ccedil;&Atilde;O DO CASO</div>
+          <div style="font-size:5.5px; margin-top:2px;">1-Cura &nbsp; 2-Abandono &nbsp; 3-&Oacute;bito por LV &nbsp; 4-&Oacute;bito por outras &nbsp; 5-Transfer&ecirc;ncia</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.evolucao || '1'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">54</span> DATA DO &Oacute;BITO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataObito), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">55</span> DATA DO ENCERRAMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataEncerramento || data.dataNotificacao), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell">
+          <div class="ct">INFORMA&Ccedil;&Otilde;ES COMPLEMENTARES E OBSERVA&Ccedil;&Otilde;ES (DESLOCAMENTO NOS &Uacute;LTIMOS 6 MESES)</div>
+          <div class="cv" style="font-size:9px; font-weight:normal; min-height:40px;">${cs.deslocamentos || ''} ${cs.obs || ''}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO INVESTIGADOR -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Investigador</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.0;">
+          <div class="ct">MUNIC&Iacute;PIO/UNIDADE DE SA&Uacute;DE</div>
+          <div class="cv">${data.munNotificacao || 'MARABA'} / ${unitName}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct">C&Oacute;D. DA UNID. DE SA&Uacute;DE</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cnesCode, 7)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct">NOME</div>
+          <div class="cv" style="font-weight:900; font-size:10px;">${data.notificatorName || 'Profissional de Saude'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct">FUN&Ccedil;&Atilde;O</div>
+          <div class="cv">Profissional de Saude</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct">ASSINATURA</div>
+          <div class="cv" style="border-bottom:1px dotted #555; margin-top:4px; min-height:14px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-info">
+    <span>Leishmaniose Visceral</span>
+    <span>Sinan NET</span>
+    <span>SVS 27/09/2005</span>
+  </div>
+</div>
+        `;
+    }
+
+    function generatePage1HanseniaseHtml(data) {
+        return `
+<div class="sinan-page">
+  <div class="sn-header">
+    <div class="sn-header-left">
+      Rep&uacute;blica Federativa do Brasil<br>
+      Minist&eacute;rio da Sa&uacute;de<br>
+      Secretaria de Vigil&acirc;ncia em Sa&uacute;de
+    </div>
+    <div class="sn-header-center">
+      <p class="sn-sinan">SINAN</p>
+      <p class="sn-title">SISTEMA DE INFORMA&Ccedil;&Atilde;O DE AGRAVOS DE NOTIFICA&Ccedil;&Atilde;O</p>
+      <p class="sn-subtitle">FICHA DE NOTIFICA&Ccedil;&Atilde;O / INVESTIGA&Ccedil;&Atilde;O HANSEN&Iacute;ASE</p>
+    </div>
+    <div class="sn-header-right">
+      <span class="sn-num-label">N&ordm;</span>
+      <div class="sn-num-box">${data.sinan_number || '---.---'}</div>
+    </div>
+  </div>
+
+  <div style="border:1.5px solid #000; padding:3px 6px; margin-bottom:4px; font-size:7px; line-height:1.2; background:#fafafa;">
+    <strong>CASO CONFIRMADO DE HANSEN&Iacute;ASE:</strong> Pessoa que apresenta uma ou mais das seguintes caracter&iacute;sticas e que requer poliquimioterapia: les&atilde;o(ões) de pele com altera&ccedil;&atilde;o de sensibilidade; acometimento de nervo(s) com espessamento neural; baciloscopia positiva.
+  </div>
+
+  <!-- BLOCO 1: DADOS GERAIS -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados Gerais</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1; min-height:22px;">
+          <div class="ct"><span class="cn">1</span> TIPO DE NOTIFICA&Ccedil;&Atilde;O</div>
+          <div style="font-size:7.5px; margin-top:2px;">2 - Individual</div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">${tipoNotif}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.5; position:relative;">
+          <div class="ct"><span class="cn">2</span> AGRAVO/DOEN&Ccedil;A</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; width:100%; font-size:11px; font-weight:900;">
+            <span>HANSEN&Iacute;ASE</span>
+            <span style="font-size:7px; font-weight:bold; display:inline-flex; align-items:center;">
+              C&oacute;digo (CID10) &nbsp; <span style="display:inline-block; font-size:9px; font-weight:bold; letter-spacing:1px; border:1px solid #000; padding:1px 2px; background:#fff; margin-left:3px; font-family:monospace; line-height:1;">A 3 0 . 9</span>
+            </span>
+          </div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">3</span> DATA DA NOTIFICA&Ccedil;&Atilde;O</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.dataNotificacao), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.4;">
+          <div class="ct"><span class="cn">4</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.ufNotificacao || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">5</span> MUNICIPIO DE NOTIFICACAO</div>
+          <div class="cv">${data.munNotificacao || 'MARABA'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">CODIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('1504208', 7)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.2;">
+          <div class="ct"><span class="cn">6</span> UNIDADE DE SAUDE (OU OUTRA FONTE NOTIFICADORA)</div>
+          <div class="cv">${unitName}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">CODIGO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cnesCode, 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">7</span> DATA DO DIAGN&Oacute;STICO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataDiagnostico || data.symptomsDate), 8)}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 2: NOTIFICACAO INDIVIDUAL -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Notificacao Individual</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:3.0;">
+          <div class="ct"><span class="cn">8</span> NOME DO PACIENTE</div>
+          <div class="cv" style="font-size:10px; font-weight:900;">${data.patientName || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">9</span> DATA DE NASCIMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.patientBirthDate), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct"><span class="cn">10</span> (OU) IDADE</div>
+          <div style="display:flex; align-items:center; gap:3px; margin-top:2px;">
+            <div>${splitDigits(data.patientAge || '', 3, true)}</div>
+            <div class="single-box">${data.patientAge ? '4' : '&nbsp;'}</div>
+            <div style="font-size:5px; line-height:1.0; font-weight:bold; margin-left:2px;">
+              1 - Hora<br>2 - Dia<br>3 - M&ecirc;s<br>4 - Ano
+            </div>
+          </div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:0.7;">
+          <div class="ct"><span class="cn">11</span> SEXO</div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">M - Masculino<br>F - Feminino<br>I - Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${sexCode}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">12</span> GESTANTE</div>
+          <div style="font-size:5.2px; line-height:1.1; margin-top:2px;">
+            1-1&ordm;Trim &nbsp;&nbsp; 2-2&ordm;Trim &nbsp;&nbsp; 3-3&ordm;Trim<br>
+            4-Idade Ign. &nbsp;&nbsp; 5-N&atilde;o &nbsp;&nbsp; 6-N&atilde;o se aplica &nbsp;&nbsp; 9-Ign
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${pregnantCode}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.3;">
+          <div class="ct"><span class="cn">13</span> RACA/COR</div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">
+            1-Branca &nbsp;&nbsp; 2-Preta &nbsp;&nbsp; 3-Amarela<br>
+            4-Parda &nbsp;&nbsp; 5-Ind&iacute;gena &nbsp;&nbsp; 9-Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${raceCode}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative;">
+          <div class="ct"><span class="cn">14</span> ESCOLARIDADE</div>
+          <div style="font-size:5px; line-height:1.2; margin-top:2px; padding-right:25px;">
+            0-Analfabeto &nbsp;&nbsp; 1-1&ordf; a 4&ordf; s&eacute;rie inc EF &nbsp;&nbsp; 2-4&ordf; s&eacute;rie comp EF &nbsp;&nbsp; 3-5&ordf; a 8&ordf; s&eacute;rie inc EF &nbsp;&nbsp; 4-EF completo<br>
+            5-EM incompleto &nbsp;&nbsp; 6-EM completo &nbsp;&nbsp; 7-Superior incompleto &nbsp;&nbsp; 8-Superior completo &nbsp;&nbsp; 9-Ignorado &nbsp;&nbsp; 10-N/A
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">${schoolCode}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.2;">
+          <div class="ct"><span class="cn">15</span> NUMERO DO CARTAO SUS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.patientCns || '', 15)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">16</span> NOME DA MAE</div>
+          <div class="cv" style="font-size:9px;">${data.patientMotherName || 'Nao informada'}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 3: DADOS DE RESIDENCIA -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados de Residencia</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.35;">
+          <div class="ct"><span class="cn">17</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.patientUf || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.7;">
+          <div class="ct"><span class="cn">18</span> MUNICIPIO DE RESIDENCIA</div>
+          <div class="cv">${data.patientMunicipality || 'MARABA'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct">CODIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('1504208', 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">19</span> DISTRITO</div>
+          <div class="cv">${data.patientDistrict || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">20</span> BAIRRO</div>
+          <div class="cv">${data.patientNeighborhood || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.5;">
+          <div class="ct"><span class="cn">21</span> LOGRADOURO (RUA, AVENIDA,...)</div>
+          <div class="cv">${data.patientAddress || 'Nao informado'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct"><span class="cn">22</span> NUMERO</div>
+          <div class="cv">${data.patientNumber || 'S/N'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">23</span> COMPLEMENTO (APTO., CASA,...)</div>
+          <div class="cv">${data.patientComplement || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">24</span> GEO CAMPO 1</div>
+          <div class="cv"></div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">25</span> GEO CAMPO 2</div>
+          <div class="cv"></div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">26</span> PONTO DE REFERENCIA</div>
+          <div class="cv">${data.patientRef || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">27</span> CEP</div>
+          <div class="cv" style="padding-top:3px;">${formatCepDigits(data.patientCep)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">28</span> (DDD) TELEFONE</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits((data.patientPhone || '').replace(/\\D/g,''), 11)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">29</span> ZONA</div>
+          <div style="font-size:6px; line-height:1.1; margin-top:2px;">1 - Urbana &nbsp;&nbsp; 2 - Rural &nbsp;&nbsp; 3 - Periurbana &nbsp;&nbsp; 9 - Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${zoneCode}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct"><span class="cn">30</span> PAIS (SE RESID. FORA)</div>
+          <div class="cv">${data.patientCountry || ''}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 4: DADOS CLINICOS E TRATAMENTO -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados Cl&iacute;nicos / Atendimento</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">31</span> N&ordm; DO PRONTU&Aacute;RIO / OCUPA&Ccedil;&Atilde;O</div>
+          <div class="cv">${cs.prontuario || ''} ${cs.occupation ? ' - ' + cs.occupation : ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">32</span> DATA DO DIAGN&Oacute;STICO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataDiagnostico || data.symptomsDate), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">33</span> N&ordm; DE LES&Otilde;ES CUT&Acirc;NEAS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.lesoesCutaneas || '', 2)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:2.2;">
+          <div class="ct"><span class="cn">34</span> FORMA CL&Iacute;NICA</div>
+          <div style="font-size:5.5px; line-height:1.2; margin-top:2px; padding-right:20px;">
+            1 - Indeterminada &nbsp;&nbsp; 2 - Tubercul&oacute;ide &nbsp;&nbsp; 3 - Dimorfa<br>
+            4 - Virchowiana &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5 - N&atilde;o classificado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">${cs.formaClinica || '1'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">35</span> CLASSIFICA&Ccedil;&Atilde;O OPERACIONAL</div>
+          <div style="font-size:6px; line-height:1.2; margin-top:2px;">
+            1 - PB (Paucibacilar) &nbsp;&nbsp;&nbsp;&nbsp; 2 - MB (Multibacilar)
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">${cs.classOperacional || '1'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">36</span> N&ordm; NERVOS AFETADOS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.nervosAfetados || '0', 2)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:2.0;">
+          <div class="ct"><span class="cn">37</span> GRAU DE INCAPACIDADE F&Iacute;SICA NO DIAGN&Oacute;STICO</div>
+          <div style="font-size:5.5px; line-height:1.2; margin-top:2px; padding-right:20px;">
+            0 - Grau Zero &nbsp;&nbsp; 1 - Grau I &nbsp;&nbsp; 2 - Grau II &nbsp;&nbsp; 3 - N&atilde;o Avaliado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">${cs.incapacidadeFisica || '0'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:2.0;">
+          <div class="ct"><span class="cn">38</span> MODO DE ENTRADA</div>
+          <div style="font-size:5px; line-height:1.1; margin-top:2px; padding-right:20px;">
+            1-Caso Novo &nbsp; 2-Transf mesmo mun &nbsp; 3-Transf outro mun &nbsp; 4-Transf outro estado<br>
+            5-Transf outro pa&iacute;s &nbsp; 6-Recidiva &nbsp; 7-Outros reingressos &nbsp; 9-Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">${cs.modoEntrada || '1'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:2.0;">
+          <div class="ct"><span class="cn">39</span> MODO DE DETEC&Ccedil;&Atilde;O DO CASO NOVO</div>
+          <div style="font-size:5.5px; line-height:1.2; margin-top:2px; padding-right:20px;">
+            1 - Encaminhamento &nbsp;&nbsp; 2 - Demanda Espont&acirc;nea &nbsp;&nbsp; 3 - Exame Coletividade<br>
+            4 - Exame Contatos &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5 - Outros Modos &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">${cs.modoDeteccao || '2'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">40</span> BACILOSCOPIA</div>
+          <div style="font-size:5.5px; line-height:1.2; margin-top:2px;">
+            1-Positiva &nbsp; 2-Negativa &nbsp; 3-N&atilde;o realizada &nbsp; 9-Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">${cs.baciloscopia || '2'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">41</span> DATA IN&Iacute;CIO TRATAMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataInicioTratamento || ''), 8)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.8;">
+          <div class="ct"><span class="cn">42</span> ESQUEMA TERAP&Ecirc;UTICO INICIAL</div>
+          <div style="font-size:5.2px; line-height:1.1; margin-top:2px; padding-right:20px;">
+            1 - PQT/PB/6 doses &nbsp;&nbsp;&nbsp;&nbsp; 2 - PQT/MB/12 doses<br>
+            3 - Outros Esquemas Substitutos
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">${cs.esquemaTerapeutico || '1'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">43</span> N&ordm; CONTATOS REGISTRADOS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.contatosRegistrados || '0', 3)}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INVESTIGADOR SIGNATURES -->
+  <div class="sn-block" style="margin-top:4px;">
+    <div class="sn-sidebar">Investigador</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.0;">
+          <div class="ct">MUNICIPIO / UNIDADE DE SA&Uacute;DE</div>
+          <div class="cv">${data.munNotificacao || 'MARABA'} / ${unitName}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct">C&Oacute;DIGO DA UNID. DE SA&Uacute;DE</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cnesCode, 7)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct">NOME DO INVESTIGADOR</div>
+          <div class="cv" style="font-weight:900; font-size:10px;">${data.notificatorName || 'Profissional de Saude'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct">FUN&Ccedil;&Atilde;O</div>
+          <div class="cv">Profissional de Saude</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct">ASSINATURA</div>
+          <div class="cv" style="border-bottom:1px dotted #555; margin-top:4px; min-height:14px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-info">
+    <span>Hansen&iacute;ase</span>
+    <span>Sinan NET</span>
+    <span>SVS 30/10/2007</span>
+  </div>
+</div>
+`;
+    }
+
+    function generatePage1TracomaHtml(data) {
+        return `
+<div class="sinan-page">
+  <div class="sn-header">
+    <div class="sn-header-left">
+      Rep&uacute;blica Federativa do Brasil<br>
+      Minist&eacute;rio da Sa&uacute;de<br>
+      Secretaria de Vigil&acirc;ncia em Sa&uacute;de
+    </div>
+    <div class="sn-header-center">
+      <p class="sn-sinan">SINAN</p>
+      <p class="sn-title">SISTEMA DE INFORMA&Ccedil;&Atilde;O DE AGRAVOS DE NOTIFICA&Ccedil;&Atilde;O</p>
+      <p class="sn-subtitle">INQU&Eacute;RITO DE TRACOMA / FICHA DE INVESTIGA&Ccedil;&Atilde;O</p>
+    </div>
+    <div class="sn-header-right">
+      <span class="sn-num-label">N&ordm;</span>
+      <div class="sn-num-box">${data.sinan_number || '---.---'}</div>
+    </div>
+  </div>
+
+  <!-- BLOCO 1: DADOS GERAIS -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados Gerais</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1; min-height:22px;">
+          <div class="ct"><span class="cn">1</span> TIPO DE NOTIFICA&Ccedil;&Atilde;O</div>
+          <div style="font-size:7.5px; margin-top:2px;">4 - Inqu&eacute;rito Tracoma</div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">4</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.5; position:relative;">
+          <div class="ct"><span class="cn">2</span> AGRAVO/DOEN&Ccedil;A</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; width:100%; font-size:11px; font-weight:900;">
+            <span>TRACOMA</span>
+            <span style="font-size:7px; font-weight:bold; display:inline-flex; align-items:center;">
+              C&oacute;digo (CID10) &nbsp; <span style="display:inline-block; font-size:9px; font-weight:bold; letter-spacing:1px; border:1px solid #000; padding:1px 2px; background:#fff; margin-left:3px; font-family:monospace; line-height:1;">A 7 1 . 9</span>
+            </span>
+          </div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">3</span> DATA DA NOTIFICA&Ccedil;&Atilde;O</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.dataNotificacao), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.4;">
+          <div class="ct"><span class="cn">4</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.ufNotificacao || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">5</span> MUNICIPIO DE NOTIFICACAO</div>
+          <div class="cv">${data.munNotificacao || 'MARABA'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">CODIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('1504208', 7)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.2;">
+          <div class="ct"><span class="cn">6</span> UNIDADE DE SAUDE / ESCOLA NOTIFICADORA</div>
+          <div class="cv">${unitName}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">CODIGO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cnesCode, 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">7</span> DATA DO EXAME OCULAR</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.symptomsDate), 8)}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 2: NOTIFICACAO INDIVIDUAL -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Notificacao Individual</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:3.0;">
+          <div class="ct"><span class="cn">8</span> NOME DO PACIENTE / ALUNO</div>
+          <div class="cv" style="font-size:10px; font-weight:900;">${data.patientName || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">9</span> DATA DE NASCIMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.patientBirthDate), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct"><span class="cn">10</span> (OU) IDADE</div>
+          <div style="display:flex; align-items:center; gap:3px; margin-top:2px;">
+            <div>${splitDigits(data.patientAge || '', 3, true)}</div>
+            <div class="single-box">${data.patientAge ? '4' : '&nbsp;'}</div>
+            <div style="font-size:5px; line-height:1.0; font-weight:bold; margin-left:2px;">
+              1 - Hora<br>2 - Dia<br>3 - M&ecirc;s<br>4 - Ano
+            </div>
+          </div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:0.7;">
+          <div class="ct"><span class="cn">11</span> SEXO</div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">M - Masculino<br>F - Feminino<br>I - Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${sexCode}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">12</span> GESTANTE</div>
+          <div style="font-size:5.2px; line-height:1.1; margin-top:2px;">
+            1-1&ordm;Trim &nbsp;&nbsp; 2-2&ordm;Trim &nbsp;&nbsp; 3-3&ordm;Trim<br>
+            4-Idade Ign. &nbsp;&nbsp; 5-N&atilde;o &nbsp;&nbsp; 6-N&atilde;o se aplica &nbsp;&nbsp; 9-Ign
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${pregnantCode}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.3;">
+          <div class="ct"><span class="cn">13</span> RACA/COR</div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">
+            1-Branca &nbsp;&nbsp; 2-Preta &nbsp;&nbsp; 3-Amarela<br>
+            4-Parda &nbsp;&nbsp; 5-Ind&iacute;gena &nbsp;&nbsp; 9-Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${raceCode}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative;">
+          <div class="ct"><span class="cn">14</span> ESCOLARIDADE</div>
+          <div style="font-size:5px; line-height:1.2; margin-top:2px; padding-right:25px;">
+            0-Analfabeto &nbsp;&nbsp; 1-1&ordf; a 4&ordf; s&eacute;rie inc EF &nbsp;&nbsp; 2-4&ordf; s&eacute;rie comp EF &nbsp;&nbsp; 3-5&ordf; a 8&ordf; s&eacute;rie inc EF &nbsp;&nbsp; 4-EF completo<br>
+            5-EM incompleto &nbsp;&nbsp; 6-EM completo &nbsp;&nbsp; 7-Superior incompleto &nbsp;&nbsp; 8-Superior completo &nbsp;&nbsp; 9-Ignorado &nbsp;&nbsp; 10-N/A
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">${schoolCode}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.2;">
+          <div class="ct"><span class="cn">15</span> NUMERO DO CARTAO SUS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.patientCns || '', 15)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">16</span> NOME DA MAE</div>
+          <div class="cv" style="font-size:9px;">${data.patientMotherName || 'Nao informada'}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 3: DADOS DE RESIDENCIA -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados de Residencia</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.35;">
+          <div class="ct"><span class="cn">17</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.patientUf || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.7;">
+          <div class="ct"><span class="cn">18</span> MUNICIPIO DE RESIDENCIA</div>
+          <div class="cv">${data.patientMunicipality || 'MARABA'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct">CODIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('1504208', 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">19</span> DISTRITO</div>
+          <div class="cv">${data.patientDistrict || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">20</span> BAIRRO</div>
+          <div class="cv">${data.patientNeighborhood || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.5;">
+          <div class="ct"><span class="cn">21</span> LOGRADOURO (RUA, AVENIDA,...)</div>
+          <div class="cv">${data.patientAddress || 'Nao informado'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct"><span class="cn">22</span> NUMERO</div>
+          <div class="cv">${data.patientNumber || 'S/N'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">23</span> COMPLEMENTO (APTO., CASA,...)</div>
+          <div class="cv">${data.patientComplement || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">24</span> CEP</div>
+          <div class="cv" style="padding-top:3px;">${formatCepDigits(data.patientCep)}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 4: DADOS DO EXAME OCULAR -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Exame Ocular / Tracoma</div>
+    <div class="sn-content">
+      <div class="sn-row" style="background:#f0f0f0; border-bottom:1px solid #000; font-weight:bold; font-size:8px; padding:2px 4px;">
+        &nbsp; DIAGN&Oacute;STICO E CLASSIFICA&Ccedil;&Atilde;O CL&Iacute;NICA DO TRACOMA (OMS)
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.0;">
+          <div class="ct">OLHO DIREITO (OD)</div>
+          <div style="font-size:7.5px; line-height:1.4; padding:3px 0;">
+            TF (Folicular): <strong>${cs.odTf === '1' ? '[X] Sim' : '[ ] N&atilde;o'}</strong> &nbsp;&nbsp;
+            TI (Intenso): <strong>${cs.odTi === '1' ? '[X] Sim' : '[ ] N&atilde;o'}</strong><br>
+            TS (Cicatricial): <strong>${cs.odTs === '1' ? '[X] Sim' : '[ ] N&atilde;o'}</strong> &nbsp;&nbsp;
+            TT (Triqu&iacute;ase): <strong>${cs.odTt === '1' ? '[X] Sim' : '[ ] N&atilde;o'}</strong> &nbsp;&nbsp;
+            CO (Opacidade): <strong>${cs.odCo === '1' ? '[X] Sim' : '[ ] N&atilde;o'}</strong>
+          </div>
+        </div>
+        <div class="sn-cell" style="flex:2.0;">
+          <div class="ct">OLHO ESQUERDO (OE)</div>
+          <div style="font-size:7.5px; line-height:1.4; padding:3px 0;">
+            TF (Folicular): <strong>${cs.oeTf === '1' ? '[X] Sim' : '[ ] N&atilde;o'}</strong> &nbsp;&nbsp;
+            TI (Intenso): <strong>${cs.oeTi === '1' ? '[X] Sim' : '[ ] N&atilde;o'}</strong><br>
+            TS (Cicatricial): <strong>${cs.oeTs === '1' ? '[X] Sim' : '[ ] N&atilde;o'}</strong> &nbsp;&nbsp;
+            TT (Triqu&iacute;ase): <strong>${cs.oeTt === '1' ? '[X] Sim' : '[ ] N&atilde;o'}</strong> &nbsp;&nbsp;
+            CO (Opacidade): <strong>${cs.oeCo === '1' ? '[X] Sim' : '[ ] N&atilde;o'}</strong>
+          </div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:2.0;">
+          <div class="ct">CONDUTA / TRATAMENTO PRESCRITO</div>
+          <div style="font-size:7px; line-height:1.2; margin-top:2px;">
+            1 - Azitromicina dose &uacute;nica &nbsp;&nbsp; 2 - Col&iacute;rio / Outro &nbsp;&nbsp; 3 - Cirurgia TT &nbsp;&nbsp; 9 - Sem tratamento
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">${cs.conduta || '1'}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.0;">
+          <div class="ct">EXAME DE CONTATOS DOMICILIARES</div>
+          <div style="font-size:7.5px; padding-top:2px;">
+            Examinados: <strong>${cs.contatosExaminados || '0'}</strong> &nbsp;&nbsp;&nbsp;&nbsp; Positivos: <strong>${cs.contatosPositivos || '0'}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INVESTIGADOR SIGNATURES -->
+  <div class="sn-block" style="margin-top:4px;">
+    <div class="sn-sidebar">Investigador</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.0;">
+          <div class="ct">MUNICIPIO / UNIDADE DE SA&Uacute;DE</div>
+          <div class="cv">${data.munNotificacao || 'MARABA'} / ${unitName}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct">C&Oacute;DIGO DA UNID. DE SA&Uacute;DE</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cnesCode, 7)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct">NOME DO EXAMINADOR / INVESTIGADOR</div>
+          <div class="cv" style="font-weight:900; font-size:10px;">${data.notificatorName || 'Profissional de Saude'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct">FUN&Ccedil;&Atilde;O</div>
+          <div class="cv">Profissional de Saude</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct">ASSINATURA</div>
+          <div class="cv" style="border-bottom:1px dotted #555; margin-top:4px; min-height:14px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-info">
+    <span>Tracoma</span>
+    <span>Inqu&eacute;rito Tracoma</span>
+    <span>Sinan NET</span>
+    <span>SVS</span>
+  </div>
+</div>
+`;
+    }
+
+    function generatePage1AcidenteOfidicoHtml(data) {
+        const customBlockHtml = `
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados do Acidente</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">31</span> DATA DA INVESTIGACAO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataInvestigacao), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.0;">
+          <div class="ct"><span class="cn">32</span> OCUPACAO</div>
+          <div class="cv">${cs.occupation || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">33</span> DATA DO ACIDENTE</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataAcidente), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.4;">
+          <div class="ct"><span class="cn">34</span> UF OC.</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.ufOcorrencia || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">35</span> MUNICIPIO OCORRENCIA</div>
+          <div class="cv">${cs.munOcorrencia || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">36</span> LOCALIDADE OCORRENCIA</div>
+          <div class="cv">${cs.localidadeOcorrencia || ''}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.0;">
+          <div class="ct"><span class="cn">37</span> ZONA OCORRENCIA</div>
+          <div style="font-size:6px; line-height:1.1; margin-top:2px;">1-Urbana &nbsp; 2-Rural &nbsp; 3-Periurbana &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.zonaOcorrencia || '1'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">38</span> TEMPO PICADA/ATENDIMENTO</div>
+          <div style="font-size:5px; line-height:1.1; margin-top:2px;">
+            1- 0-1h &nbsp; 2- 1-3h &nbsp; 3- 3-6h &nbsp; 4- 6-12h<br>
+            5- 12-24h &nbsp; 6- 24h+ &nbsp; 9-Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.tempoAtendimento || '1'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">39</span> LOCAL DA PICADA</div>
+          <div style="font-size:5px; line-height:1.1; margin-top:2px;">
+            01-Cabeça &nbsp; 02-Braço &nbsp; 04-Mão &nbsp; 06-Tronco<br>
+            07-Coxa &nbsp; 08-Perna &nbsp; 09-Pé &nbsp; 99-Ignorado
+          </div>
+          <div style="position:absolute; right:8px; top:4px; display:inline-flex;">
+            <span class="digit-box" style="width:11px; height:13px; font-size:8px; border:1px solid #000; display:inline-flex; align-items:center; justify-content:center; background:#fff; font-family:monospace; font-weight:bold;">${String(cs.localPicada || '09')[0]}</span>
+            <span class="digit-box" style="width:11px; height:13px; font-size:8px; border:1px solid #000; display:inline-flex; align-items:center; justify-content:center; background:#fff; font-family:monospace; font-weight:bold; margin-left:-1px;">${String(cs.localPicada || '09')[1]}</span>
+          </div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:0.8;">
+          <div class="ct"><span class="cn">40</span> MANIF. LOCAIS?</div>
+          <div style="font-size:7px; margin-top:2px;">1-Sim &nbsp;&nbsp;&nbsp; 2-Não &nbsp;&nbsp;&nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.locais || '1'}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.0;">
+          <div class="ct"><span class="cn">41</span> SINTOMAS LOCAIS</div>
+          <div class="cv" style="font-size:9.5px;">${cs.sintomasLocais || ''}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:0.8;">
+          <div class="ct"><span class="cn">42</span> MANIF. SISTEMICAS?</div>
+          <div style="font-size:7px; margin-top:2px;">1-Sim &nbsp;&nbsp;&nbsp; 2-Não &nbsp;&nbsp;&nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.sistemicas || '2'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.0;">
+          <div class="ct"><span class="cn">43</span> SINTOMAS SISTEMICOS</div>
+          <div class="cv" style="font-size:9.5px;">${cs.sintomasSistemicos || ''}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.0;">
+          <div class="ct"><span class="cn">44</span> TEMPO COAGULACAO</div>
+          <div style="font-size:6.5px; line-height:1.1; margin-top:2px;">1-Normal &nbsp; 2-Alterado &nbsp; 3-Não Realizado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.tempoCoag || '1'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">45</span> TIPO DE ACIDENTE</div>
+          <div style="font-size:5px; line-height:1.1; margin-top:2px;">
+            1-Serpente &nbsp; 2-Aranha &nbsp; 3-Escorpião &nbsp; 4-Lagarta<br>
+            5-Abelha &nbsp; 6-Outros &nbsp; 9-Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.tipoAcidente || '1'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">46/47/48</span> AGENTE CAUSADOR (ESPECIE)</div>
+          <div class="cv">${cs.agenteEspecie || ''}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+        `;
+        return generatePage1CustomHtml(data, "Acidentes por Animais Peçonhentos", "X29", customBlockHtml);
+    }
+
+    function generatePage2AcidenteOfidicoHtml(data) {
+        return `
+<div class="sinan-page">
+  <div class="pg2-header">
+    <p class="pg2-title">DADOS COMPLEMENTARES - ACIDENTES POR ANIMAIS PEÇONHENTOS</p>
+    <p class="pg2-sub">(ANOTAR TODOS OS DADOS DISPONÍVEIS NO MOMENTO DA NOTIFICACAO)</p>
+  </div>
+
+  <!-- BLOCO 6: CLASSIFICAÇÃO E SOROTERAPIA -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Classif. / Soroterapia</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">49</span> CLASSIFICACAO DO CASO</div>
+          <div style="font-size:7px; margin-top:2px;">1-Leve &nbsp; 2-Moderado &nbsp; 3-Grave &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.classificacaoCaso || '1'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.0;">
+          <div class="ct"><span class="cn">50</span> SOROTERAPIA?</div>
+          <div style="font-size:7px; margin-top:2px;">1-Sim &nbsp;&nbsp;&nbsp; 2-Não &nbsp;&nbsp;&nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.soroterapia || '2'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">51</span> QUANTIDADE DE AMPOLAS DE SORO</div>
+          <div class="cv" style="font-size:9.5px;">${cs.soroAmpolas || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.0;">
+          <div class="ct"><span class="cn">52</span> COMPLICACOES LOCAIS?</div>
+          <div style="font-size:7px; margin-top:2px;">1-Sim &nbsp;&nbsp;&nbsp; 2-Não &nbsp;&nbsp;&nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.complLocais || '2'}</div>
+        </div>
+        <div class="sn-cell" style="flex:3.0;">
+          <div class="ct"><span class="cn">53</span> ESPECIFICAR COMPLICACOES LOCAIS</div>
+          <div class="cv">${cs.complLocaisEspecificar || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.0;">
+          <div class="ct"><span class="cn">54</span> COMPLICACOES SISTEMICAS?</div>
+          <div style="font-size:7px; margin-top:2px;">1-Sim &nbsp;&nbsp;&nbsp; 2-Não &nbsp;&nbsp;&nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.complSistemicas || '2'}</div>
+        </div>
+        <div class="sn-cell" style="flex:3.0;">
+          <div class="ct"><span class="cn">55</span> ESPECIFICAR COMPLICACOES SISTEMICAS</div>
+          <div class="cv">${cs.complSistemicasEspecificar || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.0;">
+          <div class="ct"><span class="cn">56</span> RELACIONADO AO TRABALHO?</div>
+          <div style="font-size:7px; margin-top:2px;">1-Sim &nbsp;&nbsp;&nbsp; 2-Não &nbsp;&nbsp;&nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.trabalho || '2'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">57</span> EVOLUCAO</div>
+          <div style="font-size:6px; line-height:1.1; margin-top:2px;">1-Cura &nbsp; 2-Óbito por acidente &nbsp; 3-Óbito por outras causas &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.evolucao || '1'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">58</span> DATA DO OBITO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataObito), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">59</span> DATA DO ENCERRAMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataEncerramento), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell">
+          <div class="ct">OBSERVACOES / INFORMACOES COMPLEMENTARES</div>
+          <div class="cv" style="font-size:9.5px; font-weight:normal; min-height:40px;">${cs.obs || ''}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INVESTIGADOR SIGNATURES -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Investigador</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct">MUNICIPIO/UNIDADE DE SAUDE</div>
+          <div class="cv">${data.munNotificacao || 'MARABA'} / ${unitName}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct">NOME DO INVESTIGADOR</div>
+          <div class="cv">${data.notificatorName || 'Profissional de Saude'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct">FUNCAO</div>
+          <div class="cv">Profissional de Saude</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct">ASSINATURA</div>
+          <div class="cv" style="border-bottom:1px dotted #555; margin-top:8px; min-height:14px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-info">
+    <span>Dados Complementares / Peçonhentos</span>
+    <span>Sinan NET</span>
+    <span>SVS 17/07/2006</span>
+  </div>
+</div>
+`;
+    }
+
+    function generatePage1LeishTegumentarHtml(data) {
+        const customBlockHtml = `
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados Clínicos / Diag.</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">31</span> DATA DA INVESTIGACAO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataInvestigacao), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.0;">
+          <div class="ct"><span class="cn">32</span> OCUPACAO</div>
+          <div class="cv">${cs.occupation || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">33</span> PRESENCA DE LESAO</div>
+          <div style="font-size:6px; line-height:1.1; margin-top:2px;">1-Cutânea &nbsp; 2-Mucosa &nbsp; 3-Ambas &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.presencaLesao || '3'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.0;">
+          <div class="ct"><span class="cn">34</span> SE MUCOSA, CICATRIZES?</div>
+          <div style="font-size:7px; margin-top:2px;">1-Sim &nbsp;&nbsp;&nbsp; 2-Não</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.cicatrizes || '2'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.0;">
+          <div class="ct"><span class="cn">35</span> CO-INFECÇÃO HIV</div>
+          <div style="font-size:7px; margin-top:2px;">1-Sim &nbsp;&nbsp;&nbsp; 2-Não &nbsp;&nbsp;&nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.hiv || '2'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">36</span> PARASITOLOGICO DIRETO</div>
+          <div style="font-size:6.5px; line-height:1.1; margin-top:2px;">1-Positivo &nbsp; 2-Negativo &nbsp; 3-Não Realizado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.diagParasito || '3'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">37</span> INTRADERMOREACAO (IRM)</div>
+          <div style="font-size:6.5px; line-height:1.1; margin-top:2px;">1-Positivo &nbsp; 2-Negativo &nbsp; 3-Não Realizado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.diagIrm || '3'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">38</span> HISTOPATOLOGIA</div>
+          <div style="font-size:5px; line-height:1.1; margin-top:2px;">1-Encontro Parasitas &nbsp; 2-Compatível &nbsp; 3-Não Comp. &nbsp; 4-Não Realizado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.histopato || '4'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">39</span> TIPO DE ENTRADA</div>
+          <div style="font-size:6px; line-height:1.1; margin-top:2px;">1-Caso Novo &nbsp; 2-Recidiva &nbsp; 3-Transferência &nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.tipoEntrada || '1'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">40</span> FORMA CLINICA</div>
+          <div style="font-size:7px; margin-top:2px;">1-Cutânea &nbsp;&nbsp;&nbsp; 2-Mucosa &nbsp;&nbsp;&nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.formaClinica || '1'}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+        `;
+        return generatePage1CustomHtml(data, "Leishmaniose Tegumentar", "B55.1", customBlockHtml);
+    }
+
+    function generatePage2LeishTegumentarHtml(data) {
+        return `
+<div class="sinan-page">
+  <div class="pg2-header">
+    <p class="pg2-title">DADOS COMPLEMENTARES DO CASO - LEISHMANIOSE TEGUMENTAR AMERICANA</p>
+    <p class="pg2-sub">(ANOTAR TODOS OS DADOS DISPONÍVEIS NO MOMENTO DA NOTIFICACAO)</p>
+  </div>
+
+  <!-- BLOCO 5: TRATAMENTO E CONCLUSÃO -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Tratamento / Concl.</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">41</span> DATA INICIO TRATAMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.inicioTratamento), 8)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:2.0;">
+          <div class="ct"><span class="cn">42</span> DROGA INICIAL ADMINISTRADA</div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">
+            1-Antimonial Pentavalente &nbsp; 2-Anfotericina B &nbsp; 3-Pentamidina<br>
+            4-Outras &nbsp; 5-Não Utilizada
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.droga || '1'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct"><span class="cn">43</span> PESO (KG)</div>
+          <div class="cv">${cs.peso || ''}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">44</span> DOSE PRESCRITA Sb+5 (MG/KG/DIA)</div>
+          <div style="font-size:5px; line-height:1.1; margin-top:2px;">
+            1-Menor que 10 &nbsp; 2-Maior/igual 10 e menor 15<br>
+            3-Igual a 15 &nbsp; 4-Maior ou igual a 20
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.dose || '1'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">45</span> TOTAL AMPOLAS PRESCRITAS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.ampolas || '', 3)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">46</span> OUTRA DROGA UTILIZADA (FALENCIA)</div>
+          <div style="font-size:6px; line-height:1.1; margin-top:2px;">1-Anfotericina B &nbsp; 2-Pentamidina &nbsp; 3-Outras &nbsp; 4-Não se aplica</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.outraDroga || '4'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">47</span> CRITERIO DE CONFIRMACAO</div>
+          <div style="font-size:7px; margin-top:2px;">1-Laboratorial &nbsp;&nbsp;&nbsp; 2-Clínico-Epidemiológico</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.criterio || '1'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">48</span> CLASSIFICACAO EPIDEMIOLOGICA</div>
+          <div style="font-size:7px; margin-top:2px;">1-Autóctone &nbsp;&nbsp;&nbsp; 2-Importado &nbsp;&nbsp;&nbsp; 3-Indeterminado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.classEpidemio || '1'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:0.8;">
+          <div class="ct"><span class="cn">49</span> AUTOCTONE?</div>
+          <div style="font-size:7px; margin-top:2px;">1-Sim &nbsp;&nbsp;&nbsp; 2-Não &nbsp;&nbsp;&nbsp; 3-Indeterminado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.autoctone || '1'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.4;">
+          <div class="ct"><span class="cn">50</span> UF INF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.ufInfeccao || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">51</span> PAIS PROVAVEL INF.</div>
+          <div class="cv">${cs.paisInfeccao || 'Brasil'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">52</span> MUNICIPIO DE INFECCAO</div>
+          <div class="cv">${cs.municipioInfeccao || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct"><span class="cn">53</span> DISTRITO</div>
+          <div class="cv">${cs.distritoInfeccao || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">54</span> BAIRRO</div>
+          <div class="cv">${cs.bairroInfeccao || ''}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.0;">
+          <div class="ct"><span class="cn">55</span> RELACIONADA AO TRABALHO?</div>
+          <div style="font-size:7px; margin-top:2px;">1-Sim &nbsp;&nbsp;&nbsp; 2-Não &nbsp;&nbsp;&nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.trabalho || '2'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">56</span> EVOLUCAO DO CASO</div>
+          <div style="font-size:6px; line-height:1.1; margin-top:2px;">1-Cura &nbsp; 2-Abandono &nbsp; 3-Óbito por LTA &nbsp; 4-Óbito por outras causas &nbsp; 5-Transferência &nbsp; 6-Mudança Diag.</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.evolucao || '1'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">57</span> DATA DO OBITO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataObito), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">58</span> DATA DO ENCERRAMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataEncerramento), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell">
+          <div class="ct">DESLOCAMENTO NOS ULTIMOS 6 MESES (DATAS E CIDADES)</div>
+          <div class="cv" style="font-size:9.5px; font-weight:normal;">${cs.deslocamentos || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell">
+          <div class="ct">OBSERVACOES / INFORMACOES COMPLEMENTARES</div>
+          <div class="cv" style="font-size:9px; font-weight:normal; min-height:40px;">${cs.obs || ''}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INVESTIGADOR SIGNATURES -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Investigador</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct">MUNICIPIO/UNIDADE DE SAUDE</div>
+          <div class="cv">${data.munNotificacao || 'MARABA'} / ${unitName}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct">NOME DO INVESTIGADOR</div>
+          <div class="cv">${data.notificatorName || 'Profissional de Saude'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct">FUNCAO</div>
+          <div class="cv">Profissional de Saude</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct">ASSINATURA</div>
+          <div class="cv" style="border-bottom:1px dotted #555; margin-top:8px; min-height:14px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-info">
+    <span>Dados Complementares / Leishmaniose Tegumentar</span>
+    <span>Sinan NET</span>
+    <span>SVS 17/07/2006</span>
+  </div>
+</div>
+`;
+    }
+
+    function generatePage1DengueHtml(data) {
+        const sc = cs.sinaisClinicos || {};
+        const cb = (val) => '<span class="single-box">' + (val === '1' ? '1' : (val === '2' ? '2' : '&nbsp;')) + '</span>';
+        const cb9 = (val) => '<span class="single-box">' + (val !== undefined && val !== null ? val : '9') + '</span>';
+
+        return `
+<div class="sinan-page">
+  <div class="sn-header">
+    <div class="sn-header-left">
+      Rep&uacute;blica Federativa do Brasil<br>
+      Minist&eacute;rio da Sa&uacute;de<br>
+      Secretaria de Vigil&acirc;ncia em Sa&uacute;de
+    </div>
+    <div class="sn-header-center">
+      <p class="sn-sinan">SINAN</p>
+      <p class="sn-title">SISTEMA DE INFORMA&Ccedil;&Atilde;O DE AGRAVOS DE NOTIFICA&Ccedil;&Atilde;O</p>
+      <p class="sn-subtitle">FICHA DE INVESTIGA&Ccedil;&Atilde;O DENGUE E FEBRE DE CHIKUNGUNYA N&ordm;</p>
+    </div>
+    <div class="sn-header-right">
+      <span class="sn-num-label">N&ordm;</span>
+      <div class="sn-num-box">${data.sinan_number || '---.---'}</div>
+    </div>
+  </div>
+
+  <!-- DEFINIÇÕES DE CASO SUSPEITO -->
+  <div style="border:1.5px solid #000; padding:4px 6px; margin-bottom:5px; font-size:7px; line-height:1.2; background:#fafafa;">
+    <strong>Caso suspeito de dengue:</strong> pessoa que viva ou tenha viajado nos &uacute;ltimos 14 dias para &aacute;rea onde esteja ocorrendo transmiss&atilde;o de dengue ou tenha presen&ccedil;a de Ae.aegypti que apresente febre, usualmente entre 2 e 7 dias, e apresente duas ou mais das seguintes manifesta&ccedil;&otilde;es: n&aacute;useas, v&ocirc;mitos, exantema, mialgias, cefal&eacute;ia, dor retroorbital, pet&eacute;quias ou prova do la&ccedil;o positiva e leucopenia.<br>
+    <strong>Caso suspeito de Chikungunya:</strong> febre de in&iacute;cio s&uacute;bito e artralgia ou artrite intensa com in&iacute;cio agudo, n&atilde;o explicado por outras condi&ccedil;&otilde;es, que resida ou tenha viajado para &aacute;reas end&ecirc;micas ou epid&ecirc;micas at&eacute; 14 dias antes do in&iacute;cio dos sintomas, ou que tenha v&iacute;nculo epidemiol&oacute;gico com um caso importado confirmado.
+  </div>
+
+  <!-- BLOCO 1: DADOS GERAIS -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados Gerais</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1; min-height:24px;">
+          <div class="ct"><span class="cn">1</span> TIPO DE NOTIFICA&Ccedil;&Atilde;O</div>
+          <div style="font-size:7.5px; margin-top:2px;">
+            2 - Individual
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            ${tipoNotif}
+          </div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.5; position:relative;">
+          <div class="ct"><span class="cn">2</span> AGRAVO/DOEN&Ccedil;A &nbsp;&nbsp;&nbsp; 1- DENGUE &nbsp;&nbsp;&nbsp; 2- CHIKUNGUNYA</div>
+          <div style="font-size:10px; font-weight:900; margin-top:2px;">
+            ${diseaseLower === 'chikungunya' ? 'CHIKUNGUNYA' : 'DENGUE'}
+          </div>
+          <div class="single-box" style="position:absolute; right:110px; top:4px;">
+            ${diseaseLower === 'chikungunya' ? '2' : '1'}
+          </div>
+          <div style="position:absolute; right:8px; top:4px; font-size:7px; font-weight:bold;">
+            C&oacute;digo (CID10)<br>
+            <span style="font-size:8px; border:1px solid #000; padding:1px 3px; font-family:monospace; background:#fff;">A 90</span>
+            <span style="font-size:8px; border:1px solid #000; padding:1px 3px; font-family:monospace; background:#fff;">A 92</span>
+          </div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">3</span> DATA DA NOTIFICA&Ccedil;&Atilde;O</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.dataNotificacao), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.4;">
+          <div class="ct"><span class="cn">4</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.ufNotificacao || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">5</span> MUNIC&Iacute;PIO DE NOTIFICA&Ccedil;&Atilde;O</div>
+          <div class="cv">${data.munNotificacao || 'MARABA'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('1504208', 7)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.2;">
+          <div class="ct"><span class="cn">6</span> UNIDADE DE SA&Uacute;DE (OU OUTRA FONTE NOTIFICADORA)</div>
+          <div class="cv">${unitName}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cnesCode, 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">7</span> DATA DOS PRIMEIROS SINTOMAS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.symptomsDate), 8)}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 2: NOTIFICAÇÃO INDIVIDUAL -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Notifica&ccedil;&atilde;o Individual</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:3.0;">
+          <div class="ct"><span class="cn">8</span> NOME DO PACIENTE</div>
+          <div class="cv" style="font-size:10px; font-weight:900;">${data.patientName || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">9</span> DATA DE NASCIMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(data.patientBirthDate), 8)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct"><span class="cn">10</span> (OU) IDADE</div>
+          <div style="display:flex; align-items:center; gap:3px; margin-top:2px;">
+            <div>${splitDigits(data.patientAge || '', 3, true)}</div>
+            <div class="single-box">${data.patientAge ? '4' : '&nbsp;'}</div>
+            <div style="font-size:5px; line-height:1.0; font-weight:bold; margin-left:2px;">
+              1 - Hora<br>2 - Dia<br>3 - M&ecirc;s<br>4 - Ano
+            </div>
+          </div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:0.7;">
+          <div class="ct"><span class="cn">11</span> SEXO</div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">
+            M - Masculino<br>F - Feminino<br>I - Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            ${sexCode}
+          </div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">12</span> GESTANTE</div>
+          <div style="font-size:5.2px; line-height:1.1; margin-top:2px;">
+            1-1&ordm;Trimestre &nbsp;&nbsp; 2-2&ordm;Trimestre &nbsp;&nbsp; 3-3&ordm;Trimestre<br>
+            4-Idade gestacional Ignorada &nbsp;&nbsp; 5-N&atilde;o &nbsp;&nbsp; 6-N&atilde;o se aplica<br>
+            9-Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            ${pregnantCode}
+          </div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.3;">
+          <div class="ct"><span class="cn">13</span> RA&Ccedil;A/COR</div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">
+            1-Branca &nbsp;&nbsp; 2-Preta &nbsp;&nbsp; 3-Amarela<br>
+            4-Parda &nbsp;&nbsp; 5-Ind&iacute;gena &nbsp;&nbsp; 9-Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            ${raceCode}
+          </div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative;">
+          <div class="ct"><span class="cn">14</span> ESCOLARIDADE</div>
+          <div style="font-size:5px; line-height:1.2; margin-top:2px; padding-right:25px;">
+            0-Analfabeto &nbsp;&nbsp; 1-1&ordf; a 4&ordf; s&eacute;rie incompleta do EF &nbsp;&nbsp; 2-4&ordf; s&eacute;rie completa do EF<br>
+            3-5&ordf; &agrave; 8&ordf; s&eacute;rie incompleta do EF &nbsp;&nbsp; 4-Ensino fundamental completo &nbsp;&nbsp; 5-Ensino m&eacute;dio incompleto<br>
+            6-Ensino m&eacute;dio completo &nbsp;&nbsp; 7-Educa&ccedil;&atilde;o superior incompleta &nbsp;&nbsp; 8-Educa&ccedil;&atilde;o superior completa &nbsp;&nbsp; 9-Ignorado &nbsp;&nbsp; 10-N&atilde;o se aplica
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:50%; transform:translateY(-50%);">
+            ${schoolCode}
+          </div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.2;">
+          <div class="ct"><span class="cn">15</span> N&Uacute;MERO DO CART&Atilde;O SUS</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.patientCns || '', 15)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">16</span> NOME DA M&Atilde;E</div>
+          <div class="cv" style="font-size:9px;">${data.patientMotherName || 'Nao informada'}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 3: DADOS DE RESIDÊNCIA -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Dados de Resid&ecirc;ncia</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.35;">
+          <div class="ct"><span class="cn">17</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(data.patientUf || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.7;">
+          <div class="ct"><span class="cn">18</span> MUNIC&Iacute;PIO DE RESID&Ecirc;NCIA</div>
+          <div class="cv">${data.patientMunicipality || 'MARABA'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct">C&Oacute;DIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('1504208', 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">19</span> DISTRITO</div>
+          <div class="cv">${data.patientDistrict || ''}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">20</span> BAIRRO</div>
+          <div class="cv">${data.patientNeighborhood || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.5;">
+          <div class="ct"><span class="cn">21</span> LOGRADOURO (RUA, AVENIDA,...)</div>
+          <div class="cv">${data.patientAddress || 'Nao informado'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO</div>
+          <div class="cv"></div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct"><span class="cn">22</span> N&Uacute;MERO</div>
+          <div class="cv">${data.patientNumber || 'S/N'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">23</span> COMPLEMENTO (APTO., CASA,...)</div>
+          <div class="cv">${data.patientComplement || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">24</span> GEO CAMPO 1</div>
+          <div class="cv"></div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">25</span> GEO CAMPO 2</div>
+          <div class="cv"></div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">26</span> PONTO DE REFER&Ecirc;NCIA</div>
+          <div class="cv">${data.patientRef || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">27</span> CEP</div>
+          <div class="cv" style="padding-top:3px;">${formatCepDigits(data.patientCep)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.6;">
+          <div class="ct"><span class="cn">28</span> (DDD) TELEFONE</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits((data.patientPhone || '').replace(/\D/g,''), 11)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">29</span> ZONA</div>
+          <div style="font-size:6px; line-height:1.1; margin-top:2px;">
+            1 - Urbana &nbsp;&nbsp;&nbsp;&nbsp; 2 - Rural &nbsp;&nbsp;&nbsp;&nbsp; 3 - Periurbana &nbsp;&nbsp;&nbsp;&nbsp; 9 - Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">
+            ${zoneCode}
+          </div>
+        </div>
+        <div class="sn-cell" style="flex:0.9;">
+          <div class="ct"><span class="cn">30</span> PA&Iacute;S (SE RESID. FORA)</div>
+          <div class="cv">${data.patientCountry || ''}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 4: DADOS CLÍNICOS E LABORATORIAIS -->
+  <div class="sn-block">
+    <div class="sn-sidebar" style="font-size:6.5px;">Inv. / Dados cl&iacute;nicos / Dados laboratoriais</div>
+    <div class="sn-content">
+      <div style="background:#e6e6e6; font-size:8px; font-weight:bold; text-align:center; padding:2px; border-bottom:1px solid #000;">
+        Dados cl&iacute;nicos e laboratoriais
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">31</span> DATA DA INVESTIGA&Ccedil;&Atilde;O</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.dataInvestigacao), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:2.0;">
+          <div class="ct"><span class="cn">32</span> OCUPA&Ccedil;&Atilde;O</div>
+          <div class="cv">${cs.occupation || ''}</div>
+        </div>
+      </div>
+
+      <!-- Campo 33: Sinais clínicos -->
+      <div class="sn-row" style="flex-direction:column; padding:3px 5px;">
+        <div class="ct"><span class="cn">33</span> SINAIS CL&Iacute;NICOS &nbsp;&nbsp;&nbsp; 1-Sim &nbsp;&nbsp; 2-N&atilde;o</div>
+        <div style="display:grid; grid-template-columns: repeat(7, 1fr); gap:3px; font-size:6.5px; font-weight:bold; margin-top:3px;">
+          <div>Febre ${cb(sc.febre)}</div>
+          <div>Cefaleia ${cb(sc.cefaleia)}</div>
+          <div>V&ocirc;mito ${cb(sc.vomito)}</div>
+          <div>Dor nas costas ${cb(sc.costas)}</div>
+          <div>Artrite ${cb(sc.artrite)}</div>
+          <div>Pet&eacute;quias ${cb(sc.petequias)}</div>
+          <div>Prova do la&ccedil;o ${cb(sc.laco)}</div>
+
+          <div>Mialgia ${cb(sc.mialgia)}</div>
+          <div>Exantema ${cb(sc.exantema)}</div>
+          <div>N&aacute;useas ${cb(sc.nauseas)}</div>
+          <div>Conjuntivite ${cb(sc.conjuntivite)}</div>
+          <div>Artralgia int. ${cb(sc.artralgia)}</div>
+          <div>Leucopenia ${cb(sc.leucopenia)}</div>
+          <div>Dor retroorb. ${cb(sc.retroorbital)}</div>
+        </div>
+      </div>
+
+      <!-- Campo 34: Doenças pré-existentes -->
+      <div class="sn-row" style="flex-direction:column; padding:3px 5px;">
+        <div class="ct"><span class="cn">34</span> DOEN&Ccedil;AS PR&Eacute;-EXISTENTES &nbsp;&nbsp;&nbsp; 1-Sim &nbsp;&nbsp; 2-N&atilde;o &nbsp;&nbsp; 9-Ignorado</div>
+        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:3px; font-size:6.5px; font-weight:bold; margin-top:3px;">
+          <div>Diabetes ${cb9(cs.comorbidades?.diabetes)}</div>
+          <div>Hepatopatias ${cb9(cs.comorbidades?.hepatopatias)}</div>
+          <div>Hipertens&atilde;o art. ${cb9(cs.comorbidades?.hipertensao)}</div>
+          <div>Doen&ccedil;as auto-imunes ${cb9(cs.comorbidades?.autoimunes)}</div>
+
+          <div>Doen&ccedil;as hematol. ${cb9(cs.comorbidades?.hematologicas)}</div>
+          <div>Doen&ccedil;a renal cr&ocirc;nica ${cb9(cs.comorbidades?.renal)}</div>
+          <div>Doen&ccedil;a &aacute;cido-p&eacute;ptica ${cb9(cs.comorbidades?.peptica)}</div>
+          <div></div>
+        </div>
+      </div>
+
+      <!-- Exames Sorologia Chikungunya -->
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">35</span> DATA 1&ordf; AMOSTRA CHIK (S1)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.lab?.chikS1Date), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">36</span> DATA 2&ordf; AMOSTRA CHIK (S2)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.lab?.chikS2Date), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">37</span> DATA EXAME PRNT</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.lab?.chikPrntDate), 8)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:2.4;">
+          <div class="ct"><span class="cn">38</span> RESULTADO CHIK / PRNT</div>
+          <div style="font-size:5.5px; line-height:1.1; margin-top:2px;">
+            1-Reagente &nbsp; 2-N&atilde;o Reagente &nbsp; 3-Inconclusivo &nbsp; 4-N&atilde;o Realizado<br>
+            S1: ${singleBox(cs.lab?.chikS1Res || '4')} &nbsp;&nbsp; S2: ${singleBox(cs.lab?.chikS2Res || '4')} &nbsp;&nbsp; PRNT: ${singleBox(cs.lab?.chikPrntRes || '4')}
+          </div>
+        </div>
+      </div>
+
+      <!-- Exames Sorologia Dengue e NS1 -->
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">39</span> DATA IGM DENGUE</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.lab?.dengueIgmDate), 8)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">40</span> RESULTADO IGM</div>
+          <div style="font-size:5px; margin-top:2px;">1-Pos &nbsp; 2-Neg &nbsp; 3-Inconc &nbsp; 4-N/Realiz</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.lab?.dengueIgmRes || '4'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">41</span> DATA EXAME NS1</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.lab?.ns1Date), 8)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">42</span> RESULTADO NS1</div>
+          <div style="font-size:5px; margin-top:2px;">1-Pos &nbsp; 2-Neg &nbsp; 3-Inconc &nbsp; 4-N/Realiz</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.lab?.ns1Res || '4'}</div>
+        </div>
+      </div>
+
+      <!-- Isolamento Viral e RT-PCR -->
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">43</span> DATA ISOLAMENTO VIRAL</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.lab?.isolamentoDate), 8)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">44</span> RES. ISOLAMENTO</div>
+          <div style="font-size:5px; margin-top:2px;">1-Pos &nbsp; 2-Neg &nbsp; 3-Inconc &nbsp; 4-N/Realiz</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.lab?.isolamentoRes || '4'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">45</span> DATA RT-PCR</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.lab?.pcrDate), 8)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">46</span> RESULTADO RT-PCR</div>
+          <div style="font-size:5px; margin-top:2px;">1-Pos &nbsp; 2-Neg &nbsp; 3-Inconc &nbsp; 4-N/Realiz</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.lab?.pcrRes || '4'}</div>
+        </div>
+      </div>
+
+      <!-- Sorotipo, Histopatologia, Imunohistoquímica -->
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">47</span> SOROTIPO</div>
+          <div style="font-size:5px; margin-top:2px;">1-DENV 1 &nbsp; 2-DENV 2 &nbsp; 3-DENV 3 &nbsp; 4-DENV 4</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.lab?.sorotipo || '&nbsp;'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">48</span> DATA HISTOPATOLOGIA</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.lab?.histoDate), 8)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.1;">
+          <div class="ct">RES. HISTOPAT.</div>
+          <div style="font-size:5px; margin-top:2px;">1-Compat &nbsp; 2-Incompat &nbsp; 3-Inconc &nbsp; 4-N/R</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.lab?.histoRes || '4'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">49</span> DATA IMUNOHISTOQ.</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.lab?.imunoDate), 8)}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.1;">
+          <div class="ct">RES. IMUNO.</div>
+          <div style="font-size:5px; margin-top:2px;">1-Pos &nbsp; 2-Neg &nbsp; 3-Inconc &nbsp; 4-N/R</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.lab?.imunoRes || '4'}</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer-info">
+    <span>Chikungunya/Dengue</span>
+    <span>Sinan Online</span>
+    <span>SVS 14/03/2016</span>
+  </div>
+</div>
+        `;
+    }
+
+    function generatePage2DengueHtml(data) {
+        const sa = cs.sinaisAlarme || {};
+        const dg = cs.dengueGrave || {};
+        const cb = (val) => '<span class="single-box">' + (val === '1' ? '1' : (val === '2' ? '2' : (val === '9' ? '9' : '&nbsp;'))) + '</span>';
+
+        return `
+<div class="sinan-page">
+  <!-- BLOCO 1: HOSPITALIZAÇÃO -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Hospitaliza&ccedil;&atilde;o</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">50</span> OCORREU HOSPITALIZA&Ccedil;&Atilde;O?</div>
+          <div style="font-size:6px; margin-top:2px;">1-Sim &nbsp;&nbsp; 2-N&atilde;o &nbsp;&nbsp; 9-Ignorado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.hospitalizacao?.ocorreu || '2'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">51</span> DATA DA INTERNA&Ccedil;&Atilde;O</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.hospitalizacao?.dataInternacao), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.4;">
+          <div class="ct"><span class="cn">52</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.hospitalizacao?.uf || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">53</span> MUNIC&Iacute;PIO DO HOSPITAL</div>
+          <div class="cv">${cs.hospitalizacao?.mun || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('', 7)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.2;">
+          <div class="ct"><span class="cn">54</span> NOME DO HOSPITAL</div>
+          <div class="cv">${cs.hospitalizacao?.nome || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO</div>
+          <div class="cv"></div>
+        </div>
+        <div class="sn-cell" style="flex:1.5;">
+          <div class="ct"><span class="cn">55</span> (DDD) TELEFONE</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits((cs.hospitalizacao?.fone || '').replace(/\D/g,''), 11)}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 2: LOCAL PROVÁVEL DE INFECÇÃO & CONCLUSÃO -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Conclus&atilde;o</div>
+    <div class="sn-content">
+      <div style="background:#e6e6e6; font-size:7.5px; font-weight:bold; padding:2px 5px; border-bottom:1px solid #000;">
+        Local Prov&aacute;vel de Infec&ccedil;&atilde;o (no per&iacute;odo de 15 dias)
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:2.0;">
+          <div class="ct"><span class="cn">56</span> O CASO &Eacute; AUT&Oacute;CTONE DO MUNIC&Iacute;PIO DE RESID&Ecirc;NCIA?</div>
+          <div style="font-size:6px; margin-top:2px;">1-Sim &nbsp;&nbsp; 2-N&atilde;o &nbsp;&nbsp; 3-Indeterminado</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.localInfeccao?.autoctone || '1'}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.4;">
+          <div class="ct"><span class="cn">57</span> UF</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cs.localInfeccao?.uf || 'PA', 2)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">58</span> PA&Iacute;S</div>
+          <div class="cv">${cs.localInfeccao?.pais || 'Brasil'}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct"><span class="cn">59</span> MUNIC&Iacute;PIO</div>
+          <div class="cv">${cs.localInfeccao?.mun || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:0.8;">
+          <div class="ct">C&Oacute;DIGO (IBGE)</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits('', 7)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">60</span> DISTRITO</div>
+          <div class="cv">${cs.localInfeccao?.dist || ''}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct"><span class="cn">61</span> BAIRRO</div>
+          <div class="cv">${cs.localInfeccao?.bairro || ''}</div>
+        </div>
+      </div>
+
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:2.2;">
+          <div class="ct"><span class="cn">62</span> CLASSIFICA&Ccedil;&Atilde;O</div>
+          <div style="font-size:5px; line-height:1.1; margin-top:2px;">
+            5-Descartado &nbsp; 10-Dengue &nbsp; 11-Dengue c/ Sinais de Alarme<br>
+            12-Dengue Grave &nbsp; 13-Chikungunya
+          </div>
+          <div style="position:absolute; right:8px; top:4px; display:inline-flex;">
+            <span class="digit-box" style="width:11px; height:13px; font-size:8px; border:1px solid #000; display:inline-flex; align-items:center; justify-content:center; background:#fff; font-family:monospace; font-weight:bold;">${String(cs.conclusao?.classificacao || (diseaseLower === 'chikungunya' ? '13' : '10')).padStart(2,'0')[0]}</span>
+            <span class="digit-box" style="width:11px; height:13px; font-size:8px; border:1px solid #000; display:inline-flex; align-items:center; justify-content:center; background:#fff; font-family:monospace; font-weight:bold; margin-left:-1px;">${String(cs.conclusao?.classificacao || (diseaseLower === 'chikungunya' ? '13' : '10')).padStart(2,'0')[1]}</span>
+          </div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.5;">
+          <div class="ct"><span class="cn">63</span> CRIT&Eacute;RIO DE CONFIRMA&Ccedil;&Atilde;O/DESCARTE</div>
+          <div style="font-size:5px; line-height:1.1; margin-top:2px;">
+            1-Laborat&oacute;rio &nbsp; 2-Cl&iacute;nico-Epidemiol&oacute;gico &nbsp; 3-Em investiga&ccedil;&atilde;o
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.conclusao?.criterio || '1'}</div>
+        </div>
+        <div class="sn-cell" style="position:relative; flex:1.2;">
+          <div class="ct"><span class="cn">64</span> APRESENTA&Ccedil;&Atilde;O CL&Iacute;NICA</div>
+          <div style="font-size:5.5px; margin-top:2px;">1-Aguda &nbsp; 2-Cr&ocirc;nica</div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.conclusao?.apresentacaoChik || '1'}</div>
+        </div>
+      </div>
+
+      <div class="sn-row">
+        <div class="sn-cell" style="position:relative; flex:2.0;">
+          <div class="ct"><span class="cn">65</span> EVOLU&Ccedil;&Atilde;O DO CASO</div>
+          <div style="font-size:5px; line-height:1.1; margin-top:2px;">
+            1-Cura &nbsp; 2-&Oacute;bito pelo agravo &nbsp; 3-&Oacute;bito por outras causas<br>
+            4-&Oacute;bito em investiga&ccedil;&atilde;o &nbsp; 9-Ignorado
+          </div>
+          <div class="single-box" style="position:absolute; right:8px; top:4px;">${cs.conclusao?.evolucao || '1'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">66</span> DATA DO &Oacute;BITO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.conclusao?.dataObito), 8)}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct"><span class="cn">67</span> DATA DO ENCERRAMENTO</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(formatDateDigits(cs.conclusao?.dataEncerramento || data.dataNotificacao), 8)}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 3: SINAIS DE ALARME E DENGUE GRAVE -->
+  <div class="sn-block">
+    <div class="sn-sidebar" style="font-size:5.5px;">Dados Cl&iacute;nicos - Dengue com Sinais de Alarme e Dengue Grave</div>
+    <div class="sn-content">
+      <div style="background:#e6e6e6; font-size:7.5px; font-weight:bold; text-align:center; padding:3px; border-bottom:1px solid #000;">
+        Preencher os sinais cl&iacute;nicos para Dengue com Sinais de Alarme e Dengue Grave
+      </div>
+
+      <!-- Campo 68 & 69 -->
+      <div class="sn-row" style="flex-direction:column; padding:3px 5px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div class="ct"><span class="cn">68</span> Dengue com sinais de alarme &nbsp;&nbsp;&nbsp; 1-Sim &nbsp; 2-N&atilde;o &nbsp; 9-Ignorado</div>
+          <div style="font-size:6.5px; font-weight:bold; display:flex; align-items:center; gap:3px;">
+            <span class="cn">69</span> Data de in&iacute;cio dos sinais de alarme: ${splitDigits(formatDateDigits(sa.dataInicio), 8)}
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:3px; font-size:6.5px; font-weight:bold; margin-top:3px;">
+          <div>${cb(sa.vomitos)} V&ocirc;mitos persistentes</div>
+          <div>${cb(sa.hematocrito)} Aumento progressivo do hemat&oacute;crito</div>
+          <div>${cb(sa.dorAbdominal)} Dor abdominal intensa e cont&iacute;nua</div>
+          <div>${cb(sa.hepatomegalia)} Hepatomegalia >= 2cm</div>
+          <div>${cb(sa.letargia)} Letargia ou irritabilidade</div>
+          <div>${cb(sa.acumuloLiq)} Ac&uacute;mulo de l&iacute;quidos</div>
+          <div>${cb(sa.sangramento)} Sangramento de mucosa/outras hemorragias</div>
+          <div>${cb(sa.hipotensao)} Hipotens&atilde;o postural e/ou lipot&iacute;mia</div>
+          <div>${cb(sa.plaquetas)} Queda abrupta de plaquetas</div>
+        </div>
+      </div>
+
+      <!-- Campo 70 & 71 -->
+      <div class="sn-row" style="flex-direction:column; padding:3px 5px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div class="ct"><span class="cn">70</span> Dengue grave &nbsp;&nbsp;&nbsp; 1-Sim &nbsp; 2-N&atilde;o &nbsp; 9-Ignorado</div>
+          <div style="font-size:6.5px; font-weight:bold; display:flex; align-items:center; gap:3px;">
+            <span class="cn">71</span> Data de in&iacute;cio dos sinais de gravidade: ${splitDigits(formatDateDigits(dg.dataInicio), 8)}
+          </div>
+        </div>
+
+        <div style="font-size:6.5px; font-weight:bold; margin-top:2px; color:#444;">Extravasamento grave de plasma:</div>
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:2px; font-size:6px; margin-top:1px;">
+          <div>${cb(dg.pulso)} Pulso d&eacute;bil ou indetect&aacute;vel</div>
+          <div>${cb(dg.taquicardia)} Taquicardia</div>
+          <div>${cb(dg.pa)} PA convergente <= 20 mmHg</div>
+          <div>${cb(dg.extremidades)} Extremidades frias</div>
+          <div>${cb(dg.capilar)} Tempo enchimento capilar >= 3s</div>
+          <div>${cb(dg.hipotensaoTardia)} Hipotens&atilde;o arterial em fase tardia</div>
+          <div style="grid-column: span 3;">${cb(dg.acumuloResp)} Ac&uacute;mulo de l&iacute;quidos com insufici&ecirc;ncia respirat&oacute;ria</div>
+        </div>
+
+        <div style="font-size:6.5px; font-weight:bold; margin-top:3px; color:#444;">Sangramento grave:</div>
+        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:2px; font-size:6px; margin-top:1px;">
+          <div>${cb(dg.hematemese)} Hemat&ecirc;mese</div>
+          <div>${cb(dg.metrorragia)} Metrorragia volumosa</div>
+          <div>${cb(dg.melena)} Melena</div>
+          <div>${cb(dg.snc)} Sangramento do SNC</div>
+        </div>
+
+        <div style="font-size:6.5px; font-weight:bold; margin-top:3px; color:#444;">Comprometimento grave de &oacute;rg&atilde;os:</div>
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:2px; font-size:6px; margin-top:1px;">
+          <div>${cb(dg.astAlt)} AST/ALT > 1.000</div>
+          <div>${cb(dg.miocardite)} Miocardite</div>
+          <div>${cb(dg.consciencia)} Altera&ccedil;&atilde;o da consci&ecirc;ncia</div>
+          <div style="grid-column: span 3;">Outros &oacute;rg&atilde;os, especificar: <u>${dg.outrosOrgaos || '_____________________________'}</u></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 4: INFORMAÇÕES COMPLEMENTARES E OBSERVACÕES -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Observa&ccedil;&otilde;es</div>
+    <div class="sn-content">
+      <div style="background:#e6e6e6; font-size:7.5px; font-weight:bold; padding:2px 5px; border-bottom:1px solid #000;">
+        Informa&ccedil;&otilde;es complementares e observa&ccedil;&otilde;es
+      </div>
+      <div class="sn-row" style="min-height:45px; padding:3px 5px; font-size:8px;">
+        ${cs.obs || ''}
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 5: INVESTIGADOR -->
+  <div class="sn-block">
+    <div class="sn-sidebar">Investigador</div>
+    <div class="sn-content">
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:2.0;">
+          <div class="ct">MUNIC&Iacute;PIO/UNIDADE DE SA&Uacute;DE</div>
+          <div class="cv">${cs.investigador?.unidade || data.munNotificacao + ' / ' + unitName}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct">C&Oacute;D. DA UNID. DE SA&Uacute;DE</div>
+          <div class="cv" style="padding-top:3px;">${splitDigits(cnesCode, 7)}</div>
+        </div>
+      </div>
+      <div class="sn-row">
+        <div class="sn-cell" style="flex:1.8;">
+          <div class="ct">NOME</div>
+          <div class="cv" style="font-weight:900; font-size:10px;">${cs.investigador?.nome || data.notificatorName || 'Profissional de Saude'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.0;">
+          <div class="ct">FUN&Ccedil;&Atilde;O</div>
+          <div class="cv">${cs.investigador?.funcao || 'Profissional de Saude'}</div>
+        </div>
+        <div class="sn-cell" style="flex:1.2;">
+          <div class="ct">ASSINATURA</div>
+          <div class="cv" style="border-bottom:1px dotted #555; margin-top:4px; min-height:14px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-info">
+    <span>Chikungunya/Dengue</span>
+    <span>Sinan Online</span>
+    <span>SVS 14/03/2016</span>
+  </div>
+</div>
+        `;
+    }
+
+    if (diseaseLower === 'tracoma') {
+        let tracomaRowsHtml = '';
+        const cases = cs.cases || [];
+        function formatAge(age) {
+            if (age === undefined || age === '') return '<span class="digit-box">&nbsp;</span><span class="digit-box">&nbsp;</span><span class="digit-box">&nbsp;</span>';
+            let ageStr = String(age).replace(/\D/g, '').padStart(3, '0');
+            return splitDigits(ageStr, 3);
+        }
+        for (let i = 0; i < 25; i++) {
+            const c = cases[i] || {};
+            const fc = Array.isArray(c.fc) ? c.fc : [];
+            const ageDigitsStr = formatAge(c.idade);
+
+            tracomaRowsHtml += `
+            <tr style="font-size: 8px; text-align: center; border-bottom: 1px solid #000; height: 17px;">
+                <td style="border-right: 1px solid #000; padding: 1px; font-weight: bold; text-align: left; padding-left: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    ${c.inicial || '&nbsp;'}
+                </td>
+                <td style="border-right: 1px solid #000; padding: 1px;">
+                    ${c.uf || 'PA'}
+                </td>
+                <td style="border-right: 1px solid #000; padding: 1px; text-align: left; padding-left: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    ${c.mun || 'MARABA'}
+                </td>
+                <td style="border-right: 1px solid #000; padding: 1px; text-align: left; padding-left: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    ${c.dist || '&nbsp;'}
+                </td>
+                <td style="border-right: 1px solid #000; padding: 1px; text-align: left; padding-left: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    ${c.bairro || '&nbsp;'}
+                </td>
+                <td style="border-right: 1px solid #000; padding: 1px;">
+                    ${singleBox(c.zona || '9')}
+                </td>
+                <td style="border-right: 1px solid #000; padding: 1px; text-transform: uppercase;">
+                    ${singleBox(c.sexo || 'I')}
+                </td>
+                <td style="border-right: 1px solid #000; padding: 1px; white-space: nowrap;">
+                    <div style="display: inline-flex; align-items: center; justify-content: center; height: 11px;">
+                        ${ageDigitsStr} <span style="font-weight: bold; margin-left: 2px; font-size: 7px; line-height: 1;">| 4 (anos)</span>
+                    </div>
+                </td>
+                <td style="border-right: 1px solid #000; padding: 1px;">
+                    ${singleBox(fc.includes('TF') ? '1' : '2')}
+                </td>
+                <td style="border-right: 1px solid #000; padding: 1px;">
+                    ${singleBox(fc.includes('TI') ? '1' : '2')}
+                </td>
+                <td style="border-right: 1px solid #000; padding: 1px;">
+                    ${singleBox(fc.includes('TS') ? '1' : '2')}
+                </td>
+                <td style="border-right: 1px solid #000; padding: 1px;">
+                    ${singleBox(fc.includes('TT') ? '1' : '2')}
+                </td>
+                <td style="border-right: 1px solid #000; padding: 1px;">
+                    ${singleBox(fc.includes('CO') ? '1' : '2')}
+                </td>
+                <td style="padding: 1px;">
+                    ${singleBox(c.cirurg || '2')}
+                </td>
+            </tr>
+            `;
+        }
+        html = generateTracomaHtml();
+    } else {
+        let page1, page2;
+        if (diseaseLower === 'dengue' || diseaseLower === 'chikungunya') {
+            page1 = generatePage1DengueHtml(data);
+            page2 = generatePage2DengueHtml(data);
+        } else if (diseaseLower === 'malaria') {
+            page1 = generatePage1MalariaHtml(data);
+            page2 = generatePage2MalariaHtml(data);
+        } else if (diseaseLower === 'raiva') {
+            page1 = generatePage1RaivaHtml(data);
+            page2 = generatePage2RaivaHtml(data);
+        } else if (diseaseLower === 'leishmaniose-visceral') {
+            page1 = generatePage1LeishVisceralHtml(data);
+            page2 = generatePage2LeishVisceralHtml(data);
+        } else if (diseaseLower === 'chagas') {
+            page1 = generatePage1ChagasHtml(data);
+            page2 = generatePage2ChagasHtml(data);
+        } else if (diseaseLower === 'leptospirose') {
+            page1 = generatePage1LeptospiroseHtml(data);
+            page2 = generatePage2LeptospiroseHtml(data);
+        } else if (diseaseLower === 'acidente-ofidico' || diseaseLower === 'animais-peconhentos' || diseaseLower === 'peconhentos' || diseaseLower === 'ofidico') {
+            page1 = generatePage1AcidenteOfidicoHtml(data);
+            page2 = generatePage2AcidenteOfidicoHtml(data);
+        } else if (diseaseLower === 'esquistossomose') {
+            page1 = generatePage1EsquistossomoseHtml(data);
+            page2 = '';
+        } else if (diseaseLower === 'hanseniase') {
+            page1 = generatePage1HanseniaseHtml(data);
+            page2 = '';
+        } else if (diseaseLower === 'tracoma') {
+            page1 = generatePage1TracomaHtml(data);
+            page2 = '';
+        } else if (diseaseLower === 'leishmaniose-tegumentar') {
+            page1 = generatePage1LeishTegumentarHtml(data);
+            page2 = generatePage2LeishTegumentarHtml(data);
+        } else {
+            page1 = generatePage1Html(data);
+            page2 = generatePage2Standard(data);
+        }
+        
+        html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Ficha SINAN - ${data.patientName || 'Paciente'}</title>
+<style>
+  @media screen { body { background:#f0f0f0; margin:0; padding:20px; display:flex; flex-direction:column; align-items:center; font-family:Arial,Helvetica,sans-serif; } .sinan-page { background:#fff; width:210mm; padding:8mm 10mm; box-sizing:border-box; margin-bottom:25px; box-shadow:0 4px 15px rgba(0,0,0,0.15); border:1px solid #ccc; } }
+  @media print { body { margin:0; padding:0; background:#fff; font-family:Arial,Helvetica,sans-serif; -webkit-print-color-adjust:exact; print-color-adjust:exact; } .sinan-page { width:210mm; min-height:297mm; padding:8mm 10mm; box-sizing:border-box; page-break-after:always; background:#fff; } .no-print { display:none !important; } }
+  .sinan-page * { box-sizing:border-box; }
+  /* Header */
+  .sn-header { display:flex; justify-content:space-between; align-items:stretch; border-bottom:2px solid #000; padding-bottom:6px; margin-bottom:6px; }
+  .sn-header-left { width:30%; font-size:10px; font-weight:bold; line-height:1.4; }
+  .sn-header-center { flex:1; text-align:center; padding:0 10px; }
+  .sn-header-center .sn-sinan { font-size:11px; font-weight:bold; letter-spacing:2px; margin:0; }
+  .sn-header-center .sn-title { font-size:14px; font-weight:900; margin:2px 0; letter-spacing:0.5px; }
+  .sn-header-center .sn-subtitle { font-size:12px; font-weight:bold; text-decoration:underline; margin:0; }
+  .sn-header-right { width:22%; display:flex; flex-direction:column; align-items:flex-end; justify-content:center; }
+  .sn-num-label { font-size:8px; font-weight:bold; margin-bottom:2px; }
+  .sn-num-box { border:1.5px solid #000; background:#f0f0f0; padding:5px 10px; font-size:13px; font-weight:bold; border-radius:4px; min-width:110px; text-align:center; }
+  /* Blocks */
+  .sn-block { display:flex; width:100%; border:1.5px solid #000; margin-bottom:5px; }
+  .sn-sidebar { width:26px; background:#e6e6e6; border-right:1.5px solid #000; display:flex; align-items:center; justify-content:center; font-size:7.5px; font-weight:bold; text-align:center; text-transform:uppercase; writing-mode:vertical-rl; transform:rotate(180deg); padding:3px; flex-shrink:0; }
+  .sn-content { flex:1; display:flex; flex-direction:column; }
+  .sn-row { display:flex; width:100%; border-bottom:1px solid #000; }
+  .sn-row:last-child { border-bottom:none; }
+  .sn-cell { display:flex; flex-direction:column; padding:2px 5px; border-right:1px solid #000; flex:1; }
+  .sn-cell:last-child { border-right:none; }
+  .ct { font-size:7px; font-weight:bold; text-transform:uppercase; color:#111; display:flex; align-items:center; gap:3px; white-space:nowrap; }
+  .cn { display:inline-flex; align-items:center; justify-content:center; border:1px solid #000; width:10px; height:10px; font-size:6.5px; font-weight:bold; background:#fff; flex-shrink:0; }
+  .cv { font-size:9.5px; font-weight:bold; color:#000; padding-top:2px; min-height:14px; text-transform:uppercase; display:flex; align-items:center; flex-wrap:wrap; }
+  .digit-box { display:inline-flex; align-items:center; justify-content:center; width:11px; height:13px; border:1px solid #000; margin-right:1px; font-size:8px; font-family:monospace; font-weight:bold; background:#fff; }
+  .check-box { display:inline-flex; align-items:center; justify-content:center; width:10px; height:10px; border:1px solid #000; margin:0 2px; font-size:7.5px; font-weight:bold; background:#fff; flex-shrink:0; }
+  .single-box { display:inline-flex; align-items:center; justify-content:center; width:11px; height:11px; border:1px solid #000; font-size:8px; font-weight:bold; background:#fff; flex-shrink:0; line-height:1; font-family:monospace; }
+  .double-box { display:inline-flex; align-items:center; }
+  .double-box span { display:inline-flex; align-items:center; justify-content:center; width:13px; height:13px; border:1px solid #000; font-size:8px; font-weight:bold; background:#fff; margin-left:-1px; line-height:1; font-family:monospace; }
+  .fr { display:flex; align-items:center; flex-wrap:wrap; gap:6px; font-size:7.5px; margin-top:2px; }
+  .fi { display:flex; align-items:center; gap:1px; }
+  .footer-info { display:flex; justify-content:space-between; font-size:7.5px; font-weight:bold; margin-top:3px; border-top:1px solid #888; padding-top:2px; }
+  .no-print-btn { position:fixed; top:20px; right:20px; background:#0d8abc; color:#fff; border:none; padding:10px 20px; font-size:14px; font-weight:bold; border-radius:8px; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.2); z-index:9999; display:flex; align-items:center; gap:8px; }
+  .no-print-btn:hover { background:#0a6f98; }
+  .pg2-header { text-align:center; border-bottom:2px solid #000; padding-bottom:6px; margin-bottom:6px; }
+  .pg2-title { font-size:16px; font-weight:900; margin:0; letter-spacing:1px; }
+  .pg2-sub { font-size:9px; margin:2px 0 0 0; font-weight:bold; }
+</style>
+</head>
+<body>
+<button class="no-print-btn no-print" onclick="window.print()">&#128438; Imprimir / Salvar PDF</button>
+${page1}
+${page2}
 </body>
 </html>`;
+    }
 
     printWindow.document.write(html);
     printWindow.document.close();
@@ -6089,14 +14055,26 @@ window.printNotificationData = function(data) {
         ? CaseNotificationModule.getDiseaseName(data.disease) 
         : (data.disease || 'Não informado');
 
+    const isEdited = historyItem.isEdited || data.isEdited;
+    const updatedByName = historyItem.updatedByName || data.updatedByName;
+    const updatedAt = historyItem.updatedAt || data.updatedAt;
+
     let html = `
+        ${isEdited ? `
+            <div style="margin-bottom: 15px; padding: 10px 14px; background-color: #fff8e1; border-left: 4px solid #ffb300; border-radius: 6px; font-size: 0.88rem; color: #8f6b00; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 1.2rem; color: #ffa000;"></i>
+                <div>
+                    <strong>Aviso de Alteração:</strong> Esta notificação foi modificada por <strong>${updatedByName || 'Profissional'}</strong> em <strong>${updatedAt || historyItem.date}</strong>.
+                </div>
+            </div>
+        ` : ''}
         <div style="margin-bottom: 20px;">
             <h4 style="color: var(--primary-color); margin: 0 0 10px 0;">${historyItem.title}</h4>
             <p style="margin: 0 0 5px 0; color: #555;"><i class="far fa-calendar-alt"></i> <strong>Data da Notificação:</strong> ${historyItem.date}</p>
             <p style="margin: 0 0 5px 0; color: #555;"><strong>Doença Suspeita:</strong> ${diseaseName}</p>
             <p style="margin: 0 0 5px 0; color: #555;"><strong>Unidade de Saúde:</strong> ${data.healthUnit || 'Não informado'}</p>
             <p style="margin: 0 0 5px 0; color: #555;"><strong>Início dos Sintomas:</strong> ${data.symptomsDate || 'Não informado'}</p>
-            <p style="margin: 0 0 5px 0; color: #555;"><strong>Notificador:</strong> ${data.notificatorName || 'Não informado'}</p>
+            <p style="margin: 0 0 5px 0; color: #555;"><strong>Notificador Origem:</strong> ${data.notificatorName || 'Não informado'}</p>
         </div>
         <div style="background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
             <h5 style="margin: 0 0 10px 0; color: #333;">Sintomas Principais Relatados:</h5>
@@ -6209,19 +14187,367 @@ window.enterEditNotificationMode = function(data, patient) {
     setVal(`surto-local-${data.disease}`, data.surtoData?.localSurto || '');
 
     // Dados complementares
-    setVal(`comp-obito-${data.disease}`, data.clinicalSigns?.obito);
-    setVal(`comp-contato-${data.disease}`, data.clinicalSigns?.contato);
-    setVal(`comp-exantema-${data.disease}`, data.clinicalSigns?.exantema);
-    setVal(`comp-exantema-date-${data.disease}`, data.clinicalSigns?.exantemaDate);
-    setVal(`comp-petequias-${data.disease}`, data.clinicalSigns?.petequias);
-    setVal(`comp-liquor-${data.disease}`, data.clinicalSigns?.liquor);
-    setVal(`comp-vacina-${data.disease}`, data.clinicalSigns?.vacina);
-    setVal(`comp-vacina-date-${data.disease}`, data.clinicalSigns?.vacinaDate);
-    setVal(`comp-hospitalizacao-${data.disease}`, data.clinicalSigns?.hospitalizacao);
-    setVal(`comp-hosp-date-${data.disease}`, data.clinicalSigns?.hospitalizacaoDate);
-    setVal(`comp-hospital-uf-${data.disease}`, data.clinicalSigns?.hospitalUf);
-    setVal(`comp-hospital-mun-${data.disease}`, data.clinicalSigns?.hospitalMun);
-    setVal(`comp-hospital-nome-${data.disease}`, data.clinicalSigns?.hospitalName);
+    if (data.disease === 'dengue' || data.disease === 'chikungunya') {
+        const cs = data.clinicalSigns || {};
+        setVal(`dengue-data-investigacao-${data.disease}`, cs.dataInvestigacao);
+        setVal(`dengue-ocupacao-${data.disease}`, cs.occupation);
+        if (cs.sinaisClinicos) {
+            Object.keys(cs.sinaisClinicos).forEach(k => setVal(`dengue-sint-${k}-${data.disease}`, cs.sinaisClinicos[k]));
+        }
+        if (cs.comorbidades) {
+            Object.keys(cs.comorbidades).forEach(k => setVal(`dengue-comorb-${k}-${data.disease}`, cs.comorbidades[k]));
+        }
+        if (cs.lab) {
+            setVal(`chik-s1-date-${data.disease}`, cs.lab.chikS1Date);
+            setVal(`chik-s1-res-${data.disease}`, cs.lab.chikS1Res);
+            setVal(`chik-s2-date-${data.disease}`, cs.lab.chikS2Date);
+            setVal(`chik-s2-res-${data.disease}`, cs.lab.chikS2Res);
+            setVal(`chik-prnt-date-${data.disease}`, cs.lab.chikPrntDate);
+            setVal(`chik-prnt-res-${data.disease}`, cs.lab.chikPrntRes);
+            setVal(`dengue-igm-date-${data.disease}`, cs.lab.dengueIgmDate);
+            setVal(`dengue-igm-res-${data.disease}`, cs.lab.dengueIgmRes);
+            setVal(`dengue-ns1-date-${data.disease}`, cs.lab.ns1Date);
+            setVal(`dengue-ns1-res-${data.disease}`, cs.lab.ns1Res);
+            setVal(`dengue-isolamento-date-${data.disease}`, cs.lab.isolamentoDate);
+            setVal(`dengue-isolamento-res-${data.disease}`, cs.lab.isolamentoRes);
+            setVal(`dengue-pcr-date-${data.disease}`, cs.lab.pcrDate);
+            setVal(`dengue-pcr-res-${data.disease}`, cs.lab.pcrRes);
+            setVal(`dengue-sorotipo-${data.disease}`, cs.lab.sorotipo);
+            setVal(`dengue-histo-date-${data.disease}`, cs.lab.histoDate);
+            setVal(`dengue-histo-res-${data.disease}`, cs.lab.histoRes);
+            setVal(`dengue-imuno-date-${data.disease}`, cs.lab.imunoDate);
+            setVal(`dengue-imuno-res-${data.disease}`, cs.lab.imunoRes);
+        }
+        if (cs.hospitalizacao) {
+            setVal(`dengue-hospitalizacao-${data.disease}`, cs.hospitalizacao.ocorreu);
+            setVal(`dengue-data-internacao-${data.disease}`, cs.hospitalizacao.dataInternacao);
+            setVal(`dengue-hospital-uf-${data.disease}`, cs.hospitalizacao.uf);
+            setVal(`dengue-hospital-mun-${data.disease}`, cs.hospitalizacao.mun);
+            setVal(`dengue-hospital-nome-${data.disease}`, cs.hospitalizacao.nome);
+            setVal(`dengue-hospital-fone-${data.disease}`, cs.hospitalizacao.fone);
+        }
+        if (cs.localInfeccao) {
+            setVal(`dengue-autoctone-${data.disease}`, cs.localInfeccao.autoctone);
+            setVal(`dengue-uf-infeccao-${data.disease}`, cs.localInfeccao.uf);
+            setVal(`dengue-pais-infeccao-${data.disease}`, cs.localInfeccao.pais);
+            setVal(`dengue-mun-infeccao-${data.disease}`, cs.localInfeccao.mun);
+            setVal(`dengue-dist-infeccao-${data.disease}`, cs.localInfeccao.dist);
+            setVal(`dengue-bairro-infeccao-${data.disease}`, cs.localInfeccao.bairro);
+        }
+        if (cs.conclusao) {
+            setVal(`dengue-classificacao-${data.disease}`, cs.conclusao.classificacao);
+            setVal(`dengue-criterio-${data.disease}`, cs.conclusao.criterio);
+            setVal(`dengue-apresentacao-chik-${data.disease}`, cs.conclusao.apresentacaoChik);
+            setVal(`dengue-evolucao-${data.disease}`, cs.conclusao.evolucao);
+            setVal(`dengue-data-obito-${data.disease}`, cs.conclusao.dataObito);
+            setVal(`dengue-data-encerramento-${data.disease}`, cs.conclusao.dataEncerramento);
+        }
+        if (cs.sinaisAlarme) {
+            setVal(`dengue-sinais-alarme-date-${data.disease}`, cs.sinaisAlarme.dataInicio);
+            setVal(`dengue-alarme-vomitos-${data.disease}`, cs.sinaisAlarme.vomitos);
+            setVal(`dengue-alarme-dor-abdo-${data.disease}`, cs.sinaisAlarme.dorAbdominal);
+            setVal(`dengue-alarme-letargia-${data.disease}`, cs.sinaisAlarme.letargia);
+            setVal(`dengue-alarme-sangramento-${data.disease}`, cs.sinaisAlarme.sangramento);
+            setVal(`dengue-alarme-hematocrito-${data.disease}`, cs.sinaisAlarme.hematocrito);
+            setVal(`dengue-alarme-hepatomegalia-${data.disease}`, cs.sinaisAlarme.hepatomegalia);
+            setVal(`dengue-alarme-acumulo-liq-${data.disease}`, cs.sinaisAlarme.acumuloLiq);
+            setVal(`dengue-alarme-hipotensao-${data.disease}`, cs.sinaisAlarme.hipotensao);
+            setVal(`dengue-alarme-plaquetas-${data.disease}`, cs.sinaisAlarme.plaquetas);
+        }
+        if (cs.dengueGrave) {
+            setVal(`dengue-sinais-grave-date-${data.disease}`, cs.dengueGrave.dataInicio);
+            setVal(`dengue-grave-pulso-${data.disease}`, cs.dengueGrave.pulso);
+            setVal(`dengue-grave-pa-${data.disease}`, cs.dengueGrave.pa);
+            setVal(`dengue-grave-capilar-${data.disease}`, cs.dengueGrave.capilar);
+            setVal(`dengue-grave-acumulo-resp-${data.disease}`, cs.dengueGrave.acumuloResp);
+            setVal(`dengue-grave-taquicardia-${data.disease}`, cs.dengueGrave.taquicardia);
+            setVal(`dengue-grave-extremidades-${data.disease}`, cs.dengueGrave.extremidades);
+            setVal(`dengue-grave-hipotensao-tardia-${data.disease}`, cs.dengueGrave.hipotensaoTardia);
+            setVal(`dengue-grave-hematemese-${data.disease}`, cs.dengueGrave.hematemese);
+            setVal(`dengue-grave-melena-${data.disease}`, cs.dengueGrave.melena);
+            setVal(`dengue-grave-metrorragia-${data.disease}`, cs.dengueGrave.metrorragia);
+            setVal(`dengue-grave-snc-${data.disease}`, cs.dengueGrave.snc);
+            setVal(`dengue-grave-ast-alt-${data.disease}`, cs.dengueGrave.astAlt);
+            setVal(`dengue-grave-miocardite-${data.disease}`, cs.dengueGrave.miocardite);
+            setVal(`dengue-grave-consciencia-${data.disease}`, cs.dengueGrave.consciencia);
+            setVal(`dengue-grave-outros-orgaos-${data.disease}`, cs.dengueGrave.outrosOrgaos);
+        }
+        if (cs.investigador) {
+            setVal(`dengue-inv-unidade-${data.disease}`, cs.investigador.unidade);
+            setVal(`dengue-inv-nome-${data.disease}`, cs.investigador.nome);
+            setVal(`dengue-inv-funcao-${data.disease}`, cs.investigador.funcao);
+        }
+        setVal(`dengue-obs-${data.disease}`, cs.obs);
+    } else if (data.disease === 'tracoma') {
+        setVal(`tracoma-inquerito-${data.disease}`, data.clinicalSigns?.inquerito || '1');
+        setVal(`tracoma-examinadas-${data.disease}`, data.clinicalSigns?.pessoasExaminadas || '0');
+        setVal(`tracoma-positivos-${data.disease}`, data.clinicalSigns?.casosPositivos || '0');
+        
+        const tbody = document.querySelector(`#tracoma-cases-table-${data.disease} tbody`);
+        if (tbody) {
+            tbody.innerHTML = '';
+            if (Array.isArray(data.clinicalSigns?.cases)) {
+                data.clinicalSigns.cases.forEach(c => {
+                    window.addTracomaCaseRow(`tracoma-cases-table-${data.disease}`, c);
+                });
+            } else {
+                window.addTracomaCaseRow(`tracoma-cases-table-${data.disease}`);
+            }
+        }
+    } else if (data.disease === 'hanseniase') {
+        setVal(`hanseniase-prontuario-${data.disease}`, data.clinicalSigns?.prontuario);
+        setVal(`hanseniase-ocupacao-${data.disease}`, data.clinicalSigns?.occupation);
+        setVal(`hanseniase-lesoes-${data.disease}`, data.clinicalSigns?.lesoesCutaneas);
+        setVal(`hanseniase-forma-${data.disease}`, data.clinicalSigns?.formaClinica);
+        setVal(`hanseniase-class-oper-${data.disease}`, data.clinicalSigns?.classOperacional);
+        setVal(`hanseniase-nervos-${data.disease}`, data.clinicalSigns?.nervosAfetados);
+        setVal(`hanseniase-incapacidade-${data.disease}`, data.clinicalSigns?.incapacidadeFisica);
+        setVal(`hanseniase-modo-entrada-${data.disease}`, data.clinicalSigns?.modoEntrada);
+        setVal(`hanseniase-modo-deteccao-${data.disease}`, data.clinicalSigns?.modoDeteccao);
+        setVal(`hanseniase-baciloscopia-${data.disease}`, data.clinicalSigns?.baciloscopia);
+        setVal(`hanseniase-inicio-tratamento-${data.disease}`, data.clinicalSigns?.dataInicioTratamento);
+        setVal(`hanseniase-esquema-${data.disease}`, data.clinicalSigns?.esquemaTerapeutico);
+        setVal(`hanseniase-contatos-${data.disease}`, data.clinicalSigns?.contatosRegistrados);
+    } else if (data.disease === 'esquistossomose') {
+        setVal(`esquisto-data-investigacao-${data.disease}`, data.clinicalSigns?.dataInvestigacao);
+        setVal(`esquisto-ocupacao-${data.disease}`, data.clinicalSigns?.occupation);
+        setVal(`esquisto-data-copro-${data.disease}`, data.clinicalSigns?.dataCoproscopia);
+        setVal(`esquisto-analise-quant-${data.disease}`, data.clinicalSigns?.analiseQuant);
+        setVal(`esquisto-analise-qual-${data.disease}`, data.clinicalSigns?.analiseQual);
+        setVal(`esquisto-outros-qual-${data.disease}`, data.clinicalSigns?.outrosQual);
+        setVal(`esquisto-outros-especificar-${data.disease}`, data.clinicalSigns?.outrosEspecificar);
+        setVal(`esquisto-fez-tratamento-${data.disease}`, data.clinicalSigns?.fezTratamento);
+        setVal(`esquisto-data-tratamento-${data.disease}`, data.clinicalSigns?.dataTratamento);
+        setVal(`esquisto-motivo-nao-tratamento-${data.disease}`, data.clinicalSigns?.motivoNaoTratamento);
+        setVal(`esquisto-cura-1amostra-${data.disease}`, data.clinicalSigns?.cura1Amostra);
+        setVal(`esquisto-cura-2amostra-${data.disease}`, data.clinicalSigns?.cura2Amostra);
+        setVal(`esquisto-cura-3amostra-${data.disease}`, data.clinicalSigns?.cura3Amostra);
+        setVal(`esquisto-cura-data-3amostra-${data.disease}`, data.clinicalSigns?.curaData3Amostra);
+        setVal(`esquisto-forma-clinica-${data.disease}`, data.clinicalSigns?.formaClinica);
+        setVal(`esquisto-autoctone-${data.disease}`, data.clinicalSigns?.autoctone);
+        setVal(`esquisto-infeccao-uf-${data.disease}`, data.clinicalSigns?.infeccaoUf);
+        setVal(`esquisto-infeccao-pais-${data.disease}`, data.clinicalSigns?.infeccaoPais);
+        setVal(`esquisto-infeccao-mun-${data.disease}`, data.clinicalSigns?.infeccaoMun);
+        setVal(`esquisto-infeccao-dist-${data.disease}`, data.clinicalSigns?.infeccaoDist);
+        setVal(`esquisto-infeccao-bairro-${data.disease}`, data.clinicalSigns?.infeccaoBairro);
+        setVal(`esquisto-infeccao-propriedade-${data.disease}`, data.clinicalSigns?.infeccaoPropriedade);
+        setVal(`esquisto-infeccao-hidrica-${data.disease}`, data.clinicalSigns?.infeccaoHidrica);
+        setVal(`esquisto-trabalho-${data.disease}`, data.clinicalSigns?.trabalho);
+        setVal(`esquisto-evolucao-${data.disease}`, data.clinicalSigns?.evolucao);
+        setVal(`esquisto-data-obito-${data.disease}`, data.clinicalSigns?.dataObito);
+        setVal(`esquisto-data-encerramento-${data.disease}`, data.clinicalSigns?.dataEncerramento);
+    } else if (data.disease === 'malaria') {
+        setVal(`malaria-data-investigacao-${data.disease}`, data.clinicalSigns?.dataInvestigacao);
+        setVal(`malaria-ocupacao-${data.disease}`, data.clinicalSigns?.occupation);
+        setVal(`malaria-atividade-${data.disease}`, data.clinicalSigns?.atividade);
+        setVal(`malaria-tipo-lamina-${data.disease}`, data.clinicalSigns?.tipoLamina);
+        setVal(`malaria-sintomas-${data.disease}`, data.clinicalSigns?.sintomas);
+        setVal(`malaria-data-exame-${data.disease}`, data.clinicalSigns?.dataExame);
+        setVal(`malaria-resultado-exame-${data.disease}`, data.clinicalSigns?.resultadoExame);
+        setVal(`malaria-parasitos-${data.disease}`, data.clinicalSigns?.parasitos);
+        setVal(`malaria-parasitemia-cruzes-${data.disease}`, data.clinicalSigns?.parasitemiaCruzes);
+        setVal(`malaria-esquema-tratamento-${data.disease}`, data.clinicalSigns?.esquemaTratamento);
+        setVal(`malaria-data-inicio-trat-${data.disease}`, data.clinicalSigns?.dataInicioTrat);
+        setVal(`malaria-classificacao-final-${data.disease}`, data.clinicalSigns?.classificacaoFinal);
+        setVal(`malaria-autoctone-${data.disease}`, data.clinicalSigns?.autoctone);
+        setVal(`malaria-uf-infeccao-${data.disease}`, data.clinicalSigns?.ufInfeccao);
+        setVal(`malaria-pais-infeccao-${data.disease}`, data.clinicalSigns?.paisInfeccao);
+        setVal(`malaria-municipio-infeccao-${data.disease}`, data.clinicalSigns?.municipioInfeccao);
+        setVal(`malaria-ibge-infeccao-${data.disease}`, data.clinicalSigns?.ibgeInfeccao);
+        setVal(`malaria-distrito-infeccao-${data.disease}`, data.clinicalSigns?.distritoInfeccao);
+        setVal(`malaria-bairro-infeccao-${data.disease}`, data.clinicalSigns?.bairroInfeccao);
+        setVal(`malaria-localidade-infeccao-${data.disease}`, data.clinicalSigns?.localidadeInfeccao);
+        setVal(`malaria-data-encerramento-${data.disease}`, data.clinicalSigns?.dataEncerramento);
+        setVal(`malaria-obs-${data.disease}`, data.clinicalSigns?.obs);
+        setVal(`malaria-examinador-${data.disease}`, data.clinicalSigns?.examinador);
+    } else if (data.disease === 'raiva') {
+        setVal(`raiva-data-investigacao-${data.disease}`, data.clinicalSigns?.dataInvestigacao);
+        setVal(`raiva-ocupacao-${data.disease}`, data.clinicalSigns?.occupation);
+        setVal(`raiva-tipo-exposicao-${data.disease}`, data.clinicalSigns?.tipoExposicao);
+        setVal(`raiva-localizacao-${data.disease}`, data.clinicalSigns?.localizacaoPicada);
+        setVal(`raiva-ferimento-${data.disease}`, data.clinicalSigns?.ferimento);
+        setVal(`raiva-tipo-ferimento-${data.disease}`, data.clinicalSigns?.tipoFerimento);
+        setVal(`raiva-data-exposicao-${data.disease}`, data.clinicalSigns?.dataExposicao);
+        setVal(`raiva-antecedentes-trat-${data.disease}`, data.clinicalSigns?.antecedentesTrat);
+        setVal(`raiva-doses-aplicadas-${data.disease}`, data.clinicalSigns?.dosesAplicadas);
+        setVal(`raiva-data-ultima-dose-${data.disease}`, data.clinicalSigns?.dataUltimaDose);
+        setVal(`raiva-especie-animal-${data.disease}`, data.clinicalSigns?.especieAnimal);
+        setVal(`raiva-animal-vacinado-${data.disease}`, data.clinicalSigns?.animalVacinado);
+        setVal(`raiva-hospitalizacao-${data.disease}`, data.clinicalSigns?.hospitalizacao);
+        setVal(`raiva-data-internacao-${data.disease}`, data.clinicalSigns?.dataInternacao);
+        setVal(`raiva-hospital-uf-${data.disease}`, data.clinicalSigns?.hospitalUf);
+        setVal(`raiva-hospital-mun-${data.disease}`, data.clinicalSigns?.hospitalMun);
+        setVal(`raiva-hospital-nome-${data.disease}`, data.clinicalSigns?.hospitalNome);
+        setVal(`raiva-sintomas-${data.disease}`, data.clinicalSigns?.sintomas);
+        setVal(`raiva-vacina-atual-${data.disease}`, data.clinicalSigns?.vacinaAtual);
+        setVal(`raiva-inicio-tratamento-${data.disease}`, data.clinicalSigns?.inicioTratamento);
+        setVal(`raiva-vacina-doses-${data.disease}`, data.clinicalSigns?.vacinaDoses);
+        setVal(`raiva-data-1dose-${data.disease}`, data.clinicalSigns?.data1Dose);
+        setVal(`raiva-data-ultdose-${data.disease}`, data.clinicalSigns?.dataUltDose);
+        setVal(`raiva-soro-aplicado-${data.disease}`, data.clinicalSigns?.soroAplicado);
+        setVal(`raiva-data-soro-${data.disease}`, data.clinicalSigns?.dataSoro);
+        setVal(`raiva-qtd-soro-${data.disease}`, data.clinicalSigns?.qtdSoro);
+        setVal(`raiva-infiltracao-soro-${data.disease}`, data.clinicalSigns?.infiltracaoSoro);
+        setVal(`raiva-diag-laboratorial-${data.disease}`, data.clinicalSigns?.diagLaboratorial);
+        setVal(`raiva-variante-${data.disease}`, data.clinicalSigns?.variante);
+        setVal(`raiva-classificacao-${data.disease}`, data.clinicalSigns?.classificacao);
+        setVal(`raiva-criterio-${data.disease}`, data.clinicalSigns?.criterio);
+        setVal(`raiva-autoctone-${data.disease}`, data.clinicalSigns?.autoctone);
+        setVal(`raiva-uf-infeccao-${data.disease}`, data.clinicalSigns?.ufInfeccao);
+        setVal(`raiva-pais-infeccao-${data.disease}`, data.clinicalSigns?.paisInfeccao);
+        setVal(`raiva-municipio-infeccao-${data.disease}`, data.clinicalSigns?.municipioInfeccao);
+        setVal(`raiva-ibge-infeccao-${data.disease}`, data.clinicalSigns?.ibgeInfeccao);
+        setVal(`raiva-distrito-infeccao-${data.disease}`, data.clinicalSigns?.distritoInfeccao);
+        setVal(`raiva-bairro-infeccao-${data.disease}`, data.clinicalSigns?.bairroInfeccao);
+        setVal(`raiva-zona-infeccao-${data.disease}`, data.clinicalSigns?.zonaInfeccao);
+        setVal(`raiva-trabalho-${data.disease}`, data.clinicalSigns?.trabalho);
+        setVal(`raiva-data-obito-${data.disease}`, data.clinicalSigns?.dataObito);
+        setVal(`raiva-data-encerramento-${data.disease}`, data.clinicalSigns?.dataEncerramento);
+        setVal(`raiva-obs-${data.disease}`, data.clinicalSigns?.obs);
+    } else if (data.disease === 'leishmaniose-visceral') {
+        setVal(`leish-visc-data-investigacao-${data.disease}`, data.clinicalSigns?.dataInvestigacao);
+        setVal(`leish-visc-ocupacao-${data.disease}`, data.clinicalSigns?.occupation);
+        setVal(`leish-visc-sintomas-${data.disease}`, data.clinicalSigns?.sintomas);
+        setVal(`leish-visc-hiv-${data.disease}`, data.clinicalSigns?.hiv);
+        setVal(`leish-visc-diag-parasito-${data.disease}`, data.clinicalSigns?.diagParasito);
+        setVal(`leish-visc-diag-imuno-${data.disease}`, data.clinicalSigns?.diagImuno);
+        setVal(`leish-visc-tipo-entrada-${data.disease}`, data.clinicalSigns?.tipoEntrada);
+        setVal(`leish-visc-inicio-tratamento-${data.disease}`, data.clinicalSigns?.inicioTratamento);
+        setVal(`leish-visc-droga-${data.disease}`, data.clinicalSigns?.droga);
+        setVal(`leish-visc-peso-${data.disease}`, data.clinicalSigns?.peso);
+        setVal(`leish-visc-dose-${data.disease}`, data.clinicalSigns?.dose);
+        setVal(`leish-visc-ampolas-${data.disease}`, data.clinicalSigns?.ampolas);
+        setVal(`leish-visc-outra-droga-${data.disease}`, data.clinicalSigns?.outraDroga);
+        setVal(`leish-visc-classificacao-${data.disease}`, data.clinicalSigns?.classificacao);
+        setVal(`leish-visc-criterio-${data.disease}`, data.clinicalSigns?.criterio);
+        setVal(`leish-visc-autoctone-${data.disease}`, data.clinicalSigns?.autoctone);
+        setVal(`leish-visc-uf-infeccao-${data.disease}`, data.clinicalSigns?.ufInfeccao);
+        setVal(`leish-visc-pais-infeccao-${data.disease}`, data.clinicalSigns?.paisInfeccao);
+        setVal(`leish-visc-municipio-infeccao-${data.disease}`, data.clinicalSigns?.municipioInfeccao);
+        setVal(`leish-visc-distrito-infeccao-${data.disease}`, data.clinicalSigns?.distritoInfeccao);
+        setVal(`leish-visc-bairro-infeccao-${data.disease}`, data.clinicalSigns?.bairroInfeccao);
+        setVal(`leish-visc-trabalho-${data.disease}`, data.clinicalSigns?.trabalho);
+        setVal(`leish-visc-evolucao-${data.disease}`, data.clinicalSigns?.evolucao);
+        setVal(`leish-visc-data-obito-${data.disease}`, data.clinicalSigns?.dataObito);
+        setVal(`leish-visc-data-encerramento-${data.disease}`, data.clinicalSigns?.dataEncerramento);
+        setVal(`leish-visc-deslocamentos-${data.disease}`, data.clinicalSigns?.deslocamentos);
+        setVal(`leish-visc-obs-${data.disease}`, data.clinicalSigns?.obs);
+    } else if (data.disease === 'chagas') {
+        setVal(`chagas-data-investigacao-${data.disease}`, data.clinicalSigns?.dataInvestigacao);
+        setVal(`chagas-ocupacao-${data.disease}`, data.clinicalSigns?.occupation);
+        setVal(`chagas-vestigios-${data.disease}`, data.clinicalSigns?.vestigios);
+        setVal(`chagas-data-vestigios-${data.disease}`, data.clinicalSigns?.dataVestigios);
+        setVal(`chagas-sangue-${data.disease}`, data.clinicalSigns?.sangue);
+        setVal(`chagas-controle-soro-${data.disease}`, data.clinicalSigns?.controleSoro);
+        setVal(`chagas-contato-${data.disease}`, data.clinicalSigns?.contato);
+        setVal(`chagas-mae-infeccao-${data.disease}`, data.clinicalSigns?.maeInfeccao);
+        setVal(`chagas-transmissao-oral-${data.disease}`, data.clinicalSigns?.transmissaoOral);
+        setVal(`chagas-deslocamentos-${data.disease}`, data.clinicalSigns?.deslocamentos);
+        setVal(`chagas-obs-${data.disease}`, data.clinicalSigns?.obs);
+    } else if (data.disease === 'leptospirose') {
+        setVal(`lepto-data-investigacao-${data.disease}`, data.clinicalSigns?.dataInvestigacao);
+        setVal(`lepto-ocupacao-${data.disease}`, data.clinicalSigns?.occupation);
+        setVal(`lepto-situacao-risco-${data.disease}`, data.clinicalSigns?.situacaoRisco);
+        setVal(`lepto-casos-anteriores-${data.disease}`, data.clinicalSigns?.casosAnteriores);
+        setVal(`lepto-data-atendimento-${data.disease}`, data.clinicalSigns?.dataAtendimento);
+        setVal(`lepto-sinais-sintomas-${data.disease}`, data.clinicalSigns?.sinaisSintomas);
+        setVal(`lepto-hospitalizacao-${data.disease}`, data.clinicalSigns?.hospitalizacao);
+        setVal(`lepto-data-internacao-${data.disease}`, data.clinicalSigns?.dataInternacao);
+        setVal(`lepto-data-alta-${data.disease}`, data.clinicalSigns?.dataAlta);
+        setVal(`lepto-hospital-nome-${data.disease}`, data.clinicalSigns?.hospitalNome);
+        setVal(`lepto-elisa-resultado-${data.disease}`, data.clinicalSigns?.elisaResultado);
+        setVal(`lepto-mat-resultado-${data.disease}`, data.clinicalSigns?.matResultado);
+        setVal(`lepto-classificacao-${data.disease}`, data.clinicalSigns?.classificacao);
+        setVal(`lepto-criterio-${data.disease}`, data.clinicalSigns?.criterio);
+        setVal(`lepto-autoctone-${data.disease}`, data.clinicalSigns?.autoctone);
+        setVal(`lepto-uf-infeccao-${data.disease}`, data.clinicalSigns?.ufInfeccao);
+        setVal(`lepto-pais-infeccao-${data.disease}`, data.clinicalSigns?.paisInfeccao);
+        setVal(`lepto-municipio-infeccao-${data.disease}`, data.clinicalSigns?.municipioInfeccao);
+        setVal(`lepto-distrito-infeccao-${data.disease}`, data.clinicalSigns?.distritoInfeccao);
+        setVal(`lepto-bairro-infeccao-${data.disease}`, data.clinicalSigns?.bairroInfeccao);
+        setVal(`lepto-zona-infeccao-${data.disease}`, data.clinicalSigns?.zonaInfeccao);
+        setVal(`lepto-ambiente-infeccao-${data.disease}`, data.clinicalSigns?.ambienteInfeccao);
+        setVal(`lepto-trabalho-${data.disease}`, data.clinicalSigns?.trabalho);
+        setVal(`lepto-evolucao-${data.disease}`, data.clinicalSigns?.evolucao);
+        setVal(`lepto-data-obito-${data.disease}`, data.clinicalSigns?.dataObito);
+        setVal(`lepto-data-encerramento-${data.disease}`, data.clinicalSigns?.dataEncerramento);
+        setVal(`lepto-obs-riscos-${data.disease}`, data.clinicalSigns?.obsRiscos);
+        setVal(`lepto-obs-${data.disease}`, data.clinicalSigns?.obs);
+    } else if (data.disease === 'acidente-ofidico') {
+        setVal(`ofidico-data-investigacao-${data.disease}`, data.clinicalSigns?.dataInvestigacao);
+        setVal(`ofidico-ocupacao-${data.disease}`, data.clinicalSigns?.occupation);
+        setVal(`ofidico-data-acidente-${data.disease}`, data.clinicalSigns?.dataAcidente);
+        setVal(`ofidico-uf-ocorrencia-${data.disease}`, data.clinicalSigns?.ufOcorrencia);
+        setVal(`ofidico-mun-ocorrencia-${data.disease}`, data.clinicalSigns?.munOcorrencia);
+        setVal(`ofidico-localidade-ocorrencia-${data.disease}`, data.clinicalSigns?.localidadeOcorrencia);
+        setVal(`ofidico-zona-ocorrencia-${data.disease}`, data.clinicalSigns?.zonaOcorrencia);
+        setVal(`ofidico-tempo-atendimento-${data.disease}`, data.clinicalSigns?.tempoAtendimento);
+        setVal(`ofidico-local-picada-${data.disease}`, data.clinicalSigns?.localPicada);
+        setVal(`ofidico-locais-${data.disease}`, data.clinicalSigns?.locais);
+        setVal(`ofidico-sintomas-locais-${data.disease}`, data.clinicalSigns?.sintomasLocais);
+        setVal(`ofidico-sistemicas-${data.disease}`, data.clinicalSigns?.sistemicas);
+        setVal(`ofidico-sintomas-sistemicos-${data.disease}`, data.clinicalSigns?.sintomasSistemicos);
+        setVal(`ofidico-tempo-coag-${data.disease}`, data.clinicalSigns?.tempoCoag);
+        setVal(`ofidico-tipo-acidente-${data.disease}`, data.clinicalSigns?.tipoAcidente);
+        setVal(`ofidico-agente-especie-${data.disease}`, data.clinicalSigns?.agenteEspecie);
+        setVal(`ofidico-classificacao-caso-${data.disease}`, data.clinicalSigns?.classificacaoCaso);
+        setVal(`ofidico-soroterapia-${data.disease}`, data.clinicalSigns?.soroterapia);
+        setVal(`ofidico-soro-ampolas-${data.disease}`, data.clinicalSigns?.soroAmpolas);
+        setVal(`ofidico-compl-locais-${data.disease}`, data.clinicalSigns?.complLocais);
+        setVal(`ofidico-compl-locais-especificar-${data.disease}`, data.clinicalSigns?.complLocaisEspecificar);
+        setVal(`ofidico-compl-sistemicas-${data.disease}`, data.clinicalSigns?.complSistemicas);
+        setVal(`ofidico-compl-sistemicas-especificar-${data.disease}`, data.clinicalSigns?.complSistemicasEspecificar);
+        setVal(`ofidico-trabalho-${data.disease}`, data.clinicalSigns?.trabalho);
+        setVal(`ofidico-evolucao-${data.disease}`, data.clinicalSigns?.evolucao);
+        setVal(`ofidico-data-obito-${data.disease}`, data.clinicalSigns?.dataObito);
+        setVal(`ofidico-data-encerramento-${data.disease}`, data.clinicalSigns?.dataEncerramento);
+        setVal(`ofidico-obs-${data.disease}`, data.clinicalSigns?.obs);
+    } else if (data.disease === 'leishmaniose-tegumentar') {
+        setVal(`leish-tegu-data-investigacao-${data.disease}`, data.clinicalSigns?.dataInvestigacao);
+        setVal(`leish-tegu-ocupacao-${data.disease}`, data.clinicalSigns?.occupation);
+        setVal(`leish-tegu-presenca-lesao-${data.disease}`, data.clinicalSigns?.presencaLesao);
+        setVal(`leish-tegu-cicatrizes-${data.disease}`, data.clinicalSigns?.cicatrizes);
+        setVal(`leish-tegu-hiv-${data.disease}`, data.clinicalSigns?.hiv);
+        setVal(`leish-tegu-diag-parasito-${data.disease}`, data.clinicalSigns?.diagParasito);
+        setVal(`leish-tegu-diag-irm-${data.disease}`, data.clinicalSigns?.diagIrm);
+        setVal(`leish-tegu-histopato-${data.disease}`, data.clinicalSigns?.histopato);
+        setVal(`leish-tegu-tipo-entrada-${data.disease}`, data.clinicalSigns?.tipoEntrada);
+        setVal(`leish-tegu-forma-clinica-${data.disease}`, data.clinicalSigns?.formaClinica);
+        setVal(`leish-tegu-inicio-tratamento-${data.disease}`, data.clinicalSigns?.inicioTratamento);
+        setVal(`leish-tegu-droga-${data.disease}`, data.clinicalSigns?.droga);
+        setVal(`leish-tegu-peso-${data.disease}`, data.clinicalSigns?.peso);
+        setVal(`leish-tegu-dose-${data.disease}`, data.clinicalSigns?.dose);
+        setVal(`leish-tegu-ampolas-${data.disease}`, data.clinicalSigns?.ampolas);
+        setVal(`leish-tegu-outra-droga-${data.disease}`, data.clinicalSigns?.outraDroga);
+        setVal(`leish-tegu-criterio-${data.disease}`, data.clinicalSigns?.criterio);
+        setVal(`leish-tegu-class-epidêmio-${data.disease}`, data.clinicalSigns?.classEpidemio);
+        setVal(`leish-tegu-autoctone-${data.disease}`, data.clinicalSigns?.autoctone);
+        setVal(`leish-tegu-uf-infeccao-${data.disease}`, data.clinicalSigns?.ufInfeccao);
+        setVal(`leish-tegu-pais-infeccao-${data.disease}`, data.clinicalSigns?.paisInfeccao);
+        setVal(`leish-tegu-municipio-infeccao-${data.disease}`, data.clinicalSigns?.municipioInfeccao);
+        setVal(`leish-tegu-distrito-infeccao-${data.disease}`, data.clinicalSigns?.distritoInfeccao);
+        setVal(`leish-tegu-bairro-infeccao-${data.disease}`, data.clinicalSigns?.bairroInfeccao);
+        setVal(`leish-tegu-trabalho-${data.disease}`, data.clinicalSigns?.trabalho);
+        setVal(`leish-tegu-evolucao-${data.disease}`, data.clinicalSigns?.evolucao);
+        setVal(`leish-tegu-data-obito-${data.disease}`, data.clinicalSigns?.dataObito);
+        setVal(`leish-tegu-data-encerramento-${data.disease}`, data.clinicalSigns?.dataEncerramento);
+        setVal(`leish-tegu-deslocamentos-${data.disease}`, data.clinicalSigns?.deslocamentos);
+        setVal(`leish-tegu-obs-${data.disease}`, data.clinicalSigns?.obs);
+    } else {
+        setVal(`comp-obito-${data.disease}`, data.clinicalSigns?.obito);
+        setVal(`comp-contato-${data.disease}`, data.clinicalSigns?.contato);
+        setVal(`comp-exantema-${data.disease}`, data.clinicalSigns?.exantema);
+        setVal(`comp-exantema-date-${data.disease}`, data.clinicalSigns?.exantemaDate);
+        setVal(`comp-petequias-${data.disease}`, data.clinicalSigns?.petequias);
+        setVal(`comp-liquor-${data.disease}`, data.clinicalSigns?.liquor);
+        setVal(`comp-vacina-${data.disease}`, data.clinicalSigns?.vacina);
+        setVal(`comp-vacina-date-${data.disease}`, data.clinicalSigns?.vacinaDate);
+        setVal(`comp-hospitalizacao-${data.disease}`, data.clinicalSigns?.hospitalizacao);
+        setVal(`comp-hosp-date-${data.disease}`, data.clinicalSigns?.hospitalizacaoDate);
+        setVal(`comp-hospital-uf-${data.disease}`, data.clinicalSigns?.hospitalUf);
+        setVal(`comp-hospital-mun-${data.disease}`, data.clinicalSigns?.hospitalMun);
+        setVal(`comp-hospital-nome-${data.disease}`, data.clinicalSigns?.hospitalName);
+    }
 
     // Dados de residência extras
     setVal(`patient-uf-res-${data.disease}`, data.patientInfo?.uf || (patient && patient.uf) || 'PA');

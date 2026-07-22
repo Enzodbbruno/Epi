@@ -347,9 +347,15 @@
                                 <option value="dengue">ðŸ¦Ÿ Dengue</option>
                                 <option value="chikungunya">ðŸ¤’ Chikungunya</option>
                                 <option value="zika">ðŸ¦Ÿ Zika</option>
-                                <option value="leishmaniose">ðŸ¦— Leishmaniose</option>
+                                <option value="leishmaniose-visceral">🦟 Leishmaniose Visceral</option>
+                                <option value="leishmaniose-tegumentar">🦟 Leishmaniose Tegumentar</option>
                                 <option value="hanseniase"> Hanseníase</option>
-                                <option value="esquistossomose">ðŸŒ Esquistossomose</option>
+                                <option value="esquistossomose">🥖 Esquistossomose</option>
+                                <option value="malaria">🦟 Malária</option>
+                                <option value="raiva">🐶 Raiva Humana</option>
+                                <option value="chagas">🐜 Chagas Aguda</option>
+                                <option value="leptospirose">🐀 Leptospirose</option>
+                                <option value="acidente-ofidico">🐍 Animais Peçonhentos</option>
                             </select>
                             <button id="apply-filter-btn" class="primary-button"
                                 style="padding: 10px 20px; border-radius: 8px;">
@@ -880,7 +886,7 @@
                     <div>
                         <span class="info-title">Acesso de Demonstração</span>
                         <span class="info-creds">CPF: <strong>000.000.000-00</strong></span>
-                        <span class="info-creds">Senha: <strong>2026</strong></span>
+                        <span class="info-creds">Senha: <strong>EpiConecta@2025!</strong></span>
                     </div>
                 </div>
             </div>
@@ -901,7 +907,10 @@
                     <label for="login-password" class="modal-label">Senha</label>
                     <div class="input-with-icon">
                         <i class="fas fa-lock"></i>
-                        <input type="password" id="login-password" placeholder="Digite sua senha..." class="modal-input-full">
+                        <input type="password" id="login-password" placeholder="Digite sua senha..." class="modal-input-full has-toggle">
+                        <button type="button" id="btn-toggle-password" class="toggle-password-btn" title="Mostrar ou ocultar senha" aria-label="Mostrar ou ocultar senha">
+                            <i class="far fa-eye" id="icon-toggle-password"></i>
+                        </button>
                     </div>
                 </div>
                 

@@ -11,12 +11,12 @@ async function seed() {
     const existsRes = await db.query('SELECT id, cpf_hash, password_hash FROM users WHERE role = $1', ['admin']);
     const exists = existsRes.rows[0];
 
-    const passwordHash = await bcrypt.hash(process.env.ADMIN_PASSWORD || '2026', 12);
+    const passwordHash = await bcrypt.hash(process.env.ADMIN_PASSWORD || 'EpiConecta@2025!', 12);
     const cpfRaw = process.env.ADMIN_CPF || '000.000.000-00';
     const currentCpfHash = hashIndex(cpfRaw);
 
     if (exists) {
-      const passMatch = await bcrypt.compare(process.env.ADMIN_PASSWORD || '2026', exists.password_hash);
+      const passMatch = await bcrypt.compare(process.env.ADMIN_PASSWORD || 'EpiConecta@2025!', exists.password_hash);
       if (exists.cpf_hash !== currentCpfHash || !passMatch) {
         console.log('[Seed] Admin existe mas com credenciais desatualizadas. Atualizando...');
         await db.query(`

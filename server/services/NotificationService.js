@@ -3,6 +3,7 @@ const { randomUUID } = require('crypto');
 const NotifRepo   = require('../repositories/NotificationRepository');
 const PatientRepo = require('../repositories/PatientRepository');
 const AuditRepo   = require('../repositories/AuditRepository');
+const UserRepo    = require('../repositories/UserRepository');
 
 class NotificationService {
   /**
@@ -46,9 +47,8 @@ class NotificationService {
     if (!notification) throw new Error('Notificação não encontrada.');
 
     // Validar se o usuário logado é o proprietário
-    if (notification.notificator_id !== userId) {
-      throw new Error('Apenas o profissional que criou esta notificação pode editá-la.');
-    }
+    const user = await UserRepo.findById(userId);
+    const updatedByName = user ? user.name : 'Profissional de Saúde';
 
     await NotifRepo.update(id, {
       disease:       data.disease,
@@ -58,6 +58,8 @@ class NotificationService {
       clinicalSigns: JSON.stringify(data.clinicalSigns || {}),
       labResults:    JSON.stringify(data.labResults    || {}),
       observations:  data.observations || null,
+      updatedById:   userId,
+      updatedByName: updatedByName
     });
 
     await AuditRepo.log({

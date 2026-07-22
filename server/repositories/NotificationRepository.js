@@ -81,8 +81,10 @@ class NotificationRepository {
           clinical_signs = $5,
           lab_results = $6,
           observations = $7,
-          updated_at = CURRENT_TIMESTAMP
-      WHERE id = $8
+          updated_at = CURRENT_TIMESTAMP,
+          updated_by_id = $8,
+          updated_by_name = $9
+      WHERE id = $10
     `, [
       data.disease,
       data.healthUnit,
@@ -91,6 +93,8 @@ class NotificationRepository {
       data.clinicalSigns,
       data.labResults,
       data.observations,
+      data.updatedById || null,
+      data.updatedByName || null,
       id
     ]);
   }

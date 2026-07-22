@@ -72,8 +72,13 @@ async function runMigrations() {
         sinan_number     VARCHAR(100),
         observations     TEXT,
         created_at       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_at       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        updated_at       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_by_id    VARCHAR(100),
+        updated_by_name  VARCHAR(255)
       );
+
+      ALTER TABLE notifications ADD COLUMN IF NOT EXISTS updated_by_id VARCHAR(100);
+      ALTER TABLE notifications ADD COLUMN IF NOT EXISTS updated_by_name VARCHAR(255);
 
       -- ==================== AUDIT LOG (LGPD Art. 37) ====================
       CREATE TABLE IF NOT EXISTS audit_logs (

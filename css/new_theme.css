@@ -511,7 +511,7 @@ body {
     width: 100%;
 }
 
-.input-with-icon i {
+.input-with-icon > i {
     position: absolute;
     left: 14px;
     top: 50%;
@@ -519,14 +519,55 @@ body {
     color: #94a3b8;
     font-size: 1rem;
     transition: color 0.2s ease;
+    pointer-events: none;
 }
 
 .input-with-icon .modal-input-full {
     padding-left: 42px !important;
 }
 
+.input-with-icon .modal-input-full.has-toggle {
+    padding-right: 44px !important;
+}
+
 .input-with-icon .modal-input-full:focus + i {
     color: var(--primary);
+}
+
+.toggle-password-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 5;
+    height: 28px;
+    width: 28px;
+}
+
+.toggle-password-btn i {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+    color: inherit !important;
+    font-size: 1rem !important;
+}
+
+.toggle-password-btn:hover {
+    color: var(--primary, #0ea5e9);
+    background: rgba(14, 165, 233, 0.1);
 }
 
 /* Info Box Redesign */

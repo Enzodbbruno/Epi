@@ -6119,6 +6119,16 @@ body {
     margin-top: 20px;
 }
 
+.sinan-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.sinan-grid-3 .form-group {
+    margin-bottom: 0;
+}
+
 .sinan-grid-4 {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -6176,3 +6186,55 @@ body {
     .sinan-grid-4 .span-2, .sinan-grid-4 .span-3 { grid-column: span 1; }
     .sinan-checkbox-grid { grid-template-columns: 1fr; }
 }
+
+/* Tracoma Case Survey Table styles */
+.tabela-sinan-casos {
+    width: 100%;
+    margin-top: 10px;
+    border-collapse: collapse;
+}
+
+.tabela-sinan-casos th {
+    background: #f8fafc;
+    color: var(--primary-color, #0b3a67);
+    font-weight: bold;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    padding: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.tabela-sinan-casos td {
+    padding: 6px;
+    border: 1px solid #e2e8f0;
+    vertical-align: middle;
+}
+
+.tabela-sinan-casos input[type="text"],
+.tabela-sinan-casos input[type="number"],
+.tabela-sinan-casos select {
+    width: 100%;
+    height: 32px !important;
+    padding: 4px 8px !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px !important;
+    font-size: 0.85rem !important;
+    background: #ffffff !important;
+}
+
+.tabela-sinan-casos input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: var(--primary-color);
+    cursor: pointer;
+}
+
+.tabela-sinan-casos .btn-remove-row {
+    transition: transform 0.1s ease, color 0.1s ease;
+}
+
+.tabela-sinan-casos .btn-remove-row:hover {
+    transform: scale(1.1);
+    color: #dc2626 !important;
+}
+

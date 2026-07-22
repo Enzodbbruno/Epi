@@ -46,6 +46,12 @@ class PatientService {
       // Capitaliza primeira letra da doença
       const diseaseName = n.disease.charAt(0).toUpperCase() + n.disease.slice(1);
       
+      const createdTime = n.created_at ? new Date(n.created_at).getTime() : 0;
+      const updatedTime = n.updated_at ? new Date(n.updated_at).getTime() : 0;
+      const isEdited = !!n.updated_by_name || (updatedTime > 0 && createdTime > 0 && (updatedTime - createdTime > 2000));
+      const updatedByName = n.updated_by_name || (isEdited ? (n.notificator_name || 'Profissional') : null);
+      const updatedAtFormatted = n.updated_at ? new Date(n.updated_at).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : null;
+
       return {
         date: n.created_at ? new Date(n.created_at).toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR'),
         title: `Notificação - ${diseaseName}`,
@@ -53,6 +59,9 @@ class PatientService {
         isNotification: true,
         notificatorId: n.notificator_id,
         isOwner: isOwner,
+        isEdited: isEdited,
+        updatedByName: updatedByName,
+        updatedAt: updatedAtFormatted,
         notificationData: {
           id: n.id,
           disease: n.disease,
@@ -63,7 +72,10 @@ class PatientService {
           labResults: JSON.parse(n.lab_results || '{}'),
           observations: n.observations,
           notificatorName: n.notificator_name,
-          notificatorId: n.notificator_id
+          notificatorId: n.notificator_id,
+          isEdited: isEdited,
+          updatedByName: updatedByName,
+          updatedAt: updatedAtFormatted
         }
       };
     });
