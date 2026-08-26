@@ -475,18 +475,13 @@ body {
 
 /* Messages Area */
 .chat-messages {
-    display: none;
-    /* Hidden on mobile list view */
+    display: flex;
     flex-direction: column;
     height: 100%;
-    background: #E5DDD5;
-    /* WhatsApp-like neutral bg */
-    position: fixed;
-    top: 64px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 200;
+    background: #f8fafc;
+    position: relative;
+    flex: 1;
+    min-width: 0;
 }
 
 .chat-header {
@@ -5184,7 +5179,6 @@ body {
 .gov-card,
 .metric-card,
 .stat-card,
-.chat-room,
 .detail-card,
 .alert-card,
 .settings-section,

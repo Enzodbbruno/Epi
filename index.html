@@ -24,9 +24,10 @@
     <!-- Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 
-    <link rel="stylesheet" href="css/style.css?v=20260505e">
-    <link rel="stylesheet" href="css/new_theme.css?v=20260518v10">
+    <link rel="stylesheet" href="css/style.css?v=20260825_chat_v7">
+    <link rel="stylesheet" href="css/new_theme.css?v=20260825_chat_v7">
 </head>
 
 <body>
@@ -221,6 +222,81 @@
                         </div>
                     </div>
 
+                    <!-- Heatmap Section -->
+                    <div class="analytics-heatmap-section" style="margin-top: 25px; margin-bottom: 25px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                            <h2 style="margin: 0; font-size: 1.25rem; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-fire-alt" style="color: #ef4444;"></i> Mapa de Calor Epidemiológico (Marabá - PA)
+                            </h2>
+                            <div class="heatmap-filter-group" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <label for="analytics-disease-filter" style="font-weight: 600; font-size: 0.85rem; color: #475569;">Agravo:</label>
+                                    <select id="analytics-disease-filter" class="control-select" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.85rem; background: #fff;">
+                                        <option value="all">🔥 Todas as Doenças</option>
+                                        <option value="dengue">🦟 Dengue</option>
+                                        <option value="chikungunya">🤒 Chikungunya</option>
+                                        <option value="zika">🦟 Zika</option>
+                                        <option value="leishmaniose-visceral">🦟 Leishmaniose Visceral</option>
+                                        <option value="leishmaniose-tegumentar">🦟 Leishmaniose Tegumentar</option>
+                                        <option value="hanseniase">👤 Hanseníase</option>
+                                        <option value="esquistossomose">🥖 Esquistossomose</option>
+                                        <option value="malaria">🦟 Malária</option>
+                                        <option value="raiva">🐶 Raiva Humana</option>
+                                        <option value="chagas">🐜 Chagas Aguda</option>
+                                        <option value="leptospirose">🐀 Leptospirose</option>
+                                        <option value="acidente-ofidico">🐍 Animais Peçonhentos</option>
+                                    </select>
+                                </div>
+
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <label for="analytics-neighborhood-filter" style="font-weight: 600; font-size: 0.85rem; color: #475569;">Bairro/Núcleo:</label>
+                                    <select id="analytics-neighborhood-filter" class="control-select" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.85rem; background: #fff;">
+                                        <option value="all">🏡 Todos os Bairros</option>
+                                        <option value="cidade nova">Cidade Nova</option>
+                                        <option value="nova maraba">Nova Marabá (Folhas)</option>
+                                        <option value="pioneira">Marabá Pioneira</option>
+                                        <option value="sao felix">São Félix I / II</option>
+                                        <option value="morada nova">Morada Nova</option>
+                                        <option value="novo horizonte">Novo Horizonte</option>
+                                        <option value="laranjeiras">Laranjeiras / Belo Horiz.</option>
+                                        <option value="amapa">Amapá</option>
+                                        <option value="distrito industrial">Distrito Industrial</option>
+                                    </select>
+                                </div>
+
+                                <div style="display: flex; align-items: center; gap: 6px; position: relative;">
+                                    <i class="fas fa-search" style="position: absolute; left: 10px; color: #94a3b8; font-size: 0.8rem;"></i>
+                                    <input type="text" id="analytics-address-input" placeholder="Buscar rua ou CEP... (ex: Folha 17, Tancredo)" style="padding: 6px 12px 6px 30px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.85rem; background: #fff; width: 230px; outline: none;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="position: relative;">
+                            <div id="analytics-heatmap" style="height: 480px; width: 100%; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.06); z-index: 1;"></div>
+                            <div id="analytics-heatmap-legend" class="analytics-map-legend" style="position: absolute; bottom: 15px; right: 15px; z-index: 1000; background: rgba(255, 255, 255, 0.95); padding: 10px 14px; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.1); font-size: 0.8rem;">
+                                <div style="font-weight: 700; color: #1e293b; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                                    <i class="fas fa-layer-group" style="color: #0284c7;"></i> Densidade de Casos
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 3px;">
+                                    <span style="display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: #3b82f6;"></span>
+                                    <span>Baixa (Pontual)</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 3px;">
+                                    <span style="display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: #eab308;"></span>
+                                    <span>Média (Alerta)</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 3px;">
+                                    <span style="display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: #f97316;"></span>
+                                    <span>Alta (Surto)</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: #ef4444;"></span>
+                                    <span>Crítica (Epidemia)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Hospitalizations Section -->
                     <div class="stats-extended-section hospital-stats" style="margin-top: 20px; margin-bottom: 20px;">
                         <h2>Internações por Setor - HMM</h2>
@@ -375,12 +451,92 @@
                                         <th style="padding: 15px;">Status</th>
                                     </tr>
                                 </thead>
-                                <tbody id="full-cases-tbody">
-                                    <!-- Populated by JS -->
                                 </tbody>
                             </table>
                         </div>
                     </div>
+
+                    <!-- Escalas Epidemiológicas (Likert e Thurstone) -->
+                    <div class="stats-extended-section scales-section" style="margin-top: 25px; margin-bottom: 25px;">
+                        <h2 style="margin-bottom: 15px; font-size: 1.25rem; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-sliders-h" style="color: #0284c7;"></i> Avaliações Psicométricas & Percepção Epidemiológica
+                        </h2>
+
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px;">
+                            
+                            <!-- 1. ESCALA DE LIKERT (5 PONTOS) -->
+                            <div class="stat-card" style="background: white; border-radius: 16px; padding: 22px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
+                                    <div>
+                                        <h3 style="margin: 0; font-size: 1.05rem; color: #0f172a; font-weight: 700;">
+                                            <i class="fas fa-poll-h" style="color: #0284c7;"></i> Escala de Likert (1 a 5 Pontos)
+                                        </h3>
+                                        <span style="font-size: 0.78rem; color: #64748b;">Prontidão e Satisfação das Equipes de Saúde de Marabá</span>
+                                    </div>
+                                    <span id="likert-global-avg-badge" class="likert-badge" style="background: #e0f2fe; color: #0369a1; font-weight: 700; font-size: 0.8rem; padding: 4px 10px; border-radius: 20px;">Média: 4.5 / 5.0</span>
+                                </div>
+
+                                <div class="likert-items-container" id="likert-items-list">
+                                    <!-- Populated by JS -->
+                                </div>
+
+                                <!-- Formulário de Avaliação Interativa Likert -->
+                                <div style="margin-top: 18px; padding-top: 14px; border-top: 1px dashed #cbd5e1;">
+                                    <h4 style="margin: 0 0 8px 0; font-size: 0.85rem; color: #334155; font-weight: 600;">Registrar Avaliação de Campo (Profissional)</h4>
+                                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                        <select id="likert-indicator-select" class="control-select" style="flex: 1; min-width: 180px; padding: 6px 10px; font-size: 0.8rem; border-radius: 8px; border: 1px solid #cbd5e1;">
+                                            <option value="notif_speed">Agilidade na Notificação SINAN</option>
+                                            <option value="ppe_supplies">Insumos e Testes Rápidos nas UBS</option>
+                                            <option value="vector_protocol">Clareza no Protocolo de Vetores</option>
+                                            <option value="network_comm">Comunicação Inter-Hospitalar (Teams)</option>
+                                        </select>
+                                        <select id="likert-score-select" class="control-select" style="width: 140px; padding: 6px 10px; font-size: 0.8rem; border-radius: 8px; border: 1px solid #cbd5e1;">
+                                            <option value="5">5 - Concordo Totalmente</option>
+                                            <option value="4">4 - Concordo</option>
+                                            <option value="3">3 - Neutro</option>
+                                            <option value="2">2 - Discordo</option>
+                                            <option value="1">1 - Discordo Totalmente</option>
+                                        </select>
+                                        <button id="btn-submit-likert" class="btn btn-primary btn-sm" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; font-weight: 600;">Votar</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 2. ESCALA DE THURSTONE (1 A 11 PONTOS) -->
+                            <div class="stat-card" style="background: white; border-radius: 16px; padding: 22px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
+                                    <div>
+                                        <h3 style="margin: 0; font-size: 1.05rem; color: #0f172a; font-weight: 700;">
+                                            <i class="fas fa-balance-scale" style="color: #7e22ce;"></i> Escala de Thurstone (1 a 11 Pontos)
+                                        </h3>
+                                        <span style="font-size: 0.78rem; color: #64748b;">Valoração de Severidade Epidêmica por Comitê de Juízes</span>
+                                    </div>
+                                    <span style="background: #f3e8ff; color: #7e22ce; font-weight: 700; font-size: 0.8rem; padding: 4px 10px; border-radius: 20px;">Igual Intervalo</span>
+                                </div>
+
+                                <div class="thurstone-items-container" id="thurstone-items-list">
+                                    <!-- Populated by JS -->
+                                </div>
+
+                                <!-- Valoração de Especialista Thurstone -->
+                                <div style="margin-top: 18px; padding-top: 14px; border-top: 1px dashed #cbd5e1;">
+                                    <h4 style="margin: 0 0 8px 0; font-size: 0.85rem; color: #334155; font-weight: 600;">Parecer de Especialista (Juiz Epidemiológico)</h4>
+                                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                        <select id="thurstone-item-select" class="control-select" style="flex: 1; min-width: 180px; padding: 6px 10px; font-size: 0.8rem; border-radius: 8px; border: 1px solid #cbd5e1;">
+                                            <option value="item-1">Foco Vetorial sem Caso Sintomático</option>
+                                            <option value="item-2">Suspeita com Presença de Vetor Peridomiciliar</option>
+                                            <option value="item-3">Surto Localizado no Núcleo Cidade Nova</option>
+                                            <option value="item-4">Óbito por Agravo / Emergência Epidêmica</option>
+                                        </select>
+                                        <input type="number" id="thurstone-score-input" min="1" max="11" value="8" style="width: 70px; padding: 6px 10px; font-size: 0.8rem; border-radius: 8px; border: 1px solid #cbd5e1; text-align: center;" placeholder="1-11">
+                                        <button id="btn-submit-thurstone" class="btn btn-primary btn-sm" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; background: #7e22ce; border-color: #7e22ce; font-weight: 600;">Registrar</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
 
                 </section>
 
@@ -482,28 +638,61 @@
                     </div>
                 </section>
 
-                <!-- 6. Chat Profissional -->
+                <!-- 6. Chat Profissional Inter-Hospitalar (Teams-Style) -->
                 <section class="screen" id="chat-screen" style="display:none;">
                     <div class="screen-header">
                         <button class="back-button" data-screen="dashboard"><i class="fas fa-arrow-left"></i></button>
-                        <h1>Chat Profissional</h1>
-                        <button class="icon-button" id="new-chat-btn"><i class="fas fa-plus"></i></button>
+                        <h1>Hub de Comunicação Inter-Hospitalar</h1>
+                        <button class="btn btn-primary" id="new-chat-btn" style="padding: 8px 16px; font-size: 0.85rem; border-radius: 10px; display: flex; align-items: center; gap: 8px; white-space: nowrap; font-weight: 600;"><i class="fas fa-plus-circle"></i> Nova Conversa</button>
                     </div>
 
                     <div class="chat-container">
-                        <div class="chat-rooms" id="chat-rooms">
-                            <!-- Populated by JS -->
+                        <!-- Sidebar de Salas / Conversas -->
+                        <div class="chat-sidebar-shell">
+                            <!-- Filtro de Categorias Teams -->
+                            <div class="chat-category-tabs">
+                                <button class="chat-cat-tab active" data-cat="all"><i class="fas fa-border-all"></i> Todos</button>
+                                <button class="chat-cat-tab" data-cat="ai"><i class="fas fa-robot"></i> EpiAI</button>
+                                <button class="chat-cat-tab" data-cat="hospitals"><i class="fas fa-hospital-user"></i> Hospitais</button>
+                                <button class="chat-cat-tab" data-cat="direct"><i class="fas fa-user-md"></i> Diretas</button>
+                            </div>
+
+                            <!-- Busca no Chat -->
+                            <div class="chat-search-wrap">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="chat-search-input" placeholder="Buscar canal, hospital ou colega...">
+                            </div>
+
+                            <div class="chat-rooms" id="chat-rooms">
+                                <!-- Populated by JS -->
+                            </div>
                         </div>
 
+                        <!-- Área Principal de Mensagens -->
                         <div class="chat-messages hidden" id="chat-messages">
                             <div class="chat-header">
                                 <button class="back-to-rooms"><i class="fas fa-arrow-left"></i></button>
-                                <h3 id="current-chat-name">Equipe de Vigilância</h3>
+                                <div class="chat-header-info" style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                                    <div id="chat-active-avatar" class="chat-avatar" style="background-color: #0284c7; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold;">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div>
+                                        <h3 id="current-chat-name" style="margin: 0; font-size: 1.05rem; display: flex; align-items: center; gap: 8px;">
+                                            Equipe de Vigilância
+                                        </h3>
+                                        <span id="current-chat-sub" style="font-size: 0.78rem; color: #64748b;">Marabá • Redes Hospitalares Conectadas</span>
+                                    </div>
+                                </div>
                             </div>
+
                             <div class="messages-container" id="messages-container"></div>
+
                             <div class="message-input-bar">
-                                <input type="text" id="message-input" placeholder="Digite sua mensagem...">
-                                <button class="send-btn"><i class="fas fa-paper-plane"></i></button>
+                                <button id="btn-attach-notif" class="icon-button-chat" title="Anexar Notificação de Paciente (SINAN)">
+                                    <i class="fas fa-paperclip"></i>
+                                </button>
+                                <input type="text" id="message-input" placeholder="Escreva uma mensagem para a equipe...">
+                                <button class="send-btn" id="send-message"><i class="fas fa-paper-plane"></i></button>
                             </div>
                         </div>
                     </div>
@@ -961,6 +1150,50 @@
                         class="fas fa-edit"></i> Editar Ficha</button>
                 <button onclick="document.getElementById('patient-notification-detail-modal').style.display='none'"
                     class="btn btn-secondary modal-detail-btn modal-btn-secondary-soft">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Nova Conversa Inter-Hospitalar (Teams) -->
+    <div id="new-interhospital-chat-modal" class="modal-base" style="display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.6); z-index: 9999; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: #fff; width: 92%; max-width: 520px; border-radius: 16px; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px;">
+                <h3 style="margin: 0; color: #1e293b; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-comments" style="color: #0284c7;"></i> Iniciar Conversa Inter-Hospitalar
+                </h3>
+                <button onclick="document.getElementById('new-interhospital-chat-modal').style.display='none'" style="background: none; border: none; font-size: 1.2rem; color: #94a3b8; cursor: pointer;"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <p style="font-size: 0.85rem; color: #64748b; margin-top: 0; margin-bottom: 16px;">Selecione um profissional de saúde da rede de Marabá ou escolha um canal especializado:</p>
+
+            <div id="new-chat-professionals-list" style="max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px;">
+                <!-- Populated by JS -->
+            </div>
+
+            <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+                <button onclick="document.getElementById('new-interhospital-chat-modal').style.display='none'" class="btn btn-secondary" style="padding: 8px 16px; border-radius: 8px;">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Anexar Notificação no Chat -->
+    <div id="chat-attach-notif-modal" class="modal-base" style="display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.6); z-index: 9999; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: #fff; width: 92%; max-width: 500px; border-radius: 16px; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px;">
+                <h3 style="margin: 0; color: #1e293b; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-paperclip" style="color: #0284c7;"></i> Compartilhar Notificação de Paciente
+                </h3>
+                <button onclick="document.getElementById('chat-attach-notif-modal').style.display='none'" style="background: none; border: none; font-size: 1.2rem; color: #94a3b8; cursor: pointer;"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <p style="font-size: 0.85rem; color: #64748b; margin-top: 0; margin-bottom: 14px;">Selecione uma notificação cadastrada para enviar neste canal de discussão:</p>
+
+            <div id="chat-attach-notif-list" style="max-height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+                <!-- Populated by JS -->
+            </div>
+
+            <div style="margin-top: 18px; display: flex; justify-content: flex-end;">
+                <button onclick="document.getElementById('chat-attach-notif-modal').style.display='none'" class="btn btn-secondary" style="padding: 8px 16px; border-radius: 8px;">Cancelar</button>
             </div>
         </div>
     </div>

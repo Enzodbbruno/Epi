@@ -5,6 +5,8 @@ const PatientRepo = require('../repositories/PatientRepository');
 const AuditRepo   = require('../repositories/AuditRepository');
 const UserRepo    = require('../repositories/UserRepository');
 
+const EmailService = require('./EmailService');
+
 class NotificationService {
   /**
    * Create a new SINAN notification.
@@ -35,6 +37,19 @@ class NotificationService {
       details: { disease: data.disease, patientId: data.patientId },
       ip, userAgent
     });
+
+    // Disparar e-mail de teste de confirmação para dreaeverning@gmail.com
+    const notificatorUser = await UserRepo.findById(userId);
+    const notificatorName = notificatorUser ? notificatorUser.name : 'Profissional de Saúde';
+
+    EmailService.sendNotificationCompletionEmail({
+      recipientEmail: 'dreaeverning@gmail.com',
+      notificationData: data,
+      patientName: patient ? patient.name : 'Paciente Notificado',
+      disease: data.disease,
+      healthUnit: data.healthUnit || 'UBS Hiroshi Matsuda',
+      notificatorName: notificatorName
+    }).catch(err => console.error('[NotificationService] E-mail dispatch error:', err));
 
     return { id };
   }
