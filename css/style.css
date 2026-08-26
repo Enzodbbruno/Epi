@@ -3359,7 +3359,7 @@ input:checked + .toggle-slider:before {
     }
 
     .main-wrapper {
-        margin-left: 260px;
+        margin-left: 0;
     }
 
     .app-header {

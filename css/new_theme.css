@@ -335,7 +335,7 @@ body {
     .topbar-spacer { display: none !important; }
 }
 .topbar-spacer {
-    display: block;
+    display: none !important;
 }
 
 @media (max-width: 768px) {
@@ -1272,6 +1272,177 @@ body,
     font-size: 0.8rem;
     color: #475569;
 }
+
+/* ==========================================================================
+   STRICT DESKTOP LAYOUT FIX (PREVENT MARGIN SHIFT & BLANK GAP ON DESKTOP)
+   ========================================================================== */
+@media (min-width: 769px) {
+    body, html {
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow-x: hidden !important;
+        width: 100vw !important;
+        height: 100vh !important;
+    }
+
+    .app-container {
+        display: flex !important;
+        flex-direction: row !important;
+        width: 100vw !important;
+        max-width: 100% !important;
+        height: 100vh !important;
+        overflow: hidden !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .sidebar {
+        display: flex !important;
+        width: 260px !important;
+        min-width: 260px !important;
+        max-width: 260px !important;
+        flex-shrink: 0 !important;
+        height: 100vh !important;
+        position: relative !important;
+        left: 0 !important;
+        top: 0 !important;
+    }
+
+    .main-wrapper {
+        flex: 1 !important;
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+        width: calc(100vw - 260px) !important;
+        max-width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow-y: auto !important;
+        box-sizing: border-box !important;
+        position: relative !important;
+        left: 0 !important;
+    }
+
+    .topbar {
+        width: 100% !important;
+        margin-left: 0 !important;
+        padding-left: 32px !important;
+        box-sizing: border-box !important;
+    }
+
+    .topbar-spacer {
+        display: none !important;
+        width: 0 !important;
+    }
+
+    .content {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+        flex: 1 !important;
+        overflow-y: visible !important;
+        height: auto !important;
+    }
+
+    .screen:not(#chat-screen) {
+        height: auto !important;
+        max-height: none !important;
+        overflow-y: visible !important;
+    }
+
+    #chat-screen .chat-container {
+        height: calc(100vh - 140px) !important;
+        min-height: 500px !important;
+    }
+}
+
+/* ==========================================================================
+   GLOBAL SCROLL & SCREEN FLEXIBILITY FIX (MOBILE & DESKTOP)
+   ========================================================================== */
+html, body {
+    min-height: 100vh !important;
+    height: auto !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+
+.app-container {
+    min-height: 100vh !important;
+    height: auto !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    display: flex !important;
+}
+
+.sidebar {
+    position: sticky !important;
+    top: 0 !important;
+    height: 100vh !important;
+    overflow-y: auto !important;
+    flex-shrink: 0 !important;
+}
+
+.main-wrapper {
+    flex: 1 !important;
+    min-height: 100vh !important;
+    height: auto !important;
+    overflow-y: visible !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.content {
+    flex: 1 !important;
+    height: auto !important;
+    min-height: min-content !important;
+    overflow-y: visible !important;
+    padding-bottom: 60px !important;
+}
+
+.screen {
+    height: auto !important;
+    min-height: min-content !important;
+    overflow-y: visible !important;
+}
+
+#chat-screen {
+    height: auto !important;
+    min-height: min-content !important;
+    overflow-y: visible !important;
+}
+
+#chat-screen .chat-container {
+    height: calc(100vh - 120px) !important;
+    min-height: 520px !important;
+}
+
+#symptoms-screen,
+#case-notification-screen,
+#patients-screen,
+#notifications-screen,
+#analytics-screen,
+#library-screen,
+#settings-screen,
+#dashboard-screen {
+    height: auto !important;
+    min-height: min-content !important;
+    overflow-y: visible !important;
+}
+
+/* Force hide topbar on all non-dashboard screens via CSS */
+body:has(#chat-screen.active) .topbar,
+body:has(#symptoms-screen.active) .topbar,
+body:has(#case-notification-screen.active) .topbar,
+body:has(#library-screen.active) .topbar,
+body:has(#settings-screen.active) .topbar,
+body:has(#patients-screen.active) .topbar,
+body:has(#notifications-screen.active) .topbar,
+body:has(#analytics-screen.active) .topbar {
+    display: none !important;
+}
+
+
+
 
 
 

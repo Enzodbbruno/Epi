@@ -8206,6 +8206,16 @@ const App = {
       screen.style.display = 'none';
     });
 
+    // Control topbar header visibility (only show on dashboard)
+    const topbar = document.querySelector('.topbar');
+    if (topbar) {
+      if (screenId === 'dashboard') {
+        topbar.style.display = 'flex';
+      } else {
+        topbar.style.display = 'none';
+      }
+    }
+
     // Show target screen
     const targetScreen = document.getElementById(`${screenId}-screen`);
     if (targetScreen) {
