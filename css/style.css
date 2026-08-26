@@ -1206,8 +1206,8 @@ body {
     }
 
     #chat-screen .chat-rooms {
-        width: 350px;
-        border-right: 1px solid var(--border-color);
+        width: 100% !important;
+        border-right: none;
         padding: 0;
         overflow-y: auto;
     }

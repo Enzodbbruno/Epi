@@ -1446,6 +1446,57 @@ html, body {
     box-sizing: border-box !important;
 }
 
+/* Crisp & clean separation between chat contacts panel and messages panel */
+.chat-sidebar-shell {
+    width: 320px !important;
+    min-width: 320px !important;
+    max-width: 320px !important;
+    flex-shrink: 0 !important;
+    border-right: 2px solid #cbd5e1 !important;
+    background: #ffffff !important;
+    display: flex !important;
+    flex-direction: column !important;
+    position: relative !important;
+    z-index: 2 !important;
+    box-sizing: border-box !important;
+}
+
+.chat-rooms {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
+    box-sizing: border-box !important;
+}
+
+.chat-room {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+#chat-messages,
+.chat-messages {
+    flex: 1 !important;
+    min-width: 0 !important;
+    position: relative !important;
+    z-index: 1 !important;
+    background: #f8fafc !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    border-left: none !important;
+}
+
+.chat-messages .chat-header {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    border-bottom: 1px solid #1e3a5f !important;
+}
+
+
 
 
 

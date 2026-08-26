@@ -1,4 +1,4 @@
-const CACHE_NAME = 'epiconecta-v53-fullwidth';
+const CACHE_NAME = 'epiconecta-v54-chat-split';
 // Arquivos para armazenar em cache
 const urlsToCache = [
   './',
