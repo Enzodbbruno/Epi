@@ -1429,17 +1429,23 @@ html, body {
     overflow-y: visible !important;
 }
 
-/* Force hide topbar on all non-dashboard screens via CSS */
-body:has(#chat-screen.active) .topbar,
-body:has(#symptoms-screen.active) .topbar,
-body:has(#case-notification-screen.active) .topbar,
-body:has(#library-screen.active) .topbar,
-body:has(#settings-screen.active) .topbar,
-body:has(#patients-screen.active) .topbar,
-body:has(#notifications-screen.active) .topbar,
-body:has(#analytics-screen.active) .topbar {
-    display: none !important;
+/* Force 100% width and 0 margin on all screen containers to prevent blank side gaps on large screens or zoom out */
+.screen,
+#chat-screen,
+#symptoms-screen,
+#case-notification-screen,
+#patients-screen,
+#notifications-screen,
+#analytics-screen,
+#library-screen,
+#settings-screen,
+#dashboard-screen {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
 }
+
 
 
 

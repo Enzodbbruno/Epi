@@ -1,4 +1,4 @@
-const CACHE_NAME = 'epiconecta-v52-universal-scroll';
+const CACHE_NAME = 'epiconecta-v53-fullwidth';
 // Arquivos para armazenar em cache
 const urlsToCache = [
   './',
